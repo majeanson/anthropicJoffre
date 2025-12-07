@@ -30,7 +30,7 @@ export function Skeleton({
 
   return (
     <div
-      className={`animate-pulse bg-gray-300 dark:bg-gray-700 ${variantClasses[variant]} ${className}`}
+      className={`animate-pulse bg-skin-tertiary ${variantClasses[variant]} ${className}`}
       style={{ width, height }}
       aria-label="Loading..."
       role="status"

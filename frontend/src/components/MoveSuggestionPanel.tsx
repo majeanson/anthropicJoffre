@@ -41,12 +41,12 @@ export function MoveSuggestionPanel({
             💡
           </span>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+            <p className="text-sm font-semibold text-skin-primary">
               {suggestion.skip ? 'Consider Skipping' : `Suggested Bet: ${suggestion.amount} points`}
             </p>
-            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">{suggestion.reason}</p>
+            <p className="text-xs text-skin-info mt-1">{suggestion.reason}</p>
             {isExpanded && suggestion.alternatives && (
-              <p className="text-xs text-blue-700 dark:text-blue-300 mt-2 italic">
+              <p className="text-xs text-skin-accent mt-2 italic">
                 {suggestion.alternatives}
               </p>
             )}
@@ -63,11 +63,11 @@ export function MoveSuggestionPanel({
     const getPriorityColor = () => {
       switch (suggestion.priority) {
         case 'high':
-          return 'text-green-600 dark:text-green-400';
+          return 'text-skin-success';
         case 'medium':
-          return 'text-yellow-600 dark:text-yellow-400';
+          return 'text-yellow-500';
         case 'low':
-          return 'text-gray-600 dark:text-gray-400';
+          return 'text-skin-secondary';
       }
     };
 
@@ -89,18 +89,18 @@ export function MoveSuggestionPanel({
             🎯
           </span>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+            <p className="text-sm font-semibold text-skin-primary">
               Suggested:{' '}
               <span className={getPriorityColor()}>{getCardDisplay(suggestion.card)}</span>
             </p>
-            <p className="text-xs text-blue-600 dark:text-blue-400">{suggestion.reason}</p>
+            <p className="text-xs text-skin-info">{suggestion.reason}</p>
             {isExpanded && (
               <>
-                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                <p className="text-xs text-skin-accent mt-1">
                   {suggestion.explanation}
                 </p>
                 {suggestion.alternatives && (
-                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-2 italic">
+                  <p className="text-xs text-skin-accent mt-2 italic">
                     {suggestion.alternatives}
                   </p>
                 )}
@@ -117,7 +117,7 @@ export function MoveSuggestionPanel({
       variant="gradient"
       gradient="info"
       size="sm"
-      className="border-2 border-blue-300 dark:border-blue-700"
+      className="border-2 border-skin-default"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
@@ -130,7 +130,7 @@ export function MoveSuggestionPanel({
           variant="ghost"
           size="sm"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 p-1"
+          className="text-skin-info hover:bg-skin-tertiary p-1"
           title={isExpanded ? 'Show less' : 'Show more'}
           aria-label={isExpanded ? 'Show less' : 'Show more'}
         >

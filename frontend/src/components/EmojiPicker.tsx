@@ -200,10 +200,10 @@ export function EmojiPicker({ onSelectEmoji, onClose }: EmojiPickerProps) {
     <UICard
       variant="elevated"
       size="md"
-      className="absolute bottom-full right-0 mb-2 w-80 z-50 animate-slide-in border-2 border-blue-500 dark:border-blue-600"
+      className="absolute bottom-full right-0 mb-2 w-80 z-50 animate-slide-in border-2 border-skin-accent"
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-blue-700 px-3 py-2 -mx-4 -mt-4 mb-3 rounded-t-md flex items-center justify-between">
+      <div className="bg-gradient-to-r from-skin-accent to-skin-accent px-3 py-2 -mx-4 -mt-4 mb-3 rounded-t-md flex items-center justify-between">
         <h4 className="text-white font-bold text-sm">Pick an Emoji</h4>
         <Button
           variant="ghost"
@@ -217,7 +217,7 @@ export function EmojiPicker({ onSelectEmoji, onClose }: EmojiPickerProps) {
       </div>
 
       {/* Category Tabs */}
-      <div className="flex gap-1 pb-2 border-b border-gray-300 dark:border-gray-600 overflow-x-auto -mx-4 px-4">
+      <div className="flex gap-1 pb-2 border-b border-skin-default overflow-x-auto -mx-4 px-4">
         {Object.keys(EMOJI_CATEGORIES).map((category) => (
           <Button
             key={category}
@@ -232,7 +232,7 @@ export function EmojiPicker({ onSelectEmoji, onClose }: EmojiPickerProps) {
       </div>
 
       {/* Emoji Grid */}
-      <div className="py-3 grid grid-cols-8 gap-2 max-h-48 overflow-y-auto -mx-4 px-4 bg-gray-50 dark:bg-gray-900">
+      <div className="py-3 grid grid-cols-8 gap-2 max-h-48 overflow-y-auto -mx-4 px-4 bg-skin-secondary">
         {EMOJI_CATEGORIES[activeCategory].map((emoji, index) => (
           <Button
             key={index}
@@ -242,7 +242,7 @@ export function EmojiPicker({ onSelectEmoji, onClose }: EmojiPickerProps) {
             }}
             variant="ghost"
             size="sm"
-            className="text-2xl hover:scale-125 hover:bg-blue-100 dark:hover:bg-blue-900 !p-1"
+            className="text-2xl hover:scale-125 hover:bg-skin-tertiary !p-1"
             aria-label={`Select emoji ${emoji}`}
           >
             {emoji}
@@ -251,7 +251,7 @@ export function EmojiPicker({ onSelectEmoji, onClose }: EmojiPickerProps) {
       </div>
 
       {/* Footer */}
-      <div className="-mx-4 -mb-4 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-b-md text-center text-xs text-gray-600 dark:text-gray-400">
+      <div className="-mx-4 -mb-4 px-3 py-2 bg-skin-secondary rounded-b-md text-center text-xs text-skin-secondary">
         Click an emoji to add it to your message
       </div>
     </UICard>

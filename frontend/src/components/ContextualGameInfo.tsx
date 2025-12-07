@@ -32,26 +32,26 @@ export function ContextualGameInfo({
   };
 
   const colorClasses: Record<CardColor, string> = {
-    red: 'text-red-600 dark:text-red-400',
-    brown: 'text-amber-800 dark:text-amber-600',
-    green: 'text-green-600 dark:text-green-400',
-    blue: 'text-blue-600 dark:text-blue-400',
+    red: 'text-skin-error',
+    brown: 'text-amber-700',
+    green: 'text-skin-success',
+    blue: 'text-skin-info',
   };
 
   // Waiting or in progress - unified display with consistent height
   if ((state === 'waiting' || state === 'in_progress') && (betAmount || trumpColor)) {
     const teamColorClass =
       bettingTeamId === 1
-        ? 'text-orange-600 dark:text-orange-400'
+        ? 'text-team1'
         : bettingTeamId === 2
-          ? 'text-purple-600 dark:text-purple-400'
-          : 'text-umber-900 dark:text-gray-100';
+          ? 'text-team2'
+          : 'text-skin-primary';
 
     return (
       <UICard
         variant="bordered"
         size="sm"
-        className="bg-parchment-100 dark:bg-gray-800 border-umber-700 dark:border-gray-600 text-center max-w-xs mx-auto"
+        className="bg-skin-secondary border-skin-default text-center max-w-xs mx-auto"
         data-testid={
           state === 'waiting' ? 'contextual-info-waiting' : 'contextual-info-in-progress'
         }
@@ -63,7 +63,7 @@ export function ContextualGameInfo({
             </span>
             <span className={`font-bold ${teamColorClass}`}>{betAmount}</span>
             {withoutTrump && (
-              <span className="text-umber-700 dark:text-gray-400 text-xs">(No Trump)</span>
+              <span className="text-skin-muted text-xs">(No Trump)</span>
             )}
             {!withoutTrump && trumpColor && (
               <span className={`font-semibold ${colorClasses[trumpColor]}`}>
@@ -73,7 +73,7 @@ export function ContextualGameInfo({
           </div>
         </div>
         {currentPlayerName && (
-          <div className="text-umber-700 dark:text-gray-400 text-xs mt-1 flex items-center justify-center gap-1">
+          <div className="text-skin-muted text-xs mt-1 flex items-center justify-center gap-1">
             {state === 'waiting' && <span className="font-semibold">(Waiting...)</span>}
             <span>{currentPlayerName}</span>
             {timeRemaining !== undefined && (

@@ -35,9 +35,9 @@ export function StatsPanel({
 }: StatsPanelProps) {
   return (
     <div className="space-y-3">
-      <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-6 border-2 border-parchment-400 dark:border-gray-600 text-center">
+      <div className="bg-parchment-200 bg-skin-secondary rounded-lg p-6 border-2 border-parchment-400 border-skin-default text-center">
         <p className="text-4xl mb-3">📊</p>
-        <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4">
+        <h3 className="text-xl font-bold text-skin-primary mb-4">
           Player Statistics
         </h3>
 
@@ -118,7 +118,7 @@ export function StatsPanel({
         </div>
 
         {!socket && (
-          <p className="text-sm text-red-600 dark:text-red-400 mt-4">
+          <p className="text-sm text-skin-error mt-4">
             ⚠️ Connect to server to view stats
           </p>
         )}

@@ -270,14 +270,14 @@ export function JoinGameForm({
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
+        <div className="bg-skin-primary rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-skin-accent relative">
           {/* Decorative corners */}
-          <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl"></div>
-          <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl"></div>
-          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl"></div>
-          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl"></div>
+          <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-skin-accent rounded-tl-xl"></div>
+          <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-skin-accent rounded-tr-xl"></div>
+          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-skin-accent rounded-bl-xl"></div>
+          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-skin-accent rounded-br-xl"></div>
 
-          <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">
+          <h2 className="text-4xl font-bold mb-6 text-skin-primary font-serif text-center">
             Join Game
           </h2>
 
@@ -308,8 +308,8 @@ export function JoinGameForm({
 
           <form onSubmit={handleJoin} className="space-y-4">
             {/* Join Type Selection */}
-            <div className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600">
-              <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3">
+            <div className="bg-skin-secondary rounded-lg p-4 border-2 border-skin-default">
+              <label className="block text-sm font-medium text-skin-primary mb-3">
                 Join as:
               </label>
               <div className="flex gap-4">
@@ -321,9 +321,9 @@ export function JoinGameForm({
                     value="player"
                     checked={joinType === 'player'}
                     onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
-                    className="w-4 h-4 text-umber-600 focus:ring-umber-500 focus:ring-2 focus:ring-offset-2"
+                    className="w-4 h-4 text-skin-accent focus:ring-skin-accent focus:ring-2 focus:ring-offset-2"
                   />
-                  <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">Player</span>
+                  <span className="ml-3 text-skin-primary font-medium">Player</span>
                 </label>
                 <label className="flex items-center cursor-pointer flex-1">
                   <input
@@ -333,9 +333,9 @@ export function JoinGameForm({
                     value="spectator"
                     checked={joinType === 'spectator'}
                     onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
-                    className="w-4 h-4 text-umber-600 focus:ring-umber-500 focus:ring-2 focus:ring-offset-2"
+                    className="w-4 h-4 text-skin-accent focus:ring-skin-accent focus:ring-2 focus:ring-offset-2"
                   />
-                  <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">
+                  <span className="ml-3 text-skin-primary font-medium">
                     Spectator
                   </span>
                 </label>
@@ -360,13 +360,13 @@ export function JoinGameForm({
               disabled={!!user}
               placeholder={user ? 'Using authenticated username' : 'Enter your name'}
               required={joinType === 'player'}
-              className={autoJoinGameId ? 'ring-2 ring-blue-300 dark:ring-blue-700' : ''}
+              className={autoJoinGameId ? 'ring-2 ring-skin-accent' : ''}
             />
 
             {/* Info message for spectator mode */}
             {joinType === 'spectator' && (
-              <div className="bg-parchment-100 dark:bg-gray-800 border-2 border-parchment-400 dark:border-gray-600 rounded-lg p-3">
-                <p className="text-sm text-umber-900 dark:text-gray-300">
+              <div className="bg-skin-secondary border-2 border-skin-default rounded-lg p-3">
+                <p className="text-sm text-skin-secondary">
                   As a spectator, you can watch the game but cannot play cards. Player hands will be
                   hidden.
                 </p>

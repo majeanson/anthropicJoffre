@@ -47,7 +47,7 @@ export function MoveSuggestionButton({
           className={
             isOpen
               ? '!bg-gradient-to-r !from-green-500 !to-emerald-600'
-              : '!text-green-600 dark:!text-green-400'
+              : '!text-skin-success'
           }
         />
       </div>

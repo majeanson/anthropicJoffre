@@ -71,7 +71,7 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
     if (isEmoji(avatarUrl)) {
       return (
         <div
-          className={`${sizeClasses[size]} rounded-full flex items-center justify-center border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 ${className}`}
+          className={`${sizeClasses[size]} rounded-full flex items-center justify-center border-2 border-skin-default bg-skin-tertiary ${className}`}
         >
           <span className={emojiSizeClasses[size]}>{avatarUrl}</span>
         </div>
@@ -82,7 +82,7 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
     if (isUrl(avatarUrl)) {
       return (
         <div
-          className={`${sizeClasses[size]} rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600 ${className}`}
+          className={`${sizeClasses[size]} rounded-full overflow-hidden border-2 border-skin-default ${className}`}
         >
           <img
             src={avatarUrl}
@@ -103,7 +103,7 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
     const emoji = getAvatarUrl(avatarUrl);
     return (
       <div
-        className={`${sizeClasses[size]} rounded-full flex items-center justify-center border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 ${className}`}
+        className={`${sizeClasses[size]} rounded-full flex items-center justify-center border-2 border-skin-default bg-skin-tertiary ${className}`}
       >
         <span className={emojiSizeClasses[size]}>{emoji}</span>
       </div>
@@ -113,7 +113,7 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
   // Fallback to initials with gradient background
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full flex items-center justify-center font-bold text-white bg-gradient-to-br ${getColorFromUsername(username)} border-2 border-gray-300 dark:border-gray-600 ${className}`}
+      className={`${sizeClasses[size]} rounded-full flex items-center justify-center font-bold text-white bg-gradient-to-br ${getColorFromUsername(username)} border-2 border-skin-default ${className}`}
     >
       {getInitials(username)}
     </div>

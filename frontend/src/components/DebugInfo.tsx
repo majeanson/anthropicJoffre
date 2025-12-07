@@ -113,8 +113,8 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             🏷️
           </span>
           <div className="flex-1">
-            <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Version</h3>
-            <p className="text-umber-800 dark:text-gray-300 font-mono text-sm bg-parchment-100 dark:bg-gray-900 px-3 py-2 rounded border border-parchment-400 dark:border-gray-700">
+            <h3 className="font-bold text-skin-accent mb-1">Version</h3>
+            <p className="text-skin-secondary font-mono text-sm bg-skin-primary px-3 py-2 rounded border border-skin-default">
               v{buildInfo.version}
             </p>
           </div>
@@ -126,8 +126,8 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             📅
           </span>
           <div className="flex-1">
-            <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Build Date</h3>
-            <p className="text-umber-800 dark:text-gray-300 text-sm bg-parchment-100 dark:bg-gray-900 px-3 py-2 rounded border border-parchment-400 dark:border-gray-700">
+            <h3 className="font-bold text-skin-accent mb-1">Build Date</h3>
+            <p className="text-skin-secondary text-sm bg-skin-primary px-3 py-2 rounded border border-skin-default">
               {formatDate(buildInfo.buildDate || buildInfo.releaseDate || new Date().toISOString())}
             </p>
           </div>
@@ -140,17 +140,17 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
               💾
             </span>
             <div className="flex-1">
-              <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Latest Commit</h3>
-              <div className="bg-parchment-100 dark:bg-gray-900 px-3 py-2 rounded border border-parchment-400 dark:border-gray-700">
+              <h3 className="font-bold text-skin-accent mb-1">Latest Commit</h3>
+              <div className="bg-skin-primary px-3 py-2 rounded border border-skin-default">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold">
+                  <span className="font-mono text-xs text-skin-accent font-bold">
                     {buildInfo.git.commitHash}
                   </span>
-                  <span className="text-xs text-umber-600 dark:text-gray-400">
+                  <span className="text-xs text-skin-muted">
                     on {buildInfo.git.branch}
                   </span>
                 </div>
-                <p className="text-sm text-umber-800 dark:text-gray-300 break-words">
+                <p className="text-sm text-skin-secondary break-words">
                   {getCommitTitle(buildInfo.git.commitMessage)}
                 </p>
               </div>
@@ -166,7 +166,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             </span>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-indigo-900 dark:text-indigo-200">
+                <h3 className="font-bold text-skin-accent">
                   Latest Done Features
                 </h3>
                 <Button
@@ -183,13 +183,13 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                   {buildInfo.latestDoneFeatures.map((featureGroup, index) => (
                     <div
                       key={index}
-                      className="bg-parchment-100 dark:bg-gray-900 px-4 py-3 rounded border border-parchment-400 dark:border-gray-700"
+                      className="bg-skin-primary px-4 py-3 rounded border border-skin-default"
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-semibold text-indigo-900 dark:text-indigo-200">
+                        <span className="font-semibold text-skin-accent">
                           {featureGroup.title}
                         </span>
-                        <span className="text-xs text-umber-600 dark:text-gray-400">
+                        <span className="text-xs text-skin-muted">
                           {featureGroup.date}
                         </span>
                       </div>
@@ -197,9 +197,9 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                         {featureGroup.features.map((feature, fIndex) => (
                           <li
                             key={fIndex}
-                            className="flex items-start gap-2 text-sm text-umber-800 dark:text-gray-300"
+                            className="flex items-start gap-2 text-sm text-skin-secondary"
                           >
-                            <span className="text-green-500 dark:text-green-400 flex-shrink-0">
+                            <span className="text-skin-success flex-shrink-0">
                               ✓
                             </span>
                             <span>{feature}</span>
@@ -222,7 +222,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             </span>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Future Features</h3>
+                <h3 className="font-bold text-skin-accent">Future Features</h3>
                 <Button
                   variant="secondary"
                   size="sm"
@@ -237,9 +237,9 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                   {buildInfo.futureTodos.map((todo, index) => (
                     <li
                       key={index}
-                      className="flex items-start gap-2 text-sm text-umber-800 dark:text-gray-300 bg-parchment-100 dark:bg-gray-900 px-3 py-2 rounded border border-parchment-400 dark:border-gray-700"
+                      className="flex items-start gap-2 text-sm text-skin-secondary bg-skin-primary px-3 py-2 rounded border border-skin-default"
                     >
-                      <span className="text-indigo-500 dark:text-indigo-400 flex-shrink-0">▸</span>
+                      <span className="text-skin-accent flex-shrink-0">▸</span>
                       <span>{todo}</span>
                     </li>
                   ))}
@@ -256,7 +256,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
           </span>
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Server Health</h3>
+              <h3 className="font-bold text-skin-accent">Server Health</h3>
               <Button variant="secondary" size="sm" onClick={() => setShowHealth(!showHealth)}>
                 {showHealth ? 'Hide' : 'Show'} Health
               </Button>
@@ -265,22 +265,22 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             {showHealth && (
               <div className="space-y-2">
                 {healthLoading && (
-                  <div className="bg-parchment-100 dark:bg-gray-900 px-3 py-4 rounded border border-parchment-400 dark:border-gray-700 text-center">
+                  <div className="bg-skin-primary px-3 py-4 rounded border border-skin-default text-center">
                     <Spinner size="sm" color="primary" />
-                    <p className="text-sm text-umber-700 dark:text-gray-400 mt-2">
+                    <p className="text-sm text-skin-muted mt-2">
                       Loading health data...
                     </p>
                   </div>
                 )}
 
                 {healthError && (
-                  <div className="bg-red-50 dark:bg-red-900/20 px-3 py-3 rounded border border-red-300 dark:border-red-700">
-                    <p className="text-sm text-red-700 dark:text-red-300">❌ {healthError}</p>
+                  <div className="bg-skin-error/10 px-3 py-3 rounded border border-skin-error">
+                    <p className="text-sm text-skin-error">❌ {healthError}</p>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={fetchHealthData}
-                      className="text-red-600 dark:text-red-400 underline mt-1 p-0"
+                      className="text-skin-error underline mt-1 p-0"
                     >
                       Retry
                     </Button>
@@ -288,14 +288,14 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                 )}
 
                 {healthData && !healthLoading && (
-                  <div className="bg-parchment-100 dark:bg-gray-900 px-4 py-3 rounded border border-parchment-400 dark:border-gray-700 space-y-3">
+                  <div className="bg-skin-primary px-4 py-3 rounded border border-skin-default space-y-3">
                     {/* Status & Uptime */}
-                    <div className="flex items-center justify-between pb-2 border-b border-parchment-300 dark:border-gray-700">
+                    <div className="flex items-center justify-between pb-2 border-b border-skin-default">
                       <div>
-                        <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded">
+                        <span className="inline-block px-2 py-1 bg-skin-success/30 text-skin-success text-xs font-semibold rounded">
                           {healthData.status.toUpperCase()}
                         </span>
-                        <p className="text-xs text-umber-600 dark:text-gray-400 mt-1">
+                        <p className="text-xs text-skin-muted mt-1">
                           Uptime: {healthData.uptime.formatted}
                         </p>
                       </div>
@@ -303,7 +303,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                         variant="ghost"
                         size="sm"
                         onClick={fetchHealthData}
-                        className="text-indigo-600 dark:text-indigo-400 hover:underline p-0"
+                        className="text-skin-accent hover:underline p-0"
                       >
                         🔄 Refresh
                       </Button>
@@ -311,25 +311,25 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
                     {/* Game State */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      <h4 className="text-xs font-bold text-skin-secondary mb-1">
                         🎮 Game State
                       </h4>
                       <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Games</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Games</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.game.activeGames}
                           </div>
                         </div>
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Sockets</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Sockets</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.game.connectedSockets}
                           </div>
                         </div>
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Players</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Players</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.game.onlinePlayers}
                           </div>
                         </div>
@@ -338,19 +338,19 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
                     {/* Database & Cache */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      <h4 className="text-xs font-bold text-skin-secondary mb-1">
                         💾 Database & Cache
                       </h4>
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Pool Utilization</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Pool Utilization</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.database.pool.utilization}
                           </div>
                         </div>
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Cache Keys</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Cache Keys</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.cache.keys}
                           </div>
                         </div>
@@ -359,21 +359,21 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
                     {/* Memory */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      <h4 className="text-xs font-bold text-skin-secondary mb-1">
                         🧠 Memory
                       </h4>
-                      <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded text-xs">
+                      <div className="bg-skin-secondary px-2 py-1 rounded text-xs">
                         <div className="flex justify-between">
-                          <span className="text-gray-500 dark:text-gray-400">
+                          <span className="text-skin-muted">
                             Heap Used / Total
                           </span>
-                          <span className="font-bold text-gray-900 dark:text-gray-100">
+                          <span className="font-bold text-skin-primary">
                             {healthData.memory.heapUsedMB} / {healthData.memory.heapTotalMB} MB
                           </span>
                         </div>
-                        <div className="mt-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div className="mt-1 w-full bg-skin-tertiary rounded-full h-2">
                           <div
-                            className="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full transition-all"
+                            className="bg-skin-accent h-2 rounded-full transition-all"
                             style={{ width: healthData.memory.heapUtilization }}
                           ></div>
                         </div>
@@ -382,19 +382,19 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
                     {/* Error Handling */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      <h4 className="text-xs font-bold text-skin-secondary mb-1">
                         🛡️ Error Handling
                       </h4>
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Success Rate</div>
-                          <div className="font-bold text-green-600 dark:text-green-400">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Success Rate</div>
+                          <div className="font-bold text-skin-success">
                             {healthData.errorHandling.successRate}
                           </div>
                         </div>
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Total Calls</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Total Calls</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.errorHandling.totalCalls.toLocaleString()}
                           </div>
                         </div>

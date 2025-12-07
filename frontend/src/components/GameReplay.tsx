@@ -263,7 +263,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         <div className="text-center py-4">
           <Spinner size="lg" color="primary" className="mb-4" />
           <p
-            className="text-lg font-semibold text-gray-700 dark:text-gray-200"
+            className="text-lg font-semibold text-skin-secondary"
             data-testid="loading-message"
           >
             Loading replay...
@@ -286,7 +286,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       >
         <div className="text-center">
           <p
-            className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2"
+            className="text-lg font-semibold text-skin-error mb-2"
             data-testid="error-message"
           >
             {error || 'Failed to load replay'}
@@ -295,13 +295,13 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             <UICard
               variant="default"
               size="sm"
-              className="mt-4 !bg-red-50 dark:!bg-red-900/30 !border-red-200 dark:!border-red-700"
+              className="mt-4 !bg-skin-error/10 !border-skin-error"
               data-testid="error-correlation-id"
             >
-              <p className="text-xs text-red-700 dark:text-red-300 font-mono">
+              <p className="text-xs text-skin-error font-mono">
                 Error ID: {correlationId}
               </p>
-              <p className="text-xs text-red-600 dark:text-red-400 mt-1 opacity-75">
+              <p className="text-xs text-skin-error mt-1 opacity-75">
                 Please include this ID when reporting the issue
               </p>
             </UICard>
@@ -345,12 +345,12 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       >
         <div className="text-center">
           <p
-            className="text-lg font-semibold text-yellow-600 dark:text-yellow-400 mb-2"
+            className="text-lg font-semibold text-yellow-600 mb-2"
             data-testid="no-data-warning"
           >
             No Replay Data Available
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-sm text-skin-secondary mb-4">
             This game has no recorded rounds. The game may have ended prematurely or data was not
             saved.
           </p>
@@ -372,7 +372,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       onKeyDown={(e) => e.stopPropagation()}
     >
       <div
-        className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-900 rounded-xl md:rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto border-2 md:border-4 border-emerald-600 dark:border-emerald-500"
+        className="bg-skin-primary rounded-xl md:rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto border-2 md:border-4 border-emerald-600"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -419,14 +419,14 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         </div>
 
         {/* Game Info Bar */}
-        <div className="bg-parchment-50 dark:bg-gray-800 px-4 md:px-8 py-3 md:py-4 border-b-2 border-parchment-400 dark:border-gray-700">
+        <div className="bg-skin-primary px-4 md:px-8 py-3 md:py-4 border-b-2 border-skin-default">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="grid grid-cols-2 md:flex gap-3 md:gap-6">
               {/* Final Score */}
               <div className="flex items-center gap-2 md:gap-3">
                 <span className="text-xl md:text-2xl">🏆</span>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Final Score</p>
+                  <p className="text-xs text-skin-muted">Final Score</p>
                   <div
                     className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2"
                     data-testid="final-scores"
@@ -452,8 +452,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
               <div className="flex items-center gap-2">
                 <span className="text-lg md:text-xl">⏱️</span>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Duration</p>
-                  <p className="text-sm md:text-lg font-bold text-gray-700 dark:text-gray-200">
+                  <p className="text-xs text-skin-muted">Duration</p>
+                  <p className="text-sm md:text-lg font-bold text-skin-secondary">
                     {Math.floor(replayData.game_duration_seconds / 60)}m{' '}
                     {replayData.game_duration_seconds % 60}s
                   </p>
@@ -464,15 +464,15 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
               <div className="hidden md:flex items-center gap-2 col-span-2">
                 <span className="text-xl">👥</span>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Players</p>
+                  <p className="text-xs text-skin-muted">Players</p>
                   <div className="flex flex-wrap gap-2">
                     {replayData.player_names.map((name, idx) => (
                       <span
                         key={idx}
                         className={`text-xs px-2 py-1 rounded ${
                           replayData.player_teams[idx] === 1
-                            ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                            : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                            ? 'bg-team1/20 text-team1'
+                            : 'bg-team2/20 text-team2'
                         }`}
                       >
                         {name}
@@ -485,9 +485,9 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
             {/* Bot Game Indicator */}
             {replayData.is_bot_game && (
-              <div className="flex items-center gap-2 px-2 md:px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-lg self-start md:self-auto">
+              <div className="flex items-center gap-2 px-2 md:px-3 py-1 bg-skin-info/20 rounded-lg self-start md:self-auto">
                 <span className="text-lg md:text-xl">🤖</span>
-                <span className="text-xs md:text-sm font-semibold text-blue-700 dark:text-blue-400">
+                <span className="text-xs md:text-sm font-semibold text-skin-info">
                   Bot Game
                 </span>
               </div>
@@ -497,39 +497,39 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
         {/* Current Round/Trick Info */}
         {currentRound && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800 px-4 md:px-8 py-3 md:py-4">
+          <div className="bg-skin-secondary px-4 md:px-8 py-3 md:py-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div className="flex items-center gap-4 md:gap-6 flex-wrap">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold">Round</p>
-                  <p className="text-xl md:text-2xl font-black text-indigo-700 dark:text-indigo-300">
+                  <p className="text-xs text-skin-muted font-semibold">Round</p>
+                  <p className="text-xl md:text-2xl font-black text-skin-accent">
                     {currentRoundIndex + 1} / {replayData.round_history.length}
                   </p>
                 </div>
 
                 {currentBet && (
                   <>
-                    <div className="hidden md:block w-px h-8 bg-gray-300 dark:bg-gray-600" />
+                    <div className="hidden md:block w-px h-8 bg-skin-tertiary" />
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold">Bet</p>
-                      <p className="text-sm md:text-lg font-bold text-gray-700 dark:text-gray-200">
+                      <p className="text-xs text-skin-muted font-semibold">Bet</p>
+                      <p className="text-sm md:text-lg font-bold text-skin-secondary">
                         {currentBet.amount} {currentBet.withoutTrump && '(NT)'}
                       </p>
                     </div>
                   </>
                 )}
 
-                <div className="hidden md:block w-px h-8 bg-gray-300 dark:bg-gray-600" />
+                <div className="hidden md:block w-px h-8 bg-skin-tertiary" />
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold">Trick</p>
-                  <p className="text-xl md:text-2xl font-black text-purple-700 dark:text-purple-300">
+                  <p className="text-xs text-skin-muted font-semibold">Trick</p>
+                  <p className="text-xl md:text-2xl font-black text-team2">
                     {currentTrickIndex + 1} / {currentTricks.length}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 text-sm md:text-base">
-                <span className="text-xs text-gray-500 dark:text-gray-400">Score:</span>
+                <span className="text-xs text-skin-muted">Score:</span>
                 <span className="font-bold text-orange-600">
                   T1: {currentRound.roundScore?.team1 || 0}
                 </span>
@@ -549,14 +549,14 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             <div className="lg:col-span-2">
               {/* Current Trick */}
               {currentTrick && (
-                <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg mb-4 md:mb-6 border border-parchment-400 dark:border-gray-600">
-                  <h3 className="text-lg md:text-xl font-black text-umber-800 dark:text-gray-200 mb-3 md:mb-4 flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                <div className="bg-skin-primary rounded-xl p-4 md:p-6 shadow-lg mb-4 md:mb-6 border border-skin-default">
+                  <h3 className="text-lg md:text-xl font-black text-skin-primary mb-3 md:mb-4 flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
                     <div className="flex items-center gap-2">
                       <span className="text-xl md:text-2xl">🎴</span>
                       <span>Current Trick</span>
                     </div>
                     {currentTrick.winnerName && (
-                      <span className="md:ml-auto text-xs md:text-sm font-semibold text-green-600 dark:text-green-400">
+                      <span className="md:ml-auto text-xs md:text-sm font-semibold text-skin-success">
                         Won by {currentTrick.winnerName} ({currentTrick.points} pts)
                       </span>
                     )}
@@ -580,8 +580,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                                 replayData.player_teams[
                                   replayData.player_names.indexOf(trickCard.playerName)
                                 ] === 1
-                                  ? 'text-orange-600'
-                                  : 'text-purple-600'
+                                  ? 'text-team1'
+                                  : 'text-team2'
                               }`}
                             >
                               {trickCard.playerName}
@@ -604,8 +604,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
               {/* Player Hands */}
               {Object.keys(startingHands).length > 0 && (
-                <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-parchment-400 dark:border-gray-600">
-                  <h3 className="text-lg md:text-xl font-black text-umber-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+                <div className="bg-skin-primary rounded-xl p-4 md:p-6 shadow-lg border border-skin-default">
+                  <h3 className="text-lg md:text-xl font-black text-skin-primary mb-4 flex items-center gap-2">
                     <span className="text-xl md:text-2xl">🃏</span>
                     Player Hands (Round Start)
                   </h3>
@@ -620,7 +620,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                         >
                           <span
                             className={`font-bold text-sm md:w-24 flex-shrink-0 ${
-                              teamId === 1 ? 'text-orange-600' : 'text-purple-600'
+                              teamId === 1 ? 'text-team1' : 'text-team2'
                             }`}
                           >
                             {playerName}:
@@ -648,14 +648,14 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             {/* Right: Controls & History */}
             <div className="space-y-4 md:space-y-6">
               {/* Playback Controls */}
-              <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-parchment-400 dark:border-gray-600">
-                <h3 className="text-base md:text-lg font-black text-umber-800 dark:text-gray-200 mb-3 md:mb-4">
+              <div className="bg-skin-primary rounded-xl p-4 md:p-6 shadow-lg border border-skin-default">
+                <h3 className="text-base md:text-lg font-black text-skin-primary mb-3 md:mb-4">
                   Playback Controls
                 </h3>
 
                 {/* Speed Control */}
                 <div className="mb-3 md:mb-4">
-                  <p className="text-xs md:text-sm text-umber-700 dark:text-gray-400 mb-2">
+                  <p className="text-xs md:text-sm text-skin-muted mb-2">
                     Speed:
                   </p>
                   <div className="flex gap-2">
@@ -707,8 +707,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                 </div>
 
                 {/* Round Jump Buttons */}
-                <div className="border-t pt-3 md:pt-4 dark:border-gray-700">
-                  <p className="text-xs md:text-sm text-umber-700 dark:text-gray-400 mb-2">
+                <div className="border-t pt-3 md:pt-4 border-skin-default">
+                  <p className="text-xs md:text-sm text-skin-muted mb-2">
                     Jump to Round:
                   </p>
                   <div className="grid grid-cols-5 md:grid-cols-3 gap-1">
@@ -729,8 +729,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
               {/* Trick History */}
               {currentRound && (
-                <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-parchment-400 dark:border-gray-600">
-                  <h3 className="text-base md:text-lg font-black text-umber-800 dark:text-gray-200 mb-3 md:mb-4">
+                <div className="bg-skin-primary rounded-xl p-4 md:p-6 shadow-lg border border-skin-default">
+                  <h3 className="text-base md:text-lg font-black text-skin-primary mb-3 md:mb-4">
                     Round {currentRoundIndex + 1} Tricks
                   </h3>
                   <TrickHistory

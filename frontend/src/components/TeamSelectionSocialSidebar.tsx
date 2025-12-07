@@ -131,13 +131,13 @@ export function TeamSelectionSocialSidebar({
       {/* Mobile overlay backdrop */}
       <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={onClose} />
 
-      <div className="fixed inset-y-0 right-0 w-80 max-w-[90vw] bg-parchment-50 dark:bg-gray-800 shadow-2xl z-50 overflow-y-auto border-l-4 border-amber-700 dark:border-gray-600">
+      <div className="fixed inset-y-0 right-0 w-80 max-w-[90vw] bg-skin-primary shadow-2xl z-50 overflow-y-auto border-l-4 border-skin-default">
         {/* Header */}
         <UICard
           variant="gradient"
           gradient="warning"
           size="md"
-          className="sticky top-0 rounded-none border-b-2 border-amber-800 dark:border-gray-600"
+          className="sticky top-0 rounded-none border-b-2 border-skin-default"
         >
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold text-white">Find Players</h2>
@@ -212,7 +212,7 @@ export function TeamSelectionSocialSidebar({
                 friends.map((friend) => (
                   <div
                     key={friend.player_name}
-                    className="p-3 bg-white dark:bg-gray-700 rounded-lg border-2 border-amber-200 dark:border-gray-600 hover:border-amber-400 dark:hover:border-gray-500 transition-all"
+                    className="p-3 bg-skin-secondary rounded-lg border-2 border-skin-accent hover:bg-skin-tertiary transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -265,7 +265,7 @@ export function TeamSelectionSocialSidebar({
                   .map((player) => (
                     <div
                       key={player.socketId}
-                      className="p-3 bg-white dark:bg-gray-700 rounded-lg border-2 border-green-200 dark:border-gray-600 hover:border-green-400 dark:hover:border-gray-500 transition-all"
+                      className="p-3 bg-skin-secondary rounded-lg border-2 border-skin-default hover:bg-skin-tertiary transition-all"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -311,7 +311,7 @@ export function TeamSelectionSocialSidebar({
                     return (
                       <div
                         key={player.name}
-                        className="p-3 bg-white dark:bg-gray-700 rounded-lg border-2 border-purple-200 dark:border-gray-600 hover:border-purple-400 dark:hover:border-gray-500 transition-all"
+                        className="p-3 bg-skin-secondary rounded-lg border-2 border-skin-default hover:bg-skin-tertiary transition-all"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export function TeamSelectionSocialSidebar({
         </div>
 
         {/* Quick Copy Link Button */}
-        <div className="sticky bottom-0 p-4 bg-parchment-100 dark:bg-gray-900 border-t-2 border-amber-700 dark:border-gray-600">
+        <div className="sticky bottom-0 p-4 bg-skin-secondary border-t-2 border-skin-default">
           <Button
             variant="warning"
             size="lg"

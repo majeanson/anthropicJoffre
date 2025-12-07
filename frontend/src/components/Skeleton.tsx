@@ -60,7 +60,7 @@ export function Skeleton({
 export function SkeletonCard() {
   return (
     <div
-      className="bg-parchment-100 dark:bg-gray-800 border-2 border-parchment-300 dark:border-gray-700 rounded-lg p-4 space-y-3"
+      className="bg-skin-primary border-2 border-skin-default rounded-lg p-4 space-y-3"
       data-testid="skeleton-card"
     >
       <Skeleton variant="text" width="60%" height={24} />
@@ -79,7 +79,7 @@ export function SkeletonList({ count = 3 }: { count?: number }) {
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className="flex items-center gap-3 p-3 bg-parchment-100 dark:bg-gray-800 rounded-lg border border-parchment-300 dark:border-gray-700"
+          className="flex items-center gap-3 p-3 bg-skin-primary rounded-lg border border-skin-default"
         >
           <Skeleton variant="circular" width={40} height={40} />
           <div className="flex-1 space-y-2">
@@ -95,7 +95,7 @@ export function SkeletonList({ count = 3 }: { count?: number }) {
 export function SkeletonGameCard() {
   return (
     <div
-      className="bg-parchment-100 dark:bg-gray-800 border-2 border-parchment-300 dark:border-gray-700 rounded-lg p-4"
+      className="bg-skin-primary border-2 border-skin-default rounded-lg p-4"
       data-testid="skeleton-game-card"
     >
       <div className="flex items-center justify-between mb-3">

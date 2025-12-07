@@ -9,7 +9,6 @@
  * - Manual close button
  * - Slide-in animation
  * - Icon support
- *
  * Usage:
  * ```tsx
  * <Toast

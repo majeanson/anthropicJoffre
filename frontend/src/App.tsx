@@ -878,10 +878,10 @@ function AppContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-purple-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold text-purple-600 dark:text-purple-400 mb-2">Error</h2>
-          <p className="text-gray-700 dark:text-gray-300">{error}</p>
+      <div className="min-h-screen bg-skin-primary flex items-center justify-center">
+        <div className="bg-skin-secondary p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-bold text-skin-error mb-2">Error</h2>
+          <p className="text-skin-primary">{error}</p>
           <button
             onClick={() => {
               setError('');
@@ -1064,8 +1064,8 @@ function AppContent() {
         <ErrorBoundary componentName="TeamSelection">
           <Suspense
             fallback={
-              <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-                <div className="text-white text-2xl">Loading...</div>
+              <div className="min-h-screen bg-skin-primary flex items-center justify-center">
+                <div className="text-skin-primary text-2xl">Loading...</div>
               </div>
             }
           >
@@ -1161,8 +1161,8 @@ function AppContent() {
         <ErrorBoundary>
           <Suspense
             fallback={
-              <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-                <div className="text-white text-2xl">Loading...</div>
+              <div className="min-h-screen bg-skin-primary flex items-center justify-center">
+                <div className="text-skin-primary text-2xl">Loading...</div>
               </div>
             }
           >
@@ -1266,7 +1266,7 @@ function AppContent() {
         <ErrorBoundary>
           <Suspense
             fallback={
-              <div className="min-h-screen bg-gradient-to-br from-green-900 via-teal-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+              <div className="min-h-screen bg-skin-primary flex items-center justify-center">
                 <div className="text-white text-2xl">Loading...</div>
               </div>
             }
@@ -1374,13 +1374,13 @@ function AppContent() {
         <ErrorBoundary>
           <Suspense
             fallback={
-              <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+              <div className="min-h-screen bg-skin-primary flex items-center justify-center">
                 <div className="text-white text-2xl">Loading...</div>
               </div>
             }
           >
-            <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-5xl w-full">
+            <div className="min-h-screen bg-skin-primary flex items-center justify-center p-6">
+              <div className="bg-skin-secondary rounded-2xl shadow-2xl max-w-5xl w-full">
                 <RoundSummary
                   gameState={gameState}
                   onReady={handleReady}
@@ -1460,8 +1460,8 @@ function AppContent() {
             onClose={() => setDebugPanelOpen(false)}
           />
         </Suspense>
-        <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
-          <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-4xl w-full border-4 border-amber-700 dark:border-gray-600">
+        <div className="min-h-screen bg-skin-primary flex items-center justify-center p-6">
+          <div className="bg-skin-secondary rounded-2xl p-8 shadow-2xl max-w-4xl w-full border-4 border-skin-accent">
             {/* Victory Banner */}
             <div className="text-center mb-8">
               <h2 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 via-orange-600 to-red-600 mb-4 animate-pulse">
@@ -1566,7 +1566,7 @@ function AppContent() {
 
               return (
                 <section
-                  className="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl p-4 md:p-6 border-4 border-emerald-400 dark:border-emerald-600"
+                  className="mb-8 bg-skin-success/10 rounded-xl p-4 md:p-6 border-4 border-skin-success"
                   aria-label="Game rewards summary"
                   role="region"
                 >
@@ -1582,13 +1582,13 @@ function AppContent() {
                       </span>
                       <div>
                         <h3
-                          className="text-base md:text-lg font-bold text-emerald-800 dark:text-emerald-300"
+                          className="text-base md:text-lg font-bold text-skin-success"
                           id="game-xp-label"
                         >
                           Total XP
                         </h3>
                         <div
-                          className="text-3xl md:text-4xl font-black text-emerald-600 dark:text-emerald-400"
+                          className="text-3xl md:text-4xl font-black text-skin-success"
                           aria-labelledby="game-xp-label"
                         >
                           +{xp} XP
@@ -1598,7 +1598,7 @@ function AppContent() {
 
                     {/* Coins Section */}
                     <div
-                      className="flex items-center gap-3 md:gap-4 md:border-l md:border-emerald-300 dark:md:border-emerald-700 md:pl-6"
+                      className="flex items-center gap-3 md:gap-4 md:border-l md:border-skin-success md:pl-6"
                       role="group"
                       aria-label="Coins earned"
                     >
@@ -1607,13 +1607,13 @@ function AppContent() {
                       </span>
                       <div>
                         <h3
-                          className="text-base md:text-lg font-bold text-amber-700 dark:text-amber-400"
+                          className="text-base md:text-lg font-bold text-skin-warning"
                           id="game-coins-label"
                         >
                           Total Coins
                         </h3>
                         <div
-                          className="text-3xl md:text-4xl font-black text-amber-600 dark:text-amber-400"
+                          className="text-3xl md:text-4xl font-black text-skin-warning"
                           aria-labelledby="game-coins-label"
                         >
                           +{coins}
@@ -1623,10 +1623,10 @@ function AppContent() {
 
                     {/* Breakdown */}
                     <div
-                      className="text-xs md:text-sm space-y-1 border-t md:border-t-0 md:border-l border-emerald-300 dark:border-emerald-700 pt-3 md:pt-0 md:pl-6"
+                      className="text-xs md:text-sm space-y-1 border-t md:border-t-0 md:border-l border-skin-success pt-3 md:pt-0 md:pl-6"
                       aria-label="Reward breakdown"
                     >
-                      <div className="text-emerald-700 dark:text-emerald-400">
+                      <div className="text-skin-success">
                         <div>Game = +{XP_REWARDS.GAME_COMPLETION} XP</div>
                         {won && <div>Victory = +{XP_REWARDS.GAME_WIN} XP</div>}
                         {tricksWon > 0 && (
@@ -1640,7 +1640,7 @@ function AppContent() {
                           </div>
                         )}
                       </div>
-                      <div className="text-amber-600 dark:text-amber-400">
+                      <div className="text-skin-warning">
                         {won ? (
                           <div>Win bonus = +{CURRENCY_REWARDS.GAME_WON} coins</div>
                         ) : (
@@ -1669,7 +1669,7 @@ function AppContent() {
             {/* Session Totals - Show accumulated XP/Coins across all games this session */}
             {sessionXp > 0 && (
               <section
-                className="mb-6 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/30 dark:to-violet-900/30 rounded-lg p-3 md:p-4 border-2 border-indigo-300 dark:border-indigo-600"
+                className="mb-6 bg-skin-accent/10 rounded-lg p-3 md:p-4 border-2 border-skin-accent"
                 aria-label="Session rewards summary"
                 role="region"
               >
@@ -1678,7 +1678,7 @@ function AppContent() {
                     <span className="text-xl" aria-hidden="true">
                       📊
                     </span>
-                    <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
+                    <span className="text-sm font-semibold text-skin-accent">
                       This Session:
                     </span>
                   </div>
@@ -1687,7 +1687,7 @@ function AppContent() {
                       <span className="text-lg" aria-hidden="true">
                         ✨
                       </span>
-                      <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                      <span className="text-lg font-bold text-skin-success">
                         {sessionXp} XP
                       </span>
                     </div>
@@ -1695,7 +1695,7 @@ function AppContent() {
                       <span className="text-lg" aria-hidden="true">
                         🪙
                       </span>
-                      <span className="text-lg font-bold text-amber-600 dark:text-amber-400">
+                      <span className="text-lg font-bold text-skin-warning">
                         {sessionCoins} coins
                       </span>
                     </div>
@@ -1707,20 +1707,20 @@ function AppContent() {
             {/* Player Stats */}
             <div className="grid grid-cols-2 gap-6 mb-8">
               {/* Team 1 Players */}
-              <div className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 border-2 border-orange-200 dark:border-orange-700">
-                <h4 className="text-lg font-bold text-orange-800 dark:text-orange-300 mb-3 text-center">
+              <div className="bg-team1/10 rounded-lg p-4 border-2 border-team1">
+                <h4 className="text-lg font-bold text-team1 mb-3 text-center">
                   Team 1 Players
                 </h4>
                 <div className="space-y-2">
                   {team1Players.map((player) => (
                     <div
                       key={player.id}
-                      className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-orange-200 dark:border-orange-700"
+                      className="bg-skin-primary rounded-lg p-3 border border-team1"
                     >
-                      <div className="font-semibold text-umber-900 dark:text-gray-100">
+                      <div className="font-semibold text-skin-primary">
                         {player.name}
                       </div>
-                      <div className="text-sm text-umber-700 dark:text-gray-300">
+                      <div className="text-sm text-skin-secondary">
                         {player.tricksWon} tricks • {player.pointsWon} pts
                       </div>
                     </div>
@@ -1729,20 +1729,20 @@ function AppContent() {
               </div>
 
               {/* Team 2 Players */}
-              <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 border-2 border-purple-200 dark:border-purple-700">
-                <h4 className="text-lg font-bold text-purple-800 dark:text-purple-300 mb-3 text-center">
+              <div className="bg-team2/10 rounded-lg p-4 border-2 border-team2">
+                <h4 className="text-lg font-bold text-team2 mb-3 text-center">
                   Team 2 Players
                 </h4>
                 <div className="space-y-2">
                   {team2Players.map((player) => (
                     <div
                       key={player.id}
-                      className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-purple-200 dark:border-purple-700"
+                      className="bg-skin-primary rounded-lg p-3 border border-team2"
                     >
-                      <div className="font-semibold text-umber-900 dark:text-gray-100">
+                      <div className="font-semibold text-skin-primary">
                         {player.name}
                       </div>
-                      <div className="text-sm text-umber-700 dark:text-gray-300">
+                      <div className="text-sm text-skin-secondary">
                         {player.tricksWon} tricks • {player.pointsWon} pts
                       </div>
                     </div>
@@ -1754,7 +1754,7 @@ function AppContent() {
             {/* Round History */}
             {gameState.roundHistory.length > 0 && (
               <div className="mb-8">
-                <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-umber-400 dark:border-gray-600 pb-2 font-serif">
+                <h3 className="text-2xl font-bold text-skin-primary mb-4 border-b-2 border-skin-default pb-2 font-serif">
                   📜 Game History
                 </h3>
                 <div className="max-h-96 overflow-y-auto space-y-3 pr-2">
@@ -1769,10 +1769,10 @@ function AppContent() {
                       return (
                         <div
                           key={round.roundNumber}
-                          className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 hover:bg-parchment-200 dark:hover:bg-gray-600 transition-colors"
+                          className="bg-skin-tertiary rounded-lg p-4 border-2 border-skin-default hover:bg-skin-secondary transition-colors"
                         >
                           <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-lg font-bold text-umber-900 dark:text-gray-100">
+                            <h4 className="text-lg font-bold text-skin-primary">
                               Round {round.roundNumber}
                             </h4>
                             <span
@@ -1787,41 +1787,41 @@ function AppContent() {
                           </div>
 
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                            <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
-                              <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">
+                            <div className="bg-skin-primary rounded p-2">
+                              <p className="text-skin-secondary font-semibold text-xs">
                                 Bidder
                               </p>
-                              <p className="font-bold text-umber-900 dark:text-gray-100">
+                              <p className="font-bold text-skin-primary">
                                 {betPlayer?.name || 'Unknown'}
                               </p>
-                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                              <p className="text-xs text-skin-muted">
                                 Team {round.offensiveTeam}
                               </p>
                             </div>
-                            <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
-                              <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">
+                            <div className="bg-skin-primary rounded p-2">
+                              <p className="text-skin-secondary font-semibold text-xs">
                                 Bet
                               </p>
-                              <p className="font-bold text-umber-900 dark:text-gray-100">
+                              <p className="font-bold text-skin-primary">
                                 {round.betAmount} points
                               </p>
-                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                              <p className="text-xs text-skin-muted">
                                 {round.withoutTrump ? 'No Trump (2x)' : 'With Trump'}
                               </p>
                             </div>
-                            <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
-                              <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">
+                            <div className="bg-skin-primary rounded p-2">
+                              <p className="text-skin-secondary font-semibold text-xs">
                                 Points Earned
                               </p>
-                              <p className="font-bold text-umber-900 dark:text-gray-100">
+                              <p className="font-bold text-skin-primary">
                                 {round.offensivePoints} / {round.betAmount}
                               </p>
-                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                              <p className="text-xs text-skin-muted">
                                 Defensive: {round.defensivePoints}
                               </p>
                             </div>
-                            <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
-                              <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">
+                            <div className="bg-skin-primary rounded p-2">
+                              <p className="text-skin-secondary font-semibold text-xs">
                                 Round Score
                               </p>
                               <p className="font-bold">

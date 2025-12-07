@@ -129,19 +129,19 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
         <section aria-labelledby="game-info-heading">
           <h3
             id="game-info-heading"
-            className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2"
+            className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-purple-200 pb-2"
           >
             📋 Game Information
           </h3>
           <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
             <div>
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+              <span className="text-sm font-semibold text-skin-secondary">
                 Game ID:
               </span>
               <p className="font-mono text-lg text-purple-600 font-bold">{gameId}</p>
             </div>
             <div>
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Phase:</span>
+              <span className="text-sm font-semibold text-skin-secondary">Phase:</span>
               <p className="text-lg">
                 <span
                   className={`px-3 py-1 rounded-full font-semibold ${
@@ -153,7 +153,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                           ? 'bg-orange-100 text-orange-800'
                           : gameState.phase === 'scoring'
                             ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800 dark:text-gray-200'
+                            : 'bg-gray-100 text-skin-primary'
                   }`}
                 >
                   {gameState.phase.replace('_', ' ').toUpperCase()}
@@ -161,16 +161,16 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
               </p>
             </div>
             <div>
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Round:</span>
-              <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+              <span className="text-sm font-semibold text-skin-secondary">Round:</span>
+              <p className="text-lg font-bold text-skin-primary">
                 {gameState.roundNumber}
               </p>
             </div>
             <div>
-              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+              <span className="text-sm font-semibold text-skin-secondary">
                 Trump Suit:
               </span>
-              <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+              <p className="text-lg font-bold text-skin-primary">
                 {gameState.trump || 'Not set'}
               </p>
             </div>
@@ -181,7 +181,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
         <section aria-labelledby="dev-resources-heading">
           <h3
             id="dev-resources-heading"
-            className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2"
+            className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-purple-200 pb-2"
           >
             🔧 Developer Resources
           </h3>
@@ -245,7 +245,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
           <div className="flex items-center justify-between mb-3 border-b-2 border-purple-200 pb-2">
             <h3
               id="server-health-heading"
-              className="text-lg font-bold text-gray-800 dark:text-gray-200"
+              className="text-lg font-bold text-skin-primary"
             >
               🖥️ Server Health
             </h3>
@@ -280,7 +280,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
           ) : serverHealth ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 rounded-lg p-4">
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   Status:
                 </span>
                 <p className="text-lg font-bold text-green-600">
@@ -288,31 +288,31 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                 </p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   Uptime:
                 </span>
-                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                <p className="text-lg font-bold text-skin-primary">
                   {Math.floor(serverHealth.uptime / 60)}m {serverHealth.uptime % 60}s
                 </p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   Active Games:
                 </span>
-                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                <p className="text-lg font-bold text-skin-primary">
                   {serverHealth.activeGames}
                 </p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   Heap Used:
                 </span>
-                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                <p className="text-lg font-bold text-skin-primary">
                   {serverHealth.memory.heapUsedMB}MB
                 </p>
               </div>
               <div className="col-span-2">
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   Memory:
                 </span>
                 <div className="mt-1">
@@ -330,7 +330,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                       }}
                     ></div>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-xs text-skin-secondary mt-1">
                     {serverHealth.memory.heapUsedMB}MB / {serverHealth.memory.heapTotalMB}MB (
                     {Math.round(
                       (serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) * 100
@@ -340,13 +340,13 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                 </div>
               </div>
               <div className="col-span-2">
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   RSS (Total):
                 </span>
-                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                <p className="text-lg font-bold text-skin-primary">
                   {serverHealth.memory.rssMB}MB
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Resident Set Size (all memory)</p>
+                <p className="text-xs text-skin-muted mt-1">Resident Set Size (all memory)</p>
               </div>
             </div>
           ) : (
@@ -360,7 +360,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
         <section aria-labelledby="automation-heading">
           <h3
             id="automation-heading"
-            className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2"
+            className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-purple-200 pb-2"
           >
             🎮 Automation Controls
           </h3>
@@ -507,7 +507,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
         <section aria-labelledby="scores-heading">
           <h3
             id="scores-heading"
-            className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2"
+            className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-purple-200 pb-2"
           >
             🏆 Team Scores
           </h3>
@@ -537,7 +537,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
         <section aria-labelledby="players-heading">
           <h3
             id="players-heading"
-            className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2"
+            className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-purple-200 pb-2"
           >
             👥 Players
           </h3>
@@ -564,7 +564,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                         }`}
                         aria-label={`Team ${player.teamId}`}
                       ></span>
-                      <span className="font-bold text-gray-800 dark:text-gray-200">
+                      <span className="font-bold text-skin-primary">
                         {player.name}
                       </span>
                       {isDealer && (
@@ -583,27 +583,27 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
 
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">Cards in hand:</span>
-                      <span className="ml-2 font-semibold text-gray-800 dark:text-gray-200">
+                      <span className="text-skin-secondary">Cards in hand:</span>
+                      <span className="ml-2 font-semibold text-skin-primary">
                         {player.hand.length}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">Tricks won:</span>
-                      <span className="ml-2 font-semibold text-gray-800 dark:text-gray-200">
+                      <span className="text-skin-secondary">Tricks won:</span>
+                      <span className="ml-2 font-semibold text-skin-primary">
                         {player.tricksWon}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">Points won:</span>
-                      <span className="ml-2 font-semibold text-gray-800 dark:text-gray-200">
+                      <span className="text-skin-secondary">Points won:</span>
+                      <span className="ml-2 font-semibold text-skin-primary">
                         {player.pointsWon}
                       </span>
                     </div>
                     {bet && (
                       <div>
-                        <span className="text-gray-600 dark:text-gray-400">Bet:</span>
-                        <span className="ml-2 font-semibold text-gray-800 dark:text-gray-200">
+                        <span className="text-skin-secondary">Bet:</span>
+                        <span className="ml-2 font-semibold text-skin-primary">
                           {bet.skipped
                             ? 'Skipped'
                             : `${bet.amount} ${bet.withoutTrump ? '(No Trump)' : ''}`}
@@ -622,7 +622,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
           <section aria-labelledby="trick-heading">
             <h3
               id="trick-heading"
-              className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2"
+              className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-purple-200 pb-2"
             >
               🎴 Current Trick ({gameState.currentTrick.length}/4 cards)
             </h3>
@@ -634,7 +634,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                     key={index}
                     className="bg-gray-50 rounded-lg p-3 text-center border-2 border-gray-200"
                   >
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{player?.name}</p>
+                    <p className="text-xs text-skin-secondary mb-1">{player?.name}</p>
                     <div
                       className={`inline-block px-3 py-2 rounded font-bold text-white ${
                         trickCard.card.color === 'blue'
@@ -658,7 +658,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
           <section aria-labelledby="betting-heading">
             <h3
               id="betting-heading"
-              className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2"
+              className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-purple-200 pb-2"
             >
               💰 Betting Information
             </h3>
@@ -677,9 +677,9 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                   return (
                     <div
                       key={bet.playerId}
-                      className="flex items-center justify-between bg-parchment-50 dark:bg-gray-800 rounded p-2 border border-parchment-400 dark:border-gray-600"
+                      className="flex items-center justify-between bg-skin-secondary rounded p-2 border border-skin-default"
                     >
-                      <span className="font-medium text-umber-800 dark:text-gray-300">
+                      <span className="font-medium text-skin-primary">
                         {player?.name}
                       </span>
                       <span
@@ -697,7 +697,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
 
         {/* Raw State */}
         <details className="bg-gray-50 rounded-lg border-2 border-gray-200">
-          <summary className="cursor-pointer p-4 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100">
+          <summary className="cursor-pointer p-4 font-semibold text-skin-secondary hover:bg-gray-100">
             🔧 Raw Game State (JSON)
           </summary>
           <pre className="p-4 text-xs overflow-x-auto bg-gray-900 text-green-400 rounded-b-lg font-mono">

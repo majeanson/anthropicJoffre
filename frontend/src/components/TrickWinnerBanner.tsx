@@ -29,14 +29,14 @@ export function TrickWinnerBanner({ playerName, points, teamColor }: TrickWinner
       <UICard
         variant="bordered"
         size="sm"
-        className={`border-2 border-yellow-400 ${teamColor === 'orange' ? 'bg-orange-100 dark:bg-orange-900 border-orange-300 dark:border-orange-600' : 'bg-purple-100 dark:bg-purple-900 border-purple-300 dark:border-purple-600'}`}
+        className={`border-2 ${teamColor === 'orange' ? 'bg-team1/20 border-team1' : 'bg-team2/20 border-team2'}`}
       >
         <div className="flex items-center gap-2">
           <span className="text-xl md:text-2xl" aria-hidden="true">
             👑
           </span>
           <div
-            className={`text-sm md:text-base ${teamColor === 'orange' ? 'text-orange-900 dark:text-orange-100' : 'text-purple-900 dark:text-purple-100'}`}
+            className={`text-sm md:text-base ${teamColor === 'orange' ? 'text-team1' : 'text-team2'}`}
           >
             <span className="font-bold">{playerName}</span>
             <span className="font-normal ml-1">won +{points} pts</span>

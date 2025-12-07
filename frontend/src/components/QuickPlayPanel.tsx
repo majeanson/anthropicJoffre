@@ -85,15 +85,15 @@ export function QuickPlayPanel({
   };
 
   return (
-    <UICard variant="bordered" size="md" className="bg-parchment-200 dark:bg-gray-700/50">
+    <UICard variant="bordered" size="md" className="bg-skin-secondary">
       {/* Header with toggle */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-umber-800 dark:text-gray-200">
+        <h3 className="text-sm font-bold text-skin-primary">
           ⚡ Quick Play with Bots
         </h3>
         <button
           onClick={toggleOptions}
-          className="text-xs px-2 py-1 rounded bg-umber-100 dark:bg-gray-600 text-umber-600 dark:text-gray-300 hover:bg-umber-200 dark:hover:bg-gray-500 transition-colors"
+          className="text-xs px-2 py-1 rounded bg-skin-tertiary text-skin-secondary hover:bg-skin-primary transition-colors"
         >
           {showOptions ? '▲ Hide Options' : '▼ Options'}
         </button>
@@ -101,7 +101,7 @@ export function QuickPlayPanel({
 
       {/* Current settings summary (always visible) */}
       {!showOptions && (
-        <div className="flex items-center justify-center gap-3 mb-3 text-xs text-umber-600 dark:text-gray-400">
+        <div className="flex items-center justify-center gap-3 mb-3 text-xs text-skin-muted">
           <UIBadge variant="solid" color="primary" size="sm">
             {difficultyLabels[botDifficulty]} Bots
           </UIBadge>
@@ -138,7 +138,7 @@ export function QuickPlayPanel({
 
           {/* Bot Difficulty Selector */}
           <div>
-            <label className="block text-xs font-semibold text-umber-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs font-semibold text-skin-secondary mb-2">
               Bot Difficulty
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -173,7 +173,7 @@ export function QuickPlayPanel({
                 Hard
               </Button>
             </div>
-            <p className="text-xs text-umber-600 dark:text-gray-400 mt-2 text-center">
+            <p className="text-xs text-skin-muted mt-2 text-center">
               {botDifficulty === 'easy' && 'Random play, good for beginners'}
               {botDifficulty === 'medium' && 'Strategic play with positional awareness'}
               {botDifficulty === 'hard' && 'Advanced AI with card counting'}
@@ -184,7 +184,7 @@ export function QuickPlayPanel({
           <UICard
             variant="bordered"
             size="sm"
-            className={`bg-parchment-100 dark:bg-gray-800 ${!tierInfo.canPlayRanked ? 'opacity-60' : ''}`}
+            className={`bg-skin-primary ${!tierInfo.canPlayRanked ? 'opacity-60' : ''}`}
           >
             <div className="flex items-center justify-between gap-3">
               <Checkbox
@@ -207,7 +207,7 @@ export function QuickPlayPanel({
                   : '🎮 Casual'}
               </UIBadge>
             </div>
-            <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
+            <p className="text-xs text-skin-muted mt-2">
               {!tierInfo.canPlayRanked ? (
                 <>
                   <span aria-hidden="true">🔒</span> Register an account to enable ranked mode

@@ -68,31 +68,31 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
       <div className="space-y-6">
         {/* Current State */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-green-200 pb-2">
+          <h3 className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-green-200 pb-2">
             📊 Current State
           </h3>
           <UICard variant="bordered" size="md">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   Phase:
                 </span>
                 <p className="text-lg font-bold capitalize">{gameState.phase.replace('_', ' ')}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   Round:
                 </span>
                 <p className="text-lg font-bold">{gameState.roundNumber}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   Team 1 Score:
                 </span>
                 <p className="text-lg font-bold text-orange-600">{gameState.teamScores.team1}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-semibold text-skin-secondary">
                   Team 2 Score:
                 </span>
                 <p className="text-lg font-bold text-purple-600">{gameState.teamScores.team2}</p>
@@ -103,7 +103,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
 
         {/* Score Manipulation */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-green-200 pb-2">
+          <h3 className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-green-200 pb-2">
             🎯 Set Team Scores
           </h3>
           <UICard variant="bordered" size="md">
@@ -133,7 +133,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
 
         {/* Quick Actions */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-green-200 pb-2">
+          <h3 className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-green-200 pb-2">
             ⚡ Quick Actions
           </h3>
           <div className="grid grid-cols-2 gap-4">
@@ -178,7 +178,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
 
         {/* Developer Links */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
+          <h3 className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-purple-200 pb-2">
             🔧 Developer Resources
           </h3>
           <div className="grid grid-cols-2 gap-4">
@@ -206,11 +206,11 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
 
         {/* Sentry Testing */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-red-200 pb-2">
+          <h3 className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-red-200 pb-2">
             🚨 Sentry Error Tracking Tests
           </h3>
           <UICard variant="bordered" size="md">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            <p className="text-sm text-skin-secondary mb-3">
               Test Sentry error tracking integration for both frontend and backend.
             </p>
             <div className="grid grid-cols-2 gap-4 mb-3">

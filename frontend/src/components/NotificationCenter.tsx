@@ -154,8 +154,8 @@ export function NotificationCenter({
           className="absolute right-0 bottom-full mb-2 w-96 z-50 max-h-[600px] flex flex-col border-2"
         >
           {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b-2 border-gray-200 dark:border-gray-600">
-            <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">Notifications</h3>
+          <div className="flex items-center justify-between pb-4 border-b-2 border-skin-subtle">
+            <h3 className="font-bold text-lg text-skin-primary">Notifications</h3>
             <div className="flex gap-2">
               {unreadCount > 0 && (
                 <Button variant="primary" size="sm" onClick={handleMarkAllAsRead}>
@@ -178,8 +178,8 @@ export function NotificationCenter({
               notifications.map((notification) => (
                 <div
                   key={notification.notification_id}
-                  className={`p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors cursor-pointer ${
-                    !notification.is_read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                  className={`p-4 border-b border-skin-subtle hover:bg-skin-tertiary transition-colors cursor-pointer ${
+                    !notification.is_read ? 'bg-skin-info' : ''
                   }`}
                   onClick={() => handleMarkAsRead(notification.notification_id)}
                 >
@@ -189,18 +189,18 @@ export function NotificationCenter({
                     </span>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                        <p className="font-semibold text-skin-primary text-sm">
                           {notification.title}
                         </p>
                         {!notification.is_read && (
                           <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-1"></span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-skin-secondary mt-1">
                         {notification.message}
                       </p>
                       <div className="flex items-center justify-between mt-2">
-                        <p className="text-xs text-gray-500 dark:text-gray-500">
+                        <p className="text-xs text-skin-muted">
                           {formatTime(notification.created_at)}
                         </p>
                         {notification.notification_type === 'game_invite' &&

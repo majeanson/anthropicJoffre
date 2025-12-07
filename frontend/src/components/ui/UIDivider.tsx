@@ -41,12 +41,12 @@ const variantConfig: Record<DividerVariant, string> = {
 };
 
 const colorConfig: Record<DividerColor, string> = {
-  default: 'border-parchment-400 dark:border-gray-600',
-  muted: 'border-parchment-300 dark:border-gray-700',
-  amber: 'border-amber-700/30 dark:border-amber-600/30',
-  gray: 'border-gray-300 dark:border-gray-600',
-  team1: 'border-orange-400/50 dark:border-orange-500/50',
-  team2: 'border-purple-400/50 dark:border-purple-500/50',
+  default: 'border-skin-default',
+  muted: 'border-skin-default',
+  amber: 'border-amber-600/30',
+  gray: 'border-skin-default',
+  team1: 'border-orange-500/50',
+  team2: 'border-purple-500/50',
 };
 
 const spacingConfig: Record<'none' | 'sm' | 'md' | 'lg', { horizontal: string; vertical: string }> =
@@ -123,7 +123,7 @@ export function UIDivider({
       aria-orientation="horizontal"
     >
       <div className={`flex-1 ${sizeClass} ${variantClass} ${colorClass}`} />
-      <span className="px-3 text-sm font-medium text-umber-600 dark:text-gray-400">{label}</span>
+      <span className="px-3 text-sm font-medium text-skin-muted">{label}</span>
       <div className={`flex-1 ${sizeClass} ${variantClass} ${colorClass}`} />
     </div>
   );

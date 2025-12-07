@@ -62,7 +62,7 @@ export function LoadingState({
   const content = (
     <div className={`text-center py-8 ${className}`}>
       <Spinner size={size} color={color} />
-      {message && <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">{message}</p>}
+      {message && <p className="mt-4 text-skin-muted font-medium">{message}</p>}
     </div>
   );
 
@@ -119,12 +119,12 @@ export function EmptyState({
         {icon}
       </div>
       <h3
-        className={`font-bold text-gray-700 dark:text-gray-300 ${compact ? 'text-base' : 'text-lg'}`}
+        className={`font-bold text-skin-secondary ${compact ? 'text-base' : 'text-lg'}`}
       >
         {title}
       </h3>
       {description && (
-        <p className={`text-gray-500 dark:text-gray-400 mt-2 ${compact ? 'text-sm' : ''}`}>
+        <p className={`text-skin-muted mt-2 ${compact ? 'text-sm' : ''}`}>
           {description}
         </p>
       )}
@@ -181,16 +181,16 @@ export function ErrorState({
 }: ErrorStateProps) {
   const content = (
     <div
-      className={`bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4 ${className}`}
+      className={`bg-red-900/30 border-2 border-red-700 rounded-lg p-4 ${className}`}
     >
       <div className="flex items-start gap-3">
         <span className="text-2xl flex-shrink-0" aria-hidden="true">
           ⚠️
         </span>
         <div className="flex-1 min-w-0">
-          <p className="text-red-800 dark:text-red-200 font-semibold">{message}</p>
+          <p className="text-red-200 font-semibold">{message}</p>
           {correlationId && (
-            <p className="text-xs text-red-700 dark:text-red-300 font-mono mt-2">
+            <p className="text-xs text-red-300 font-mono mt-2">
               Error ID: {correlationId}
               <br />
               <span className="opacity-75">Please include this ID when reporting the issue</span>

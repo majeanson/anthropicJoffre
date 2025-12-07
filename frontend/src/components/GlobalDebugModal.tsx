@@ -197,7 +197,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
       <div className="space-y-6">
         {/* Server Health */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+          <h3 className="text-lg font-bold text-skin-primary mb-3">
             🖥️ Server Health
           </h3>
           {clearMessage && (
@@ -208,34 +208,34 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
             </div>
           )}
           {serverHealth && (
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-skin-secondary rounded-lg p-4">
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
+                <span className="text-sm text-skin-secondary">Status:</span>
                 <p className="text-lg font-bold text-green-600">
                   {serverHealth.status.toUpperCase()}
                 </p>
               </div>
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Uptime:</span>
-                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                <span className="text-sm text-skin-secondary">Uptime:</span>
+                <p className="text-lg font-bold text-skin-primary">
                   {Math.floor(serverHealth.uptime / 3600)}h{' '}
                   {Math.floor((serverHealth.uptime % 3600) / 60)}m
                 </p>
               </div>
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Active Games:</span>
-                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                <span className="text-sm text-skin-secondary">Active Games:</span>
+                <p className="text-lg font-bold text-skin-primary">
                   {serverHealth.activeGames}
                 </p>
               </div>
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Heap:</span>
-                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                <span className="text-sm text-skin-secondary">Heap:</span>
+                <p className="text-lg font-bold text-skin-primary">
                   {serverHealth.memory.heapUsedMB}MB
                 </p>
               </div>
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Memory:</span>
+                <span className="text-sm text-skin-secondary">Memory:</span>
                 <div className="w-full bg-gray-200 rounded-full h-3 mt-1">
                   <div
                     className={`h-3 rounded-full ${
@@ -250,7 +250,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
                     }}
                   />
                 </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-xs text-skin-secondary mt-1">
                   {Math.round(
                     (serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) * 100
                   )}
@@ -263,7 +263,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
 
         {/* Quick Actions */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+          <h3 className="text-lg font-bold text-skin-primary mb-3">
             ⚡ Quick Actions
           </h3>
           <div className="flex flex-wrap gap-3">
@@ -283,11 +283,11 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
 
         {/* Storybook */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+          <h3 className="text-lg font-bold text-skin-primary mb-3">
             📖 Storybook UI
           </h3>
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+          <div className="bg-skin-secondary rounded-lg p-4">
+            <p className="text-sm text-skin-secondary mb-3">
               Browse all UI components in the design system.
             </p>
             <Button
@@ -303,11 +303,11 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
 
         {/* Sentry Testing */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-red-200 pb-2">
+          <h3 className="text-lg font-bold text-skin-primary mb-3 border-b-2 border-red-200 pb-2">
             🚨 Sentry Error Tracking Tests
           </h3>
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <div className="bg-skin-secondary rounded-lg p-4 space-y-3">
+            <p className="text-sm text-skin-secondary mb-2">
               Test Sentry error tracking integration for both frontend and backend.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -325,8 +325,8 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
                 <span>Test Backend Sentry</span>
               </Button>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
-              <p className="text-xs text-blue-800 dark:text-blue-200">
+            <div className="bg-skin-info border border-skin-info rounded-lg p-3 mt-2">
+              <p className="text-xs text-skin-info">
                 <strong>💡 Tip:</strong> After testing, check your Sentry dashboard at{' '}
                 <a
                   href="https://sentry.io"
@@ -345,7 +345,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
         {/* Games Table */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
+            <h3 className="text-lg font-bold text-skin-primary">
               🎮 All Games ({games.length})
             </h3>
             <Select
@@ -360,13 +360,13 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
           </div>
 
           {games.length === 0 ? (
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8 text-center">
-              <p className="text-gray-500">No active games</p>
+            <div className="bg-skin-secondary rounded-lg p-8 text-center">
+              <p className="text-skin-muted">No active games</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-100 dark:bg-gray-700">
+                <thead className="bg-skin-tertiary">
                   <tr>
                     <th className="px-4 py-2 text-left">Game ID</th>
                     <th className="px-4 py-2 text-left">Phase</th>
@@ -380,7 +380,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
                   {sortedGames.map((game) => (
                     <tr
                       key={game.gameId}
-                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-750"
+                      className="border-b hover:bg-skin-tertiary"
                     >
                       <td className="px-4 py-3 font-mono text-xs text-purple-600">
                         {game.gameId.slice(0, 8)}...
@@ -429,37 +429,37 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
 
         {/* Build Info & Features */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+          <h3 className="text-lg font-bold text-skin-primary mb-3">
             🏗️ Build Information
           </h3>
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
+          <div className="bg-skin-secondary rounded-lg p-4 space-y-3">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Version:</span>
-                <p className="font-bold text-gray-800 dark:text-gray-200">{buildInfo.version}</p>
+                <span className="text-sm text-skin-secondary">Version:</span>
+                <p className="font-bold text-skin-primary">{buildInfo.version}</p>
               </div>
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Commit:</span>
-                <p className="font-mono text-sm text-gray-800 dark:text-gray-200">
+                <span className="text-sm text-skin-secondary">Commit:</span>
+                <p className="font-mono text-sm text-skin-primary">
                   {buildInfo.git.commitHash}
                 </p>
               </div>
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Branch:</span>
-                <p className="font-bold text-gray-800 dark:text-gray-200">{buildInfo.git.branch}</p>
+                <span className="text-sm text-skin-secondary">Branch:</span>
+                <p className="font-bold text-skin-primary">{buildInfo.git.branch}</p>
               </div>
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Build Date:</span>
-                <p className="text-sm text-gray-800 dark:text-gray-200">
+                <span className="text-sm text-skin-secondary">Build Date:</span>
+                <p className="text-sm text-skin-primary">
                   {new Date(buildInfo.buildDate).toLocaleDateString()}
                 </p>
               </div>
             </div>
             <div>
-              <span className="text-sm text-gray-600 dark:text-gray-400 block mb-2">
+              <span className="text-sm text-skin-secondary block mb-2">
                 Latest Commit:
               </span>
-              <p className="text-sm italic text-gray-700 dark:text-gray-300">
+              <p className="text-sm italic text-skin-secondary">
                 {buildInfo.git.commitMessage}
               </p>
             </div>
@@ -468,7 +468,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
 
         {/* Summary Stats */}
         <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+          <h3 className="text-lg font-bold text-skin-primary mb-3">
             📊 Phase Breakdown
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -252,8 +252,8 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
         <div className="flex items-start gap-3">
           <span className="text-2xl flex-shrink-0">🏷️</span>
           <div className="flex-1">
-            <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Version</h3>
-            <p className="text-gray-700 dark:text-gray-300 font-mono text-sm bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
+            <h3 className="font-bold text-skin-accent mb-1">Version</h3>
+            <p className="text-skin-secondary font-mono text-sm bg-skin-primary px-3 py-2 rounded border border-skin-default">
               v{buildInfo.version}
             </p>
           </div>
@@ -263,8 +263,8 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
         <div className="flex items-start gap-3">
           <span className="text-2xl flex-shrink-0">📅</span>
           <div className="flex-1">
-            <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Build Date</h3>
-            <p className="text-gray-700 dark:text-gray-300 text-sm bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
+            <h3 className="font-bold text-skin-accent mb-1">Build Date</h3>
+            <p className="text-skin-secondary text-sm bg-skin-primary px-3 py-2 rounded border border-skin-default">
               {formatDate(buildInfo.buildDate || buildInfo.releaseDate || new Date().toISOString())}
             </p>
           </div>
@@ -275,17 +275,17 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
           <div className="flex items-start gap-3">
             <span className="text-2xl flex-shrink-0">💾</span>
             <div className="flex-1">
-              <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Latest Commit</h3>
-              <div className="bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
+              <h3 className="font-bold text-skin-accent mb-1">Latest Commit</h3>
+              <div className="bg-skin-primary px-3 py-2 rounded border border-skin-default">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold">
+                  <span className="font-mono text-xs text-skin-accent font-bold">
                     {buildInfo.git.commitHash}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-skin-muted">
                     on {buildInfo.git.branch}
                   </span>
                 </div>
-                <p className="text-sm text-gray-700 dark:text-gray-300 break-words">
+                <p className="text-sm text-skin-secondary break-words">
                   {getCommitTitle(buildInfo.git.commitMessage)}
                 </p>
               </div>
@@ -299,7 +299,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
             <span className="text-2xl flex-shrink-0">✨</span>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-indigo-900 dark:text-indigo-200">
+                <h3 className="font-bold text-skin-accent">
                   Latest Done Features
                 </h3>
                 <Button
@@ -316,13 +316,13 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                   {buildInfo.latestDoneFeatures.map((featureGroup, index) => (
                     <div
                       key={index}
-                      className="bg-white dark:bg-gray-900 px-4 py-3 rounded border border-gray-300 dark:border-gray-700"
+                      className="bg-skin-primary px-4 py-3 rounded border border-skin-default"
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-semibold text-indigo-900 dark:text-indigo-200">
+                        <span className="font-semibold text-skin-accent">
                           {featureGroup.title}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-skin-muted">
                           {featureGroup.date}
                         </span>
                       </div>
@@ -330,9 +330,9 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                         {featureGroup.features.map((feature, fIndex) => (
                           <li
                             key={fIndex}
-                            className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
+                            className="flex items-start gap-2 text-sm text-skin-secondary"
                           >
-                            <span className="text-green-500 dark:text-green-400 flex-shrink-0">
+                            <span className="text-skin-success flex-shrink-0">
                               ✓
                             </span>
                             <span>{feature}</span>
@@ -353,7 +353,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
             <span className="text-2xl flex-shrink-0">🚀</span>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Future Features</h3>
+                <h3 className="font-bold text-skin-accent">Future Features</h3>
                 <Button
                   onClick={() => setShowFutureFeatures(!showFutureFeatures)}
                   variant="secondary"
@@ -368,9 +368,9 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                   {buildInfo.futureTodos.map((todo, index) => (
                     <li
                       key={index}
-                      className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700"
+                      className="flex items-start gap-2 text-sm text-skin-secondary bg-skin-primary px-3 py-2 rounded border border-skin-default"
                     >
-                      <span className="text-indigo-500 dark:text-indigo-400 flex-shrink-0">▸</span>
+                      <span className="text-skin-accent flex-shrink-0">▸</span>
                       <span>{todo}</span>
                     </li>
                   ))}
@@ -385,7 +385,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
           <span className="text-2xl flex-shrink-0">🏥</span>
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Server Health</h3>
+              <h3 className="font-bold text-skin-accent">Server Health</h3>
               <Button onClick={() => setShowHealth(!showHealth)} variant="secondary" size="xs">
                 {showHealth ? 'Hide' : 'Show'} Health
               </Button>
@@ -394,22 +394,22 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
             {showHealth && (
               <div className="space-y-2">
                 {healthLoading && (
-                  <div className="bg-white dark:bg-gray-900 px-3 py-4 rounded border border-gray-300 dark:border-gray-700 text-center">
+                  <div className="bg-skin-primary px-3 py-4 rounded border border-skin-default text-center">
                     <div className="animate-spin inline-block w-6 h-6 border-3 border-indigo-600 border-t-transparent rounded-full"></div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                    <p className="text-sm text-skin-secondary mt-2">
                       Loading health data...
                     </p>
                   </div>
                 )}
 
                 {healthError && (
-                  <div className="bg-red-50 dark:bg-red-900/20 px-3 py-3 rounded border border-red-300 dark:border-red-700">
-                    <p className="text-sm text-red-700 dark:text-red-300">❌ {healthError}</p>
+                  <div className="bg-skin-error px-3 py-3 rounded border border-skin-error">
+                    <p className="text-sm text-skin-error">❌ {healthError}</p>
                     <Button
                       onClick={fetchHealthData}
                       variant="link"
                       size="xs"
-                      className="text-red-600 dark:text-red-400 mt-1"
+                      className="text-skin-error mt-1"
                     >
                       Retry
                     </Button>
@@ -417,14 +417,14 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                 )}
 
                 {healthData && !healthLoading && (
-                  <div className="bg-white dark:bg-gray-900 px-4 py-3 rounded border border-gray-300 dark:border-gray-700 space-y-3">
+                  <div className="bg-skin-primary px-4 py-3 rounded border border-skin-default space-y-3">
                     {/* Status & Uptime */}
-                    <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between pb-2 border-b border-skin-subtle">
                       <div>
-                        <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded">
+                        <span className="inline-block px-2 py-1 bg-skin-success/30 text-skin-success text-xs font-semibold rounded">
                           {healthData.status.toUpperCase()}
                         </span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <p className="text-xs text-skin-muted mt-1">
                           Uptime: {healthData.uptime.formatted}
                         </p>
                       </div>
@@ -435,25 +435,25 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
 
                     {/* Game State */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      <h4 className="text-xs font-bold text-skin-secondary mb-1">
                         🎮 Game State
                       </h4>
                       <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Games</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Games</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.game.activeGames}
                           </div>
                         </div>
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Sockets</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Sockets</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.game.connectedSockets}
                           </div>
                         </div>
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Players</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Players</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.game.onlinePlayers}
                           </div>
                         </div>
@@ -462,19 +462,19 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
 
                     {/* Database & Cache */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      <h4 className="text-xs font-bold text-skin-secondary mb-1">
                         💾 Database & Cache
                       </h4>
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Pool Utilization</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Pool Utilization</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.database.pool.utilization}
                           </div>
                         </div>
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Cache Keys</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Cache Keys</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.cache.keys}
                           </div>
                         </div>
@@ -483,21 +483,21 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
 
                     {/* Memory */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      <h4 className="text-xs font-bold text-skin-secondary mb-1">
                         🧠 Memory
                       </h4>
-                      <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded text-xs">
+                      <div className="bg-skin-secondary px-2 py-1 rounded text-xs">
                         <div className="flex justify-between">
-                          <span className="text-gray-500 dark:text-gray-400">
+                          <span className="text-skin-muted">
                             Heap Used / Total
                           </span>
-                          <span className="font-bold text-gray-900 dark:text-gray-100">
+                          <span className="font-bold text-skin-primary">
                             {healthData.memory.heapUsedMB} / {healthData.memory.heapTotalMB} MB
                           </span>
                         </div>
-                        <div className="mt-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div className="mt-1 w-full bg-skin-tertiary rounded-full h-2">
                           <div
-                            className="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full transition-all"
+                            className="bg-skin-accent h-2 rounded-full transition-all"
                             style={{ width: healthData.memory.heapUtilization }}
                           ></div>
                         </div>
@@ -506,19 +506,19 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
 
                     {/* Error Handling */}
                     <div>
-                      <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      <h4 className="text-xs font-bold text-skin-secondary mb-1">
                         🛡️ Error Handling
                       </h4>
                       <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Success Rate</div>
-                          <div className="font-bold text-green-600 dark:text-green-400">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Success Rate</div>
+                          <div className="font-bold text-skin-success">
                             {healthData.errorHandling.successRate}
                           </div>
                         </div>
-                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
-                          <div className="text-gray-500 dark:text-gray-400">Total Calls</div>
-                          <div className="font-bold text-gray-900 dark:text-gray-100">
+                        <div className="bg-skin-secondary px-2 py-1 rounded">
+                          <div className="text-skin-muted">Total Calls</div>
+                          <div className="font-bold text-skin-primary">
                             {healthData.errorHandling.totalCalls.toLocaleString()}
                           </div>
                         </div>
@@ -536,7 +536,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
           <span className="text-2xl flex-shrink-0">🌐</span>
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-indigo-900 dark:text-indigo-200">
+              <h3 className="font-bold text-skin-accent">
                 Game Monitoring ({games.length} active)
               </h3>
               <Button onClick={() => setShowGames(!showGames)} variant="secondary" size="xs">
@@ -547,7 +547,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
             {showGames && (
               <div className="space-y-3">
                 {clearMessage && (
-                  <div className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200 px-3 py-2 rounded border border-green-300 dark:border-green-700 text-sm">
+                  <div className="bg-skin-success text-skin-success px-3 py-2 rounded border border-skin-success text-sm">
                     {clearMessage}
                   </div>
                 )}
@@ -578,13 +578,13 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
 
                 {/* Games Table */}
                 {games.length === 0 ? (
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                  <div className="bg-skin-secondary rounded px-4 py-6 text-center text-sm text-skin-muted">
                     No active games
                   </div>
                 ) : (
-                  <div className="overflow-x-auto bg-white dark:bg-gray-900 rounded border border-gray-300 dark:border-gray-700">
+                  <div className="overflow-x-auto bg-skin-primary rounded border border-skin-default">
                     <table className="w-full text-xs">
-                      <thead className="bg-gray-100 dark:bg-gray-800">
+                      <thead className="bg-skin-secondary">
                         <tr>
                           <th className="px-3 py-2 text-left">Game ID</th>
                           <th className="px-3 py-2 text-left">Phase</th>
@@ -598,23 +598,23 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                         {sortedGames.map((game) => (
                           <tr
                             key={game.gameId}
-                            className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                            className="border-b border-skin-subtle hover:bg-skin-tertiary"
                           >
-                            <td className="px-3 py-2 font-mono text-purple-600 dark:text-purple-400">
+                            <td className="px-3 py-2 font-mono text-team2">
                               {game.gameId.slice(0, 8)}...
                             </td>
                             <td className="px-3 py-2">
                               <span
                                 className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                                   game.phase === 'team_selection'
-                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+                                    ? 'bg-team2/20 text-team2'
                                     : game.phase === 'betting'
-                                      ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
+                                      ? 'bg-team1/20 text-team1'
                                       : game.phase === 'playing'
-                                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                                        ? 'bg-skin-success text-skin-success'
                                         : game.phase === 'scoring'
-                                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                                          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                                          ? 'bg-skin-info text-skin-info'
+                                          : 'bg-skin-secondary text-skin-secondary'
                                 }`}
                               >
                                 {game.phase.toUpperCase().replace('_', ' ')}
@@ -624,7 +624,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                               {game.playerCount}/4
                             </td>
                             <td className="px-3 py-2 text-center">{game.roundNumber}</td>
-                            <td className="px-3 py-2 text-center text-gray-600 dark:text-gray-400">
+                            <td className="px-3 py-2 text-center text-skin-secondary">
                               {game.uptimeMinutes < 60
                                 ? `${game.uptimeMinutes}m`
                                 : `${Math.floor(game.uptimeMinutes / 60)}h`}
@@ -648,35 +648,35 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
 
                 {/* Phase Breakdown */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-300 dark:border-purple-700 rounded px-3 py-2 text-center">
-                    <p className="text-xs text-purple-700 dark:text-purple-300 font-semibold">
+                  <div className="bg-team2/10 border border-team2 rounded px-3 py-2 text-center">
+                    <p className="text-xs text-team2 font-semibold">
                       Team Selection
                     </p>
-                    <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                    <p className="text-xl font-bold text-team2">
                       {games.filter((g) => g.phase === 'team_selection').length}
                     </p>
                   </div>
-                  <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-700 rounded px-3 py-2 text-center">
-                    <p className="text-xs text-orange-700 dark:text-orange-300 font-semibold">
+                  <div className="bg-team1/10 border border-team1 rounded px-3 py-2 text-center">
+                    <p className="text-xs text-team1 font-semibold">
                       Betting
                     </p>
-                    <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+                    <p className="text-xl font-bold text-team1">
                       {games.filter((g) => g.phase === 'betting').length}
                     </p>
                   </div>
-                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded px-3 py-2 text-center">
-                    <p className="text-xs text-green-700 dark:text-green-300 font-semibold">
+                  <div className="bg-skin-success border border-skin-success rounded px-3 py-2 text-center">
+                    <p className="text-xs text-skin-success font-semibold">
                       Playing
                     </p>
-                    <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                    <p className="text-xl font-bold text-skin-success">
                       {games.filter((g) => g.phase === 'playing').length}
                     </p>
                   </div>
-                  <div className="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-center">
-                    <p className="text-xs text-gray-700 dark:text-gray-300 font-semibold">
+                  <div className="bg-skin-secondary border border-skin-default rounded px-3 py-2 text-center">
+                    <p className="text-xs text-skin-secondary font-semibold">
                       Finished
                     </p>
-                    <p className="text-xl font-bold text-gray-600 dark:text-gray-400">
+                    <p className="text-xl font-bold text-skin-secondary">
                       {finishedGames.length}
                     </p>
                   </div>
@@ -691,7 +691,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
           <span className="text-2xl flex-shrink-0">🚨</span>
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-indigo-900 dark:text-indigo-200">
+              <h3 className="font-bold text-skin-accent">
                 Sentry Error Tracking Tests
               </h3>
               <Button onClick={() => setShowSentry(!showSentry)} variant="secondary" size="xs">
@@ -701,7 +701,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
 
             {showSentry && (
               <div className="space-y-2">
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-skin-secondary">
                   Test Sentry error tracking integration for both frontend and backend.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -719,14 +719,14 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                     <span>Test Backend Sentry</span>
                   </Button>
                 </div>
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded px-3 py-2">
-                  <p className="text-xs text-blue-800 dark:text-blue-200">
+                <div className="bg-skin-info border border-skin-info rounded px-3 py-2">
+                  <p className="text-xs text-skin-info">
                     <strong>💡 Tip:</strong> After testing, check your Sentry dashboard at{' '}
                     <a
                       href="https://sentry.io"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="underline hover:text-blue-600 dark:hover:text-blue-400"
+                      className="underline hover:text-skin-accent"
                     >
                       sentry.io
                     </a>{' '}
@@ -739,8 +739,8 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
         </div>
 
         {/* Fun Stats */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-purple-300 dark:border-purple-700">
-          <p className="text-center text-sm text-purple-900 dark:text-purple-200 font-semibold">
+        <div className="mt-6 p-4 bg-skin-secondary rounded-lg border-2 border-skin-accent">
+          <p className="text-center text-sm text-skin-accent font-semibold">
             🎉 Made with ❤️ and lots of ☕
           </p>
         </div>

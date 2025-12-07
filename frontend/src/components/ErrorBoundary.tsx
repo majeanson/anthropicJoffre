@@ -133,23 +133,23 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="text-6xl mb-4" aria-hidden="true">
               ⚠️
             </div>
-            <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold mb-4 text-skin-primary">
               Something Went Wrong
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-skin-secondary mb-6">
               An unexpected error occurred. Don't worry, your game progress should be saved.
             </p>
             {this.state.error && (
               <div className="mb-6">
-                <p className="text-sm text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 p-3 rounded">
+                <p className="text-sm text-skin-muted font-mono bg-skin-tertiary p-3 rounded">
                   {this.state.error.message}
                 </p>
                 {import.meta.env.DEV && this.state.errorInfo && (
                   <details className="mt-4 text-left">
-                    <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                    <summary className="cursor-pointer text-sm text-skin-secondary hover:text-skin-primary">
                       Show Technical Details
                     </summary>
-                    <pre className="mt-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-3 rounded overflow-auto max-h-48">
+                    <pre className="mt-2 text-xs text-skin-muted bg-skin-tertiary p-3 rounded overflow-auto max-h-48">
                       {this.state.error.stack}
                       {'\n\nComponent Stack:'}
                       {this.state.errorInfo.componentStack}
@@ -167,7 +167,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </Button>
             </div>
             {this.state.errorCount > 1 && (
-              <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-4 text-xs text-skin-muted">
                 Error count: {this.state.errorCount}
               </p>
             )}

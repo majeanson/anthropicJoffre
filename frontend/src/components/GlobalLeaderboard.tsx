@@ -48,22 +48,22 @@ const LeaderboardRow = memo(function LeaderboardRow({
     <div
       className={`grid grid-cols-1 md:grid-cols-7 gap-2 md:gap-4 p-4 rounded-lg transition-all duration-200 ${
         index < 3
-          ? 'bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/40 dark:to-amber-900/40 border-2 border-yellow-400 dark:border-yellow-600'
-          : 'bg-parchment-50 dark:bg-gray-800 hover:bg-parchment-100 dark:hover:bg-gray-750 border border-parchment-400 dark:border-gray-600'
+          ? 'bg-skin-warning/20 border-2 border-skin-warning'
+          : 'bg-skin-primary hover:bg-skin-tertiary border border-skin-default'
       } ${onViewPlayerStats ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
       onClick={() => onViewPlayerStats?.(player.player_name)}
     >
       {/* Rank */}
       <div className="col-span-1 flex items-center">
-        <span className="text-2xl md:text-3xl font-bold text-umber-800 dark:text-gray-300">
+        <span className="text-2xl md:text-3xl font-bold text-skin-secondary">
           {getRankMedal(index + 1)}
         </span>
       </div>
 
       {/* Player Name */}
       <div className="col-span-1 md:col-span-2 flex flex-col justify-center">
-        <p className="font-bold text-lg text-umber-900 dark:text-gray-100">{player.player_name}</p>
-        <p className="text-xs text-umber-600 dark:text-gray-400">
+        <p className="font-bold text-lg text-skin-primary">{player.player_name}</p>
+        <p className="text-xs text-skin-muted">
           {showRoundStats
             ? `${player.rounds_won || 0}W - ${(player.total_rounds_played || 0) - (player.rounds_won || 0)}L`
             : `${player.games_won}W - ${player.games_lost}L`}
@@ -74,27 +74,27 @@ const LeaderboardRow = memo(function LeaderboardRow({
         <>
           {/* ELO Rating */}
           <div className="col-span-1 flex flex-col items-center justify-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">ELO</p>
-            <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+            <p className="text-sm text-skin-secondary md:hidden">ELO</p>
+            <p className="text-2xl font-bold text-team2">
               {player.elo_rating}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-500">
+            <p className="text-xs text-skin-muted">
               Peak: {player.highest_rating}
             </p>
           </div>
 
           {/* Games Played */}
           <div className="col-span-1 flex flex-col items-center justify-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Games</p>
-            <p className="text-xl font-bold text-gray-700 dark:text-gray-300">
+            <p className="text-sm text-skin-secondary md:hidden">Games</p>
+            <p className="text-xl font-bold text-skin-secondary">
               {player.games_played}
             </p>
           </div>
 
           {/* Win Percentage */}
           <div className="col-span-1 flex flex-col items-center justify-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Win Rate</p>
-            <p className="text-xl font-bold text-green-600 dark:text-green-400">
+            <p className="text-sm text-skin-secondary md:hidden">Win Rate</p>
+            <p className="text-xl font-bold text-skin-success">
               {player.win_percentage}%
             </p>
           </div>
@@ -112,32 +112,32 @@ const LeaderboardRow = memo(function LeaderboardRow({
         <>
           {/* Total Rounds Played */}
           <div className="col-span-1 flex flex-col items-center justify-center">
-            <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Rounds</p>
-            <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+            <p className="text-sm text-skin-info md:hidden">Rounds</p>
+            <p className="text-2xl font-bold text-skin-info">
               {player.total_rounds_played || 0}
             </p>
           </div>
 
           {/* Round Win Percentage */}
           <div className="col-span-1 flex flex-col items-center justify-center">
-            <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Round Win%</p>
-            <p className="text-xl font-bold text-green-600 dark:text-green-400">
+            <p className="text-sm text-skin-info md:hidden">Round Win%</p>
+            <p className="text-xl font-bold text-skin-success">
               {player.rounds_win_percentage || 0}%
             </p>
           </div>
 
           {/* Average Tricks Per Round */}
           <div className="col-span-1 flex flex-col items-center justify-center">
-            <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Avg Tricks</p>
-            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+            <p className="text-sm text-skin-info md:hidden">Avg Tricks</p>
+            <p className="text-xl font-bold text-team1">
               {player.avg_tricks_per_round || 0}
             </p>
           </div>
 
           {/* Bet Success Rate */}
           <div className="col-span-1 flex flex-col items-center justify-center">
-            <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Bet Success</p>
-            <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+            <p className="text-sm text-skin-info md:hidden">Bet Success</p>
+            <p className="text-xl font-bold text-team2">
               {player.bet_success_rate || 0}%
             </p>
           </div>
@@ -221,7 +221,7 @@ export function GlobalLeaderboard({
 
             {/* Table Header - Game Stats */}
             {!showRoundStats && (
-              <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-gray-200 dark:bg-gray-700 rounded-lg font-bold text-sm text-gray-700 dark:text-gray-300">
+              <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-skin-tertiary rounded-lg font-bold text-sm text-skin-secondary">
                 <div className="col-span-1">Rank</div>
                 <div className="col-span-2">Player</div>
                 <div className="col-span-1 text-center">ELO</div>
@@ -233,7 +233,7 @@ export function GlobalLeaderboard({
 
             {/* Table Header - Round Stats */}
             {showRoundStats && (
-              <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-blue-200 dark:bg-blue-900/60 rounded-lg font-bold text-sm text-blue-900 dark:text-blue-200">
+              <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-skin-accent/20 rounded-lg font-bold text-sm text-skin-accent">
                 <div className="col-span-1">Rank</div>
                 <div className="col-span-2">Player</div>
                 <div className="col-span-1 text-center">Rounds</div>
@@ -259,7 +259,7 @@ export function GlobalLeaderboard({
         {/* Footer */}
         {!loading && players.length > 0 && (
           <UICard variant="bordered" size="md" className="mt-4">
-            <div className="flex flex-wrap gap-4 justify-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-wrap gap-4 justify-center text-sm text-skin-secondary">
               <div className="flex items-center gap-2">
                 <span>💎 Diamond:</span>
                 <span className="font-bold">
@@ -292,7 +292,7 @@ export function GlobalLeaderboard({
               </div>
             </div>
             {onViewPlayerStats && (
-              <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-center text-xs text-skin-muted mt-2">
                 Click on a player to view detailed statistics
               </p>
             )}
