@@ -1073,7 +1073,8 @@ export function ProfileProgressModal({
                                   <img
                                     src="/cards/production/red_bon.jpg"
                                     alt={skin.skinName}
-                                    className="w-full h-full object-cover rounded"
+                                    draggable={false}
+                                    className="w-full h-full object-cover rounded select-none pointer-events-none"
                                   />
                                 )}
                               </div>
@@ -1149,7 +1150,8 @@ export function ProfileProgressModal({
                                   <img
                                     src="/cards/production/brown_bon.jpg"
                                     alt={skin.skinName}
-                                    className="w-full h-full object-cover rounded"
+                                    draggable={false}
+                                    className="w-full h-full object-cover rounded select-none pointer-events-none"
                                   />
                                 )}
                               </div>

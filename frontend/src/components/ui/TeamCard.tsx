@@ -58,22 +58,22 @@ const teamColors: Record<
   }
 > = {
   1: {
-    solid: 'bg-orange-600 text-white border-orange-700',
+    solid: 'bg-team1 text-skin-team1-text border-team1',
     subtle:
-      'bg-orange-100/50 text-orange-100 border-orange-700',
+      'bg-team1-10 text-team1 border-team1',
     outlined:
-      'bg-transparent text-orange-300 border-orange-600',
+      'bg-transparent text-team1 border-team1',
     selectedRing:
-      'ring-2 ring-orange-500 ring-offset-2 ring-offset-skin-primary',
+      'ring-2 ring-team1 ring-offset-2 ring-offset-skin-primary',
   },
   2: {
-    solid: 'bg-purple-600 text-white border-purple-700',
+    solid: 'bg-team2 text-skin-team2-text border-team2',
     subtle:
-      'bg-purple-100/50 text-purple-100 border-purple-700',
+      'bg-team2-10 text-team2 border-team2',
     outlined:
-      'bg-transparent text-purple-300 border-purple-600',
+      'bg-transparent text-team2 border-team2',
     selectedRing:
-      'ring-2 ring-purple-500 ring-offset-2 ring-offset-skin-primary',
+      'ring-2 ring-team2 ring-offset-2 ring-offset-skin-primary',
   },
 };
 
@@ -141,14 +141,14 @@ export interface TeamBadgeProps {
 
 export function TeamBadge({ teamId, children, className = '' }: TeamBadgeProps) {
   const bgColor =
-    teamId === 1 ? 'bg-orange-600' : 'bg-purple-600';
+    teamId === 1 ? 'bg-team1' : 'bg-team2';
 
   return (
     <span
       className={`
         inline-flex items-center justify-center
         px-2 py-0.5
-        text-xs font-bold text-white
+        text-xs font-bold text-skin-team1-text
         rounded-full
         ${bgColor}
         ${className}
@@ -171,7 +171,7 @@ export interface TeamIndicatorProps {
 
 export function TeamIndicator({ teamId, size = 'md', className = '' }: TeamIndicatorProps) {
   const bgColor =
-    teamId === 1 ? 'bg-orange-400' : 'bg-purple-400';
+    teamId === 1 ? 'bg-team1' : 'bg-team2';
 
   const sizeClass = {
     sm: 'w-2 h-2',

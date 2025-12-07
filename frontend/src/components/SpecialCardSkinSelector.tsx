@@ -491,7 +491,8 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
             <img
               src={`/cards/production/${cardType === 'red_zero' ? 'red' : 'brown'}_bon.jpg`}
               alt={equippedSkin?.skinName || 'Default'}
-              className="w-8 h-8 rounded object-cover"
+              draggable={false}
+              className="w-8 h-8 rounded object-cover select-none pointer-events-none"
             />
           )}
           <div className="text-left">
@@ -548,7 +549,8 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
                   <img
                     src={`/cards/production/${cardType === 'red_zero' ? 'red' : 'brown'}_bon.jpg`}
                     alt={skin.skinName}
-                    className="w-8 h-8 rounded object-cover"
+                    draggable={false}
+                    className="w-8 h-8 rounded object-cover select-none pointer-events-none"
                   />
                 )}
                 <div className="flex-1">

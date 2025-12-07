@@ -29,8 +29,8 @@ const TABS: Tab[] = [
 type SectionVariant = 'orange' | 'purple' | 'yellow' | 'teal' | 'green' | 'blue' | 'accent' | 'success' | 'warning' | 'info' | 'team1' | 'team2' | 'default';
 
 const sectionBorderClasses: Record<SectionVariant, string> = {
-  orange: 'border-orange-500',
-  purple: 'border-purple-500',
+  orange: 'border-team1',
+  purple: 'border-team2',
   yellow: 'border-yellow-500',
   teal: 'border-teal-500',
   green: 'border-green-500',
@@ -292,7 +292,7 @@ const FeaturesContent = () => (
     </div>
 
     {/* Side Bets Feature */}
-    <SectionCard variant="orange">
+    <SectionCard variant="team1">
       <SectionTitle>🎲 Side Bets</SectionTitle>
       <ul className="space-y-1 ml-4 text-sm">
         <li>• Create bets during gameplay using coins</li>
@@ -318,7 +318,7 @@ const FeaturesContent = () => (
 const RewardsContent = () => (
   <div className="space-y-5">
     {/* XP Sources */}
-    <SectionCard variant="purple">
+    <SectionCard variant="team2">
       <SectionTitle>⭐ Experience Points (XP)</SectionTitle>
       <ul className="space-y-1 ml-4 text-sm">
         <li>
@@ -370,7 +370,7 @@ const RewardsContent = () => (
     </SectionCard>
 
     {/* Daily Quests */}
-    <SectionCard variant="orange">
+    <SectionCard variant="team1">
       <SectionTitle>📅 Daily Quests & Calendar</SectionTitle>
       <ul className="space-y-1 ml-4 text-sm">
         <li>
@@ -384,7 +384,7 @@ const RewardsContent = () => (
         </li>
         <li>• Click the 📅 calendar icon to view your quests and progress</li>
       </ul>
-      <p className="text-sm italic mt-3 p-2 rounded bg-orange-500/15 text-skin-secondary">
+      <p className="text-sm italic mt-3 p-2 rounded bg-team1-10 text-skin-secondary">
         Tip: Complete all 3 daily quests for bonus XP!
       </p>
     </SectionCard>

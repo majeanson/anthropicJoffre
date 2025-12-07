@@ -87,10 +87,10 @@ export const CatchUpModal = memo(function CatchUpModal({
               variant="gradient"
               gradient="team1"
               size="sm"
-              className={`text-center ${currentPlayer?.teamId === 1 ? 'ring-2 ring-orange-500' : ''}`}
+              className={`text-center ${currentPlayer?.teamId === 1 ? 'ring-2 ring-team1' : ''}`}
             >
-              <p className="text-xs font-semibold text-orange-700">Team 1</p>
-              <p className="text-2xl font-black text-orange-900">
+              <p className="text-xs font-semibold text-team1">Team 1</p>
+              <p className="text-2xl font-black text-team1">
                 {gameState.teamScores.team1}
               </p>
             </UICard>
@@ -98,10 +98,10 @@ export const CatchUpModal = memo(function CatchUpModal({
               variant="gradient"
               gradient="team2"
               size="sm"
-              className={`text-center ${currentPlayer?.teamId === 2 ? 'ring-2 ring-purple-500' : ''}`}
+              className={`text-center ${currentPlayer?.teamId === 2 ? 'ring-2 ring-team2' : ''}`}
             >
-              <p className="text-xs font-semibold text-purple-700">Team 2</p>
-              <p className="text-2xl font-black text-purple-900">
+              <p className="text-xs font-semibold text-team2">Team 2</p>
+              <p className="text-2xl font-black text-team2">
                 {gameState.teamScores.team2}
               </p>
             </UICard>

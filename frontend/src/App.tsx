@@ -888,7 +888,7 @@ function AppContent() {
               setGameState(null);
               setGameId('');
             }}
-            className="mt-4 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
+            className="mt-4 bg-skin-accent text-skin-inverse px-4 py-2 rounded hover:opacity-80"
           >
             Back to Lobby
           </button>
@@ -1468,7 +1468,7 @@ function AppContent() {
                 🏆 Game Over! 🏆
               </h2>
               <div
-                className={`text-6xl font-black mb-2 ${winningTeam === 1 ? 'text-orange-600' : 'text-purple-600'}`}
+                className={`text-6xl font-black mb-2 ${winningTeam === 1 ? 'text-team1' : 'text-team2'}`}
               >
                 Team {winningTeam} Wins!
               </div>
@@ -1478,28 +1478,28 @@ function AppContent() {
             {/* Final Scores */}
             <div className="grid grid-cols-2 gap-6 mb-8">
               <div
-                className={`text-center p-6 rounded-xl border-4 ${winningTeam === 1 ? 'bg-orange-100 border-orange-400 ring-4 ring-yellow-400' : 'bg-orange-50 border-orange-200'}`}
+                className={`text-center p-6 rounded-xl border-4 border-team1 ${winningTeam === 1 ? 'bg-team1-20 ring-4 ring-yellow-400' : 'bg-team1-10'}`}
               >
                 <div className="flex items-center justify-center gap-2 mb-2">
                   {winningTeam === 1 && <span className="text-3xl">👑</span>}
-                  <h3 className="text-2xl font-bold text-orange-800">Team 1</h3>
+                  <h3 className="text-2xl font-bold text-team1">Team 1</h3>
                 </div>
-                <p data-testid="team1-final-score" className="text-6xl font-black text-orange-600">
+                <p data-testid="team1-final-score" className="text-6xl font-black text-team1">
                   {gameState.teamScores.team1}
                 </p>
-                <p className="text-sm text-orange-700 mt-2">Final Score</p>
+                <p className="text-sm text-team1 opacity-80 mt-2">Final Score</p>
               </div>
               <div
-                className={`text-center p-6 rounded-xl border-4 ${winningTeam === 2 ? 'bg-purple-100 border-purple-400 ring-4 ring-yellow-400' : 'bg-purple-50 border-purple-200'}`}
+                className={`text-center p-6 rounded-xl border-4 border-team2 ${winningTeam === 2 ? 'bg-team2-20 ring-4 ring-yellow-400' : 'bg-team2-10'}`}
               >
                 <div className="flex items-center justify-center gap-2 mb-2">
                   {winningTeam === 2 && <span className="text-3xl">👑</span>}
-                  <h3 className="text-2xl font-bold text-purple-800">Team 2</h3>
+                  <h3 className="text-2xl font-bold text-team2">Team 2</h3>
                 </div>
-                <p data-testid="team2-final-score" className="text-6xl font-black text-purple-600">
+                <p data-testid="team2-final-score" className="text-6xl font-black text-team2">
                   {gameState.teamScores.team2}
                 </p>
-                <p className="text-sm text-purple-700 mt-2">Final Score</p>
+                <p className="text-sm text-team2 opacity-80 mt-2">Final Score</p>
               </div>
             </div>
 
@@ -1825,12 +1825,12 @@ function AppContent() {
                                 Round Score
                               </p>
                               <p className="font-bold">
-                                <span className="text-orange-600">
+                                <span className="text-team1">
                                   {round.roundScore.team1 >= 0 ? '+' : ''}
                                   {round.roundScore.team1}
                                 </span>
                                 {' / '}
-                                <span className="text-purple-600">
+                                <span className="text-team2">
                                   {round.roundScore.team2 >= 0 ? '+' : ''}
                                   {round.roundScore.team2}
                                 </span>
@@ -1866,7 +1866,7 @@ function AppContent() {
               <button
                 data-testid="view-replay-button"
                 onClick={() => setShowReplayModal(true)}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 border-2 border-purple-700 shadow-lg transform hover:scale-105"
+                className="bg-skin-accent text-skin-inverse px-8 py-4 rounded-xl font-bold hover:opacity-90 transition-all duration-300 border-2 border-skin-accent shadow-lg transform hover:scale-105"
               >
                 📺 View Game Replay
               </button>

@@ -191,8 +191,8 @@ export function MatchStatsModal({
                   <div
                     className={`p-6 rounded-xl text-center border-4 ${
                       matchData.winning_team === 1
-                        ? 'bg-gradient-to-r from-orange-400 to-amber-500 border-orange-800'
-                        : 'bg-gradient-to-r from-purple-400 to-indigo-500 border-purple-800'
+                        ? 'bg-team1 border-team1'
+                        : 'bg-team2 border-team2'
                     }`}
                   >
                     <h3 className="text-3xl font-bold text-white mb-2">
@@ -256,13 +256,13 @@ export function MatchStatsModal({
                       size="lg"
                       className={`border-4 ${
                         teamId === 1
-                          ? 'bg-orange-50 border-orange-300'
-                          : 'bg-purple-50 border-purple-300'
+                          ? 'bg-team1-10 border-team1'
+                          : 'bg-team2-10 border-team2'
                       }`}
                     >
                       <h4
                         className={`text-xl font-bold mb-3 ${
-                          teamId === 1 ? 'text-orange-800' : 'text-purple-800'
+                          teamId === 1 ? 'text-team1' : 'text-team2'
                         }`}
                       >
                         Team {teamId}{' '}
@@ -405,20 +405,20 @@ export function MatchStatsModal({
                         key={player}
                         className={`p-6 rounded-xl border-4 ${
                           teamId === 1
-                            ? 'bg-orange-50 border-orange-300'
-                            : 'bg-purple-50 border-purple-300'
+                            ? 'bg-team1-10 border-team1'
+                            : 'bg-team2-10 border-team2'
                         }`}
                       >
                         <h4
                           className={`text-xl font-bold mb-4 ${
-                            teamId === 1 ? 'text-orange-800' : 'text-purple-800'
+                            teamId === 1 ? 'text-team1' : 'text-team2'
                           }`}
                         >
                           {player} (Team {teamId})
                         </h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div className="bg-parchment-50 rounded-lg p-3 text-center border border-parchment-400">
-                            <div className="text-2xl font-bold text-purple-600">
+                          <div className="bg-skin-secondary rounded-lg p-3 text-center border border-skin-default">
+                            <div className="text-2xl font-bold text-skin-accent">
                               {stats.totalPoints}
                             </div>
                             <div className="text-xs text-umber-700 mt-1">Total Points</div>

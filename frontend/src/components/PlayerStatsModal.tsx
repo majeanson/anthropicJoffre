@@ -423,9 +423,9 @@ export function PlayerStatsModal({
                     <p className="text-red-700 font-bold text-sm">Rounds Lost</p>
                     <p className="text-3xl font-bold text-red-900">{stats.rounds_lost || 0}</p>
                   </div>
-                  <div className="bg-purple-100 rounded-lg p-4 border-2 border-purple-300">
-                    <p className="text-purple-700 font-bold text-sm">Win Rate</p>
-                    <p className="text-3xl font-bold text-purple-900">
+                  <div className="bg-team2-10 rounded-lg p-4 border-2 border-team2">
+                    <p className="text-team2 font-bold text-sm">Win Rate</p>
+                    <p className="text-3xl font-bold text-team2">
                       {stats.rounds_win_percentage || 0}%
                     </p>
                   </div>
@@ -465,7 +465,7 @@ export function PlayerStatsModal({
                 </div>
 
                 {/* Betting Performance */}
-                <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-6 border-2 border-orange-200">
+                <div className="bg-skin-tertiary rounded-lg p-6 border-2 border-skin-default">
                   <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
                     <span aria-hidden="true">💰</span> Betting Performance
                   </h3>
@@ -485,8 +485,8 @@ export function PlayerStatsModal({
                       <p className="text-2xl font-bold text-red-700">{stats.bets_failed || 0}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Success Rate</p>
-                      <p className="text-2xl font-bold text-purple-700">
+                      <p className="text-skin-secondary text-sm">Success Rate</p>
+                      <p className="text-2xl font-bold text-skin-accent">
                         {stats.bet_success_rate || 0}%
                       </p>
                     </div>
@@ -501,8 +501,8 @@ export function PlayerStatsModal({
                       <p className="text-2xl font-bold text-gray-900">{stats.highest_bet || 0}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Without Trump</p>
-                      <p className="text-2xl font-bold text-purple-700">
+                      <p className="text-skin-secondary text-sm">Without Trump</p>
+                      <p className="text-2xl font-bold text-skin-accent">
                         {stats.without_trump_bets || 0}
                       </p>
                     </div>
@@ -577,14 +577,14 @@ export function PlayerStatsModal({
                     <p className="text-red-700 font-bold text-sm">Games Lost</p>
                     <p className="text-3xl font-bold text-red-900">{stats.games_lost}</p>
                   </div>
-                  <div className="bg-purple-100 rounded-lg p-4 border-2 border-purple-300">
-                    <p className="text-purple-700 font-bold text-sm">Win Rate</p>
-                    <p className="text-3xl font-bold text-purple-900">{stats.win_percentage}%</p>
+                  <div className="bg-team2-10 rounded-lg p-4 border-2 border-team2">
+                    <p className="text-team2 font-bold text-sm">Win Rate</p>
+                    <p className="text-3xl font-bold text-team2">{stats.win_percentage}%</p>
                   </div>
                 </div>
 
                 {/* Streaks */}
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-6 border-2 border-yellow-200">
+                <div className="bg-skin-tertiary rounded-lg p-6 border-2 border-skin-default">
                   <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
                     <span aria-hidden="true">🔥</span> Streaks
                   </h3>

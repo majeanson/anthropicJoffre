@@ -697,6 +697,10 @@ button:not(:disabled):active {
 .shadow-team1 { box-shadow: 0 0 10px color-mix(in srgb, var(--color-team1-primary) 40%, transparent); }
 .shadow-team2 { box-shadow: 0 0 10px color-mix(in srgb, var(--color-team2-primary) 40%, transparent); }
 
+/* Team ring colors */
+.ring-team1 { --tw-ring-color: var(--color-team1-primary); }
+.ring-team2 { --tw-ring-color: var(--color-team2-primary); }
+
 /* Main container shadow */
 .shadow-main-glow { box-shadow: var(--shadow-glow), var(--shadow-lg); }
 .shadow-skin-glow { box-shadow: 0 0 10px var(--color-glow); }
@@ -1397,7 +1401,42 @@ button:not(:disabled):active {
 }
 
 /* Prevent text selection on game elements */
-.game-area {
+.game-area,
+.game-container {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Prevent image dragging and selection on mobile */
+.game-container img,
+.game-area img,
+.card-image,
+.avatar-image,
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* Re-enable pointer events for clickable images */
+.game-container img.clickable,
+.game-area img.clickable,
+img.clickable {
+  pointer-events: auto;
+}
+
+/* Prevent selection on interactive game elements */
+.game-container button,
+.game-container [role="button"],
+.game-container .card,
+.game-container .player-info,
+.game-container .team-card,
+.game-container .bet-button,
+.game-container .trick-area {
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;

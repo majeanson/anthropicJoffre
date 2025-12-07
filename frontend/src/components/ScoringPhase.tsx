@@ -109,7 +109,7 @@ export function ScoringPhase({
   const statistics: RoundStatistics | undefined = latestRound?.statistics;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-r from-purple-600 to-pink-600">
+    <div className="min-h-screen flex flex-col bg-skin-primary">
       {/* Game Header */}
       <GameHeader
         gameId={gameId}
@@ -243,14 +243,14 @@ export function ScoringPhase({
                   className="text-center"
                   data-testid="team-1-score-card"
                 >
-                  <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
+                  <h3 className="text-lg font-semibold text-team1 mb-2">Team 1</h3>
                   <p
-                    className="text-5xl font-bold text-orange-700"
+                    className="text-5xl font-bold text-team1"
                     data-testid="team-1-score"
                   >
                     {gameState.teamScores.team1}
                   </p>
-                  <p className="text-xs text-orange-600 mt-2">Total Score</p>
+                  <p className="text-xs text-team1 opacity-80 mt-2">Total Score</p>
                 </UICard>
                 <UICard
                   variant="gradient"
@@ -258,14 +258,14 @@ export function ScoringPhase({
                   className="text-center"
                   data-testid="team-2-score-card"
                 >
-                  <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
+                  <h3 className="text-lg font-semibold text-team2 mb-2">Team 2</h3>
                   <p
-                    className="text-5xl font-bold text-purple-700"
+                    className="text-5xl font-bold text-team2"
                     data-testid="team-2-score"
                   >
                     {gameState.teamScores.team2}
                   </p>
-                  <p className="text-xs text-purple-600 mt-2">Total Score</p>
+                  <p className="text-xs text-team2 opacity-80 mt-2">Total Score</p>
                 </UICard>
               </div>
 
@@ -344,12 +344,12 @@ export function ScoringPhase({
                     <div className="border-t-2 border-indigo-200 pt-3">
                       <p className="text-sm text-indigo-700 font-semibold mb-2">Round Score:</p>
                       <p className="font-bold">
-                        <span className="text-orange-600">
+                        <span className="text-team1">
                           Team 1: {latestRound.roundScore.team1 >= 0 ? '+' : ''}
                           {latestRound.roundScore.team1}
                         </span>
                         {' | '}
-                        <span className="text-purple-600">
+                        <span className="text-team2">
                           Team 2: {latestRound.roundScore.team2 >= 0 ? '+' : ''}
                           {latestRound.roundScore.team2}
                         </span>
@@ -425,14 +425,14 @@ export function ScoringPhase({
                     {statistics.trumpMaster && (
                       <UICard
                         variant="bordered"
-                        className="bg-purple-50 border-2 border-purple-300"
+                        className="bg-team2-10 border-2 border-team2"
                       >
                         <div className="text-3xl mb-2 text-center">👑</div>
-                        <p className="text-sm text-purple-700 text-center">Trump Master</p>
-                        <p className="font-bold text-lg text-center text-gray-800">
+                        <p className="text-sm text-team2 text-center">Trump Master</p>
+                        <p className="font-bold text-lg text-center text-skin-primary">
                           {statistics.trumpMaster.playerName}
                         </p>
-                        <p className="text-xs text-purple-600 text-center">
+                        <p className="text-xs text-team2 opacity-80 text-center">
                           {statistics.trumpMaster.trumpsPlayed} trumps played
                         </p>
                       </UICard>

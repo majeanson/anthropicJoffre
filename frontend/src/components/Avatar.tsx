@@ -89,7 +89,8 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
             alt={`${username}'s avatar`}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover"
+            draggable={false}
+            className="w-full h-full object-cover select-none pointer-events-none"
             onError={(e) => {
               // Fallback to initials if image fails to load
               e.currentTarget.style.display = 'none';
