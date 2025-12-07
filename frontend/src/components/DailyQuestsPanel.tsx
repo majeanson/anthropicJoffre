@@ -159,7 +159,7 @@ export function DailyQuestsPanel({ socket, playerName, isOpen, onClose }: DailyQ
             size="sm"
             className="text-center animate-pulse"
           >
-            <p className="text-green-900 dark:text-white">{notification}</p>
+            <p className="text-green-900">{notification}</p>
           </UICard>
         </div>
       )}
@@ -191,10 +191,10 @@ export function DailyQuestsPanel({ socket, playerName, isOpen, onClose }: DailyQ
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{quest.template.icon}</span>
                       <div>
-                        <h3 className="text-gray-900 dark:text-white font-semibold text-lg">
+                        <h3 className="text-gray-900 font-semibold text-lg">
                           {quest.template.name}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        <p className="text-gray-600 text-sm">
                           {quest.template.description}
                         </p>
                       </div>
@@ -233,14 +233,14 @@ export function DailyQuestsPanel({ socket, playerName, isOpen, onClose }: DailyQ
                   <div className="flex items-center justify-between">
                     <div className="flex gap-4 text-sm">
                       <div className="flex items-center gap-1">
-                        <span className="text-blue-500 dark:text-blue-400">⭐</span>
-                        <span className="text-gray-700 dark:text-gray-300">
+                        <span className="text-blue-500">⭐</span>
+                        <span className="text-gray-700">
                           {quest.template.reward_xp} XP
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <span className="text-yellow-500 dark:text-yellow-400">💰</span>
-                        <span className="text-gray-700 dark:text-gray-300">
+                        <span className="text-yellow-500">💰</span>
+                        <span className="text-gray-700">
                           {quest.template.reward_currency} coins
                         </span>
                       </div>
@@ -270,7 +270,7 @@ export function DailyQuestsPanel({ socket, playerName, isOpen, onClose }: DailyQ
 
       {/* Footer note */}
       <div className="mt-4 text-center">
-        <p className="text-gray-400 dark:text-gray-500 text-sm">
+        <p className="text-gray-400 text-sm">
           🔄 New quests available every day at midnight
         </p>
       </div>

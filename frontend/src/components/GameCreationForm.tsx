@@ -204,14 +204,14 @@ export function GameCreationForm({
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
+      <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 relative">
         {/* Decorative corners */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl"></div>
-        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl"></div>
-        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl"></div>
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl"></div>
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 rounded-tl-xl"></div>
+        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 rounded-tr-xl"></div>
+        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
 
-        <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">
+        <h2 className="text-4xl font-bold mb-6 text-umber-900 font-serif text-center">
           Create Game
         </h2>
         <form onSubmit={handleCreate} className="space-y-4">
@@ -232,7 +232,7 @@ export function GameCreationForm({
 
           {/* Persistence Mode Selector */}
           <div
-            className={`bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3 ${!user ? 'opacity-60' : ''}`}
+            className={`bg-parchment-100 border-2 border-umber-300 rounded-lg p-3 ${!user ? 'opacity-60' : ''}`}
           >
             <div className="flex items-center justify-between gap-3">
               <Checkbox
@@ -254,7 +254,7 @@ export function GameCreationForm({
                 {createGamePersistence === 'elo' ? 'Ranked' : 'Casual'}
               </UIBadge>
             </div>
-            <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
+            <p className="text-xs text-umber-600 mt-2">
               {!user ? (
                 <>
                   <span aria-hidden="true">🔒</span> Available when registered - Register to enable

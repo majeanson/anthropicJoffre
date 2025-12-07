@@ -87,11 +87,11 @@ export const PlayerConnectionIndicator: React.FC<PlayerConnectionIndicatorProps>
       </div>
       <div className="flex flex-col">
         <span className={`text-sm font-medium ${text}`}>
-          {playerName && <span className="text-gray-700 dark:text-gray-300">{playerName} - </span>}
+          {playerName && <span className="text-gray-700">{playerName} - </span>}
           {label}
         </span>
         {status === 'disconnected' && reconnectTimeLeft !== undefined && (
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-gray-500">
             Time remaining: {formatTime(reconnectTimeLeft)}
           </span>
         )}
@@ -142,7 +142,7 @@ export const PlayerCardWithStatus: React.FC<PlayerCardWithStatusProps> = ({
       <div className="flex items-center gap-2">
         <span className={`font-medium ${isDisconnected ? 'line-through' : ''}`}>{playerName}</span>
         {isCurrentPlayer && (
-          <span className="text-xs text-green-600 dark:text-green-400">(You)</span>
+          <span className="text-xs text-green-600">(You)</span>
         )}
         {isBot && (
           <UIBadge variant="solid" color="info" size="xs">
@@ -153,7 +153,7 @@ export const PlayerCardWithStatus: React.FC<PlayerCardWithStatusProps> = ({
 
       {/* Disconnection message */}
       {isDisconnected && reconnectTimeLeft !== undefined && (
-        <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+        <div className="mt-1 text-xs text-red-600">
           Reconnecting... {Math.floor(reconnectTimeLeft / 60)}:
           {(reconnectTimeLeft % 60).toString().padStart(2, '0')}
         </div>

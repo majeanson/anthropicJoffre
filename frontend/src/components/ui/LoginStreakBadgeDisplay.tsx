@@ -105,7 +105,7 @@ export function LoginStreakBadgeDisplay({
         {/* Tooltip */}
         {showTooltip && (
           <div
-            className="absolute top-full mt-2 left-0 bg-gray-800 dark:bg-gray-900 border border-gray-600 rounded-lg p-4 shadow-xl z-50 min-w-[280px]"
+            className="absolute top-full mt-2 left-0 bg-gray-800 border border-gray-600 rounded-lg p-4 shadow-xl z-50 min-w-[280px]"
             role="tooltip"
           >
             <div className="space-y-2">

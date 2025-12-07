@@ -93,9 +93,9 @@ export function UIToggle({
       title={label ? `${enabled ? 'Disable' : 'Enable'} ${label}` : undefined}
       className={`
         relative inline-flex items-center rounded-full transition-colors duration-200
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
         ${config.track}
-        ${enabled ? enabledColor : 'bg-gray-300 dark:bg-gray-600'}
+        ${enabled ? enabledColor : 'bg-gray-300'}
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         ${className}
       `}
@@ -144,14 +144,14 @@ export function UIToggleField({
           {togglePosition === 'right' && icon && (
             <span className="text-xl flex-shrink-0">{icon}</span>
           )}
-          <span className="text-umber-900 dark:text-gray-100 font-semibold">{fieldLabel}</span>
+          <span className="text-umber-900 font-semibold">{fieldLabel}</span>
           {togglePosition === 'left' && icon && (
             <span className="text-xl flex-shrink-0">{icon}</span>
           )}
         </div>
         {description && (
           <p
-            className={`text-xs text-umber-600 dark:text-gray-400 mt-0.5 ${
+            className={`text-xs text-umber-600 mt-0.5 ${
               togglePosition === 'right' && icon ? 'ml-7' : ''
             }`}
           >

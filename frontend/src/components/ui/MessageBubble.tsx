@@ -70,7 +70,7 @@ export function MessageBubble({
       <div className={`max-w-[70%] ${isSent ? 'items-end' : 'items-start'} flex flex-col`}>
         <div
           className={`px-4 py-2 rounded-2xl ${
-            isSent ? 'bg-blue-600 text-white' : 'bg-gray-700 dark:bg-gray-700 text-gray-100'
+            isSent ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-100'
           }`}
         >
           <p className="break-words">{text}</p>

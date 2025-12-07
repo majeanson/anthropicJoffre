@@ -621,7 +621,7 @@ export function ProfileProgressModal({
                       size="sm"
                       className="text-center animate-pulse"
                     >
-                      <p className="text-green-900 dark:text-white">{questNotification}</p>
+                      <p className="text-green-900">{questNotification}</p>
                     </UICard>
                   )}
 

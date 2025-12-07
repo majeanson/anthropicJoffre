@@ -76,7 +76,7 @@ export function SwapConfirmationModal({
       }
     >
       <div className="space-y-4">
-        <p className="text-gray-800 dark:text-gray-200">
+        <p className="text-gray-800">
           <span className="font-semibold">{fromPlayerName}</span> wants to swap positions with you.
         </p>
 
@@ -94,13 +94,13 @@ export function SwapConfirmationModal({
           </div>
         )}
 
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-gray-600">
           <p>• Your position and turn order will be swapped</p>
           <p>• Your cards and game progress will be preserved</p>
           {willChangeTeams && <p>• Your team will change due to the new position</p>}
         </div>
 
-        <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+        <p className="text-xs text-center text-gray-500 mt-2">
           Auto-rejects in {timeLeft} seconds
         </p>
       </div>

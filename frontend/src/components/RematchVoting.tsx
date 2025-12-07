@@ -28,21 +28,21 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
   return (
     <UICard variant="elevated" size="lg" className="max-w-2xl mx-auto">
       <div className="text-center space-y-6">
-        <h2 className="text-3xl font-black text-umber-900 dark:text-gray-100 font-serif">
+        <h2 className="text-3xl font-black text-umber-900 font-serif">
           Play Again?
         </h2>
 
-        <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-800/50">
+        <UICard variant="bordered" size="md" className="bg-white">
           <div className="text-6xl mb-4" aria-hidden="true">
             {rematchVotes.length === 4 ? '🎉' : '🔄'}
           </div>
 
           <div className="space-y-2">
-            <p className="text-2xl font-bold text-umber-900 dark:text-gray-100">
+            <p className="text-2xl font-bold text-umber-900">
               {rematchVotes.length} / 4 votes
             </p>
             {votesNeeded > 0 ? (
-              <p className="text-lg text-umber-700 dark:text-gray-300">
+              <p className="text-lg text-umber-700">
                 {votesNeeded === 1 ? '1 more vote needed!' : `${votesNeeded} more votes needed`}
               </p>
             ) : (
@@ -62,12 +62,12 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
                   className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all ${
                     voted
                       ? 'bg-forest-100 border-forest-400'
-                      : 'bg-parchment-200 dark:bg-gray-600 border-parchment-400 dark:border-gray-600 dark:border-gray-500 opacity-60'
+                      : 'bg-parchment-200 border-parchment-400 opacity-60'
                   }`}
                   title={player.name}
                 >
                   <TeamIndicator teamId={player.teamId} size="md" className="mb-2" />
-                  <div className="text-xs font-bold text-umber-900 dark:text-gray-100 max-w-[60px] truncate">
+                  <div className="text-xs font-bold text-umber-900 max-w-[60px] truncate">
                     {isCurrentPlayer ? 'You' : player.name}
                   </div>
                   <div className="text-2xl mt-1">{voted ? '✓' : '○'}</div>
@@ -90,7 +90,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
 
         {hasVoted && votesNeeded > 0 && (
           <UICard variant="bordered" size="sm" gradient="info">
-            <p className="font-semibold text-blue-800 dark:text-blue-200">
+            <p className="font-semibold text-blue-800">
               ✓ You voted for rematch. Waiting for other players...
             </p>
           </UICard>

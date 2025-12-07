@@ -55,31 +55,31 @@ const variantClasses: Record<IconButtonVariant, string> = {
   circular: `
     rounded-full
     bg-red-600 hover:bg-red-700
-    dark:bg-red-700 dark:hover:bg-red-800
+   
     text-white
     shadow-lg
   `,
   square: `
     rounded-lg
     bg-gray-200 hover:bg-gray-300
-    dark:bg-gray-700 dark:hover:bg-gray-600
-    text-gray-900 dark:text-gray-100
+   
+    text-gray-900
     shadow-md
   `,
   minimal: `
     rounded-lg
     bg-transparent hover:bg-gray-100
-    dark:hover:bg-gray-800
+   
     text-gray-700 hover:text-red-600
-    dark:text-gray-300 dark:hover:text-red-400
+   
   `,
   header: `
     rounded
     bg-white/20 hover:bg-white/30
-    dark:bg-black/30 dark:hover:bg-black/40
+   
     backdrop-blur-sm
-    border border-white/30 dark:border-gray-600
-    text-white dark:text-gray-100
+    border border-white/30
+    text-white
   `,
 };
 

@@ -53,7 +53,7 @@ export function BotTakeoverModal({
 
       {/* Bots List */}
       <div className="space-y-3">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Available Bots:</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-2">Available Bots:</h3>
         {availableBots.map((bot) => (
           <TeamCard key={bot.name} teamId={bot.teamId} variant="subtle" size="lg">
             <div className="flex items-center justify-between gap-4 mb-3">
@@ -61,9 +61,9 @@ export function BotTakeoverModal({
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <TeamIndicator teamId={bot.teamId} size="md" />
-                  <span className="font-bold text-gray-900 dark:text-gray-100">{bot.name}</span>
+                  <span className="font-bold text-gray-900">{bot.name}</span>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <div className="text-sm text-gray-600 mt-1">
                   Team {bot.teamId} • {getDifficultyEmoji(bot.difficulty)}{' '}
                   {bot.difficulty.charAt(0).toUpperCase() + bot.difficulty.slice(1)}
                 </div>

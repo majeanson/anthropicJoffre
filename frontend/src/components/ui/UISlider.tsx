@@ -90,11 +90,11 @@ export function UISlider({
       aria-valuemax={max}
       data-testid={testId}
       className={`
-        w-full bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer
+        w-full bg-gray-200 rounded-lg appearance-none cursor-pointer
         ${sizeConfig[size]}
         ${colorConfig[color]}
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
         ${className}
       `}
     />
@@ -126,9 +126,9 @@ export function UISliderField({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-sm text-umber-700 dark:text-gray-300 font-medium">{fieldLabel}</span>
+        <span className="text-sm text-umber-700 font-medium">{fieldLabel}</span>
         {showValueLabel && valueLabelPosition === 'right' && (
-          <span className="text-xs text-umber-600 dark:text-gray-400 tabular-nums">
+          <span className="text-xs text-umber-600 tabular-nums">
             {valueDisplay}
           </span>
         )}
@@ -136,7 +136,7 @@ export function UISliderField({
       <UISlider {...sliderProps} formatValue={formatValue} label={fieldLabel} />
       {showValueLabel && valueLabelPosition === 'below' && (
         <div className="text-center mt-1">
-          <span className="text-sm text-umber-600 dark:text-gray-400 tabular-nums">
+          <span className="text-sm text-umber-600 tabular-nums">
             {valueDisplay}
           </span>
         </div>
