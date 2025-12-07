@@ -159,7 +159,7 @@ export function ScoringPhase({
       <div className="flex-1 flex items-center justify-center p-4 md:p-6">
         <UICard variant="elevated" size="lg" className="bg-parchment-100 max-w-4xl w-full">
           <h2
-            className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-900 text-center"
+            className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-skin-primary text-center"
             data-testid="scoring-phase-heading"
           >
             Round {gameState.roundNumber} Complete!
@@ -228,7 +228,7 @@ export function ScoringPhase({
                     style={{ animationDelay: '0.3s' }}
                   ></div>
                 </div>
-                <p className="text-center text-lg font-semibold text-gray-700 animate-pulse">
+                <p className="text-center text-lg font-semibold text-skin-secondary animate-pulse">
                   Calculating round results...
                 </p>
               </div>
@@ -272,14 +272,14 @@ export function ScoringPhase({
               {/* Current Bet Information */}
               {latestRound && latestRound.highestBet && (
                 <section className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2">
+                  <h3 className="text-xl font-bold text-skin-primary mb-4 border-b-2 border-skin-default pb-2">
                     <span aria-hidden="true">🎲</span> Round Bet
                   </h3>
                   <UICard variant="gradient" gradient="info">
                     <div className="grid grid-cols-3 gap-4 text-center">
                       <div>
                         <p className="text-sm text-blue-700 font-semibold mb-1">Highest Bidder</p>
-                        <p className="text-lg font-bold text-gray-900">
+                        <p className="text-lg font-bold text-skin-primary">
                           {gameState.players.find((p) => p.id === latestRound.highestBet?.playerId)
                             ?.name || 'Unknown'}
                         </p>
@@ -287,13 +287,13 @@ export function ScoringPhase({
                       </div>
                       <div>
                         <p className="text-sm text-blue-700 font-semibold mb-1">Bet Amount</p>
-                        <p className="text-lg font-bold text-gray-900">
+                        <p className="text-lg font-bold text-skin-primary">
                           {latestRound.betAmount} points
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-blue-700 font-semibold mb-1">Type</p>
-                        <p className="text-lg font-bold text-gray-900">
+                        <p className="text-lg font-bold text-skin-primary">
                           {latestRound.withoutTrump ? (
                             <span className="text-red-600">Without Trump (2x)</span>
                           ) : (
@@ -309,24 +309,24 @@ export function ScoringPhase({
               {/* Round Results */}
               {latestRound && (
                 <section className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2">
+                  <h3 className="text-xl font-bold text-skin-primary mb-4 border-b-2 border-skin-default pb-2">
                     <span aria-hidden="true">📊</span> Round Results
                   </h3>
                   <UICard variant="gradient" gradient="primary">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                       <div>
                         <p className="text-indigo-700 font-semibold mb-1">Offensive Team</p>
-                        <p className="font-bold text-gray-900">Team {latestRound.offensiveTeam}</p>
+                        <p className="font-bold text-skin-primary">Team {latestRound.offensiveTeam}</p>
                       </div>
                       <div>
                         <p className="text-indigo-700 font-semibold mb-1">Points Earned</p>
-                        <p className="font-bold text-gray-900">
+                        <p className="font-bold text-skin-primary">
                           {latestRound.offensivePoints} / {latestRound.betAmount}
                         </p>
                       </div>
                       <div>
                         <p className="text-indigo-700 font-semibold mb-1">Defensive Points</p>
-                        <p className="font-bold text-gray-900">{latestRound.defensivePoints}</p>
+                        <p className="font-bold text-skin-primary">{latestRound.defensivePoints}</p>
                       </div>
                       <div>
                         <p className="text-indigo-700 font-semibold mb-1">Result</p>
@@ -362,7 +362,7 @@ export function ScoringPhase({
               {/* Detailed Trick History */}
               {latestRound?.tricks && latestRound.tricks.length > 0 && (
                 <section className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2">
+                  <h3 className="text-xl font-bold text-skin-primary mb-4 border-b-2 border-skin-default pb-2">
                     <span aria-hidden="true">🃏</span> Tricks Played
                   </h3>
                   <UICard variant="gradient" gradient="info">
@@ -386,7 +386,7 @@ export function ScoringPhase({
               {/* Round Statistics */}
               {statistics && (
                 <UICard variant="gradient" gradient="warning" className="mb-4">
-                  <h3 className="text-xl font-bold mb-4 text-gray-800 text-center">
+                  <h3 className="text-xl font-bold mb-4 text-skin-primary text-center">
                     <span aria-hidden="true">🏅</span> Round Highlights
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
@@ -397,7 +397,7 @@ export function ScoringPhase({
                       >
                         <div className="text-3xl mb-2 text-center">🏆</div>
                         <p className="text-sm text-yellow-700 text-center">Trick Master</p>
-                        <p className="font-bold text-lg text-center text-gray-800">
+                        <p className="font-bold text-lg text-center text-skin-primary">
                           {statistics.trickMaster.playerName}
                         </p>
                         <p className="text-xs text-yellow-600 text-center">
@@ -413,7 +413,7 @@ export function ScoringPhase({
                       >
                         <div className="text-3xl mb-2 text-center">💎</div>
                         <p className="text-sm text-red-700 text-center">Point Leader</p>
-                        <p className="font-bold text-lg text-center text-gray-800">
+                        <p className="font-bold text-lg text-center text-skin-primary">
                           {statistics.pointLeader.playerName}
                         </p>
                         <p className="text-xs text-red-600 text-center">
@@ -445,7 +445,7 @@ export function ScoringPhase({
                       >
                         <div className="text-3xl mb-2 text-center">🍀</div>
                         <p className="text-sm text-green-700 text-center">Lucky Player</p>
-                        <p className="font-bold text-lg text-center text-gray-800">
+                        <p className="font-bold text-lg text-center text-skin-primary">
                           {statistics.luckyPlayer.playerName}
                         </p>
                         <p className="text-xs text-green-600 text-center">

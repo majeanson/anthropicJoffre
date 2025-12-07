@@ -10,7 +10,7 @@
  * - Slide-in animation
  * - Icon support
  * Usage:
- * ```tsx
+ * ```tsx 
  * <Toast
  *   variant="success"
  *   message="Operation completed successfully!"

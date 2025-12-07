@@ -530,11 +530,11 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
               <div className="flex items-center gap-2 text-sm md:text-base">
                 <span className="text-xs text-skin-muted">Score:</span>
-                <span className="font-bold text-orange-600">
+                <span className="font-bold text-team1">
                   T1: {currentRound.roundScore?.team1 || 0}
                 </span>
                 <span className="text-gray-400">/</span>
-                <span className="font-bold text-purple-600">
+                <span className="font-bold text-team2">
                   T2: {currentRound.roundScore?.team2 || 0}
                 </span>
               </div>

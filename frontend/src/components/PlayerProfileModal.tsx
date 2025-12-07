@@ -532,7 +532,7 @@ export function PlayerProfileModal({
                   <UICard variant="bordered" size="sm" className="flex-1">
                     <div className="text-xs font-semibold text-gray-400 mb-1">FAVORITE TEAM</div>
                     <div
-                      className={`text-sm font-semibold ${profile.favorite_team === 1 ? 'text-orange-400' : 'text-purple-400'}`}
+                      className={`text-sm font-semibold ${profile.favorite_team === 1 ? 'text-team1' : 'text-team2'}`}
                     >
                       Team {profile.favorite_team}
                     </div>
@@ -588,21 +588,21 @@ export function PlayerProfileModal({
                   </div>
                   <div className="text-xs text-gray-400">Coins Won</div>
                 </div>
-                <div className="text-center p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                  <div className="text-lg font-bold text-orange-400">
+                <div className="text-center p-2 bg-team1-10 rounded-lg border border-team1">
+                  <div className="text-lg font-bold text-team1">
                     -{stats.side_bets_coins_lost ?? 0}
                   </div>
                   <div className="text-xs text-gray-400">Coins Lost</div>
                 </div>
                 {(stats.best_bet_streak ?? 0) > 0 && (
-                  <div className="col-span-2 text-center p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                  <div className="col-span-2 text-center p-2 bg-team2-10 rounded-lg border border-team2">
                     <div className="flex items-center justify-center gap-2">
-                      <span className="text-lg font-bold text-purple-400">
+                      <span className="text-lg font-bold text-team2">
                         🔥 {stats.current_bet_streak ?? 0}
                       </span>
                       <span className="text-xs text-gray-400">current</span>
                       <span className="text-gray-600">|</span>
-                      <span className="text-lg font-bold text-purple-400">
+                      <span className="text-lg font-bold text-team2">
                         {stats.best_bet_streak ?? 0}
                       </span>
                       <span className="text-xs text-gray-400">best streak</span>
@@ -679,7 +679,7 @@ export function PlayerProfileModal({
           {mutualFriends.length > 0 && (
             <UICard variant="bordered" size="md">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-semibold text-purple-400">
+                <h4 className="text-sm font-semibold text-team2">
                   <span aria-hidden="true">🤝</span> Mutual Friends
                 </h4>
                 <span className="text-xs text-gray-400">{mutualFriends.length} in common</span>
@@ -688,7 +688,7 @@ export function PlayerProfileModal({
                 {mutualFriends.slice(0, 6).map((friendName) => (
                   <div
                     key={friendName}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-team2-10 border border-team2"
                   >
                     <Avatar username={friendName} size="sm" />
                     <span className="text-sm text-gray-200">{friendName}</span>

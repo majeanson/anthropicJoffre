@@ -61,7 +61,7 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
               </UIBadge>
             )}
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-skin-muted">
             {game.finished_at
               ? new Date(game.finished_at).toLocaleDateString('en-US', {
                   year: 'numeric',
@@ -84,36 +84,36 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
 
         {/* Score */}
         <div className="text-right">
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-skin-primary">
             {game.team1_score ?? 0} - {game.team2_score ?? 0}
           </div>
-          <div className="text-xs text-gray-600">
+          <div className="text-xs text-skin-muted">
             {game.rounds ?? 0} round{(game.rounds ?? 0) !== 1 ? 's' : ''}
           </div>
         </div>
       </div>
 
       {/* Stats - Only show if we have data */}
-      <div className="grid grid-cols-3 gap-3 text-sm mb-3 pt-3 border-t border-gray-300">
+      <div className="grid grid-cols-3 gap-3 text-sm mb-3 pt-3 border-t border-skin-default">
         <div>
-          <p className="text-gray-600">Tricks Won</p>
-          <p className="font-bold text-gray-900">{game.tricks_won ?? '-'}</p>
+          <p className="text-skin-muted">Tricks Won</p>
+          <p className="font-bold text-skin-primary">{game.tricks_won ?? '-'}</p>
         </div>
         <div>
-          <p className="text-gray-600">Points Earned</p>
-          <p className="font-bold text-gray-900">{game.points_earned ?? '-'}</p>
+          <p className="text-skin-muted">Points Earned</p>
+          <p className="font-bold text-skin-primary">{game.points_earned ?? '-'}</p>
         </div>
         {game.bet_amount !== null && game.bet_amount !== undefined ? (
           <div>
-            <p className="text-gray-600">Bet</p>
-            <p className="font-bold text-gray-900">
+            <p className="text-skin-muted">Bet</p>
+            <p className="font-bold text-skin-primary">
               {game.bet_amount} {game.bet_won === true ? '✓' : game.bet_won === false ? '✗' : ''}
             </p>
           </div>
         ) : (
           <div>
-            <p className="text-gray-600">Status</p>
-            <p className="font-bold text-gray-900">{isFinished ? 'N/A' : 'Active'}</p>
+            <p className="text-skin-muted">Status</p>
+            <p className="font-bold text-skin-primary">{isFinished ? 'N/A' : 'Active'}</p>
           </div>
         )}
       </div>

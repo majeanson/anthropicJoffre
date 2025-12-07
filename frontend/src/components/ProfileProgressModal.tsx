@@ -923,7 +923,7 @@ export function ProfileProgressModal({
                                 isActive
                                   ? 'ring-2 ring-blue-500 border-skin-accent'
                                   : isPreviewing
-                                    ? 'ring-2 ring-purple-500 border-purple-500'
+                                    ? 'ring-2 ring-team2 border-team2'
                                     : 'hover:ring-1 hover:ring-purple-500/50 border-skin-subtle'
                               }
                             `}
@@ -1041,10 +1041,10 @@ export function ProfileProgressModal({
                                   relative p-2 rounded-lg text-center transition-all cursor-pointer bg-skin-secondary border
                                   ${
                                     isEquipped
-                                      ? 'ring-2 ring-orange-500 border-orange-500'
+                                      ? 'ring-2 ring-team1 border-team1'
                                       : isPreviewing
-                                        ? 'ring-2 ring-purple-500 border-purple-500'
-                                        : 'hover:ring-1 hover:ring-orange-400/50 border-skin-subtle'
+                                        ? 'ring-2 ring-team2 border-team2'
+                                        : 'hover:ring-1 hover:ring-team1 border-skin-subtle'
                                   }
                                   ${!isUnlocked ? 'opacity-60' : ''}
                                 `}
@@ -1085,7 +1085,7 @@ export function ProfileProgressModal({
 
                               {/* Status */}
                               {isEquipped ? (
-                                <span className="text-[10px] text-orange-400">Equipped</span>
+                                <span className="text-[10px] text-team1">Equipped</span>
                               ) : isUnlocked ? (
                                 <span className="text-[10px] text-green-400">Select</span>
                               ) : (
@@ -1120,7 +1120,7 @@ export function ProfileProgressModal({
                                     isEquipped
                                       ? 'ring-2 ring-amber-700 border-amber-700'
                                       : isPreviewing
-                                        ? 'ring-2 ring-purple-500 border-purple-500'
+                                        ? 'ring-2 ring-team2 border-team2'
                                         : 'hover:ring-1 hover:ring-amber-600/50 border-skin-subtle'
                                   }
                                   ${!isUnlocked ? 'opacity-60' : ''}
@@ -1204,7 +1204,7 @@ export function ProfileProgressModal({
                                 isActive
                                   ? 'ring-2 ring-blue-500 border-skin-accent'
                                   : isPreviewing
-                                    ? 'ring-2 ring-purple-500 border-purple-500'
+                                    ? 'ring-2 ring-team2 border-team2'
                                     : 'hover:ring-1 hover:ring-purple-500/50 border-skin-subtle'
                               }
                             `}
