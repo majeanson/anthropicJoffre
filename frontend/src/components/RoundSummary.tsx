@@ -424,31 +424,31 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
 
   const renderBet = (playerName: string) => {
     if (!statistics?.playerBets)
-      return <span className="text-gray-500 dark:text-gray-400">--</span>;
+      return <span className="text-skin-muted">--</span>;
 
     const bet = statistics.playerBets[playerName];
     if (bet === null) {
-      return <span className="text-gray-500 dark:text-gray-400 italic">Skipped</span>;
+      return <span className="text-skin-muted italic">Skipped</span>;
     }
     if (bet) {
       return (
-        <span className="font-semibold text-gray-800 dark:text-gray-200">
+        <span className="font-semibold text-skin-primary">
           Bet {bet.amount}
           {bet.withoutTrump && (
-            <span className="ml-1 text-purple-600 dark:text-purple-400">⚡</span>
+            <span className="ml-1 text-team2">⚡</span>
           )}
         </span>
       );
     }
-    return <span className="text-gray-500 dark:text-gray-400">--</span>;
+    return <span className="text-skin-muted">--</span>;
   };
 
   const renderHand = (playerName: string) => {
     if (!statistics?.initialHands)
-      return <span className="text-gray-500 dark:text-gray-400">No hand data</span>;
+      return <span className="text-skin-muted">No hand data</span>;
 
     const hand = statistics.initialHands[playerName];
-    if (!hand) return <span className="text-gray-500 dark:text-gray-400">No hand data</span>;
+    if (!hand) return <span className="text-skin-muted">No hand data</span>;
 
     // Sort hand by suit then value
     const sortedHand = [...hand].sort((a, b) => {
@@ -490,17 +490,17 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
       <div style={{ animationDelay: `${index * 150}ms` }} className="animate-fadeInUp">
         <UICard
           variant="bordered"
-          className="flex items-center gap-3 bg-amber-50 dark:bg-gray-700 border-2 border-amber-200 dark:border-gray-600 transform hover:scale-105 transition-transform"
+          className="flex items-center gap-3 bg-skin-tertiary border-2 border-skin-accent transform hover:scale-105 transition-transform"
         >
           <span className="text-3xl">{icon}</span>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">
+            <div className="text-xs font-medium text-skin-accent uppercase tracking-wide">
               {title}
             </div>
-            <div className="font-bold text-base text-gray-900 dark:text-white truncate">
+            <div className="font-bold text-base text-skin-primary truncate">
               {stat.playerName}
             </div>
-            <div className="text-sm text-gray-700 dark:text-gray-300">{description}</div>
+            <div className="text-sm text-skin-secondary">{description}</div>
           </div>
         </UICard>
       </div>
@@ -520,7 +520,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
               <div className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-green-500 to-emerald-600 delay-200"></div>
               <div className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-purple-500 to-indigo-600 delay-300"></div>
             </div>
-            <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
+            <p className="text-center text-lg font-semibold text-skin-secondary animate-pulse">
               Calculating round results...
             </p>
           </div>
@@ -540,7 +540,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
 
       {/* Player Ready Status */}
       <div className="space-y-3 animate-fadeInUp delay-[550ms]">
-        <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200 text-center">
+        <h3 className="font-bold text-lg sm:text-xl text-skin-primary text-center">
           👥 Ready Status
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-3xl mx-auto">
@@ -553,18 +553,18 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
                 size="sm"
                 className={`transition-all ${
                   isReady
-                    ? 'bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600'
-                    : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+                    ? 'bg-skin-success border-skin-success'
+                    : 'bg-skin-secondary border-skin-default'
                 }`}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{isReady ? '✓' : '⏳'}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
+                    <div className="font-semibold text-sm text-skin-primary truncate">
                       {player.name}
                     </div>
                     <div
-                      className={`text-xs ${isReady ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}
+                      className={`text-xs ${isReady ? 'text-skin-success' : 'text-skin-muted'}`}
                     >
                       {isReady ? 'Ready' : 'Waiting...'}
                     </div>
@@ -595,18 +595,18 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
           gradient="team1"
           className={`border-4 transition-all ${
             lastRound.offensiveTeam === 1
-              ? 'border-orange-400 dark:border-orange-600 shadow-lg'
-              : 'border-orange-200 dark:border-gray-700'
+              ? 'border-[var(--color-team1-primary)] shadow-lg'
+              : 'border-skin-subtle'
           }`}
         >
-          <h3 className="font-bold text-lg sm:text-xl text-orange-600 dark:text-orange-400 mb-2">
+          <h3 className="font-bold text-lg sm:text-xl text-team1 mb-2">
             Team 1
           </h3>
 
           {/* Round Points - Main Focus */}
           <div className="mb-3">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
-            <div className="text-5xl sm:text-6xl font-black text-orange-700 dark:text-orange-300">
+            <div className="text-sm text-skin-secondary mb-1">This Round</div>
+            <div className="text-5xl sm:text-6xl font-black text-team1">
               {lastRound.roundScore.team1 >= 0 ? '+' : ''}
               {lastRound.roundScore.team1}
             </div>
@@ -614,14 +614,14 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
 
           {lastRound.offensiveTeam === 1 && (
             <div
-              className={`text-sm sm:text-base mb-2 font-semibold ${lastRound.betMade ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+              className={`text-sm sm:text-base mb-2 font-semibold ${lastRound.betMade ? 'text-skin-success' : 'text-skin-error'}`}
             >
               {lastRound.betMade ? '✓ Made bet!' : `✗ Missed bet`}
             </div>
           )}
 
           {/* Total Score - Less Prominent */}
-          <div className="text-base sm:text-lg text-gray-700 dark:text-gray-300 mt-3 pt-3 border-t-2 border-orange-200 dark:border-gray-600">
+          <div className="text-base sm:text-lg text-skin-secondary mt-3 pt-3 border-t-2 border-skin-subtle">
             Total Score: <span className="font-bold">{gameState.teamScores.team1}</span>
           </div>
         </UICard>
@@ -631,18 +631,18 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
           gradient="team2"
           className={`border-4 transition-all ${
             lastRound.offensiveTeam === 2
-              ? 'border-purple-400 dark:border-purple-600 shadow-lg'
-              : 'border-purple-200 dark:border-gray-700'
+              ? 'border-[var(--color-team2-primary)] shadow-lg'
+              : 'border-skin-subtle'
           }`}
         >
-          <h3 className="font-bold text-lg sm:text-xl text-purple-600 dark:text-purple-400 mb-2">
+          <h3 className="font-bold text-lg sm:text-xl text-team2 mb-2">
             Team 2
           </h3>
 
           {/* Round Points - Main Focus */}
           <div className="mb-3">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
-            <div className="text-5xl sm:text-6xl font-black text-purple-700 dark:text-purple-300">
+            <div className="text-sm text-skin-secondary mb-1">This Round</div>
+            <div className="text-5xl sm:text-6xl font-black text-team2">
               {lastRound.roundScore.team2 >= 0 ? '+' : ''}
               {lastRound.roundScore.team2}
             </div>
@@ -650,14 +650,14 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
 
           {lastRound.offensiveTeam === 2 && (
             <div
-              className={`text-sm sm:text-base mb-2 font-semibold ${lastRound.betMade ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+              className={`text-sm sm:text-base mb-2 font-semibold ${lastRound.betMade ? 'text-skin-success' : 'text-skin-error'}`}
             >
               {lastRound.betMade ? '✓ Made bet!' : `✗ Missed bet`}
             </div>
           )}
 
           {/* Total Score - Less Prominent */}
-          <div className="text-base sm:text-lg text-gray-700 dark:text-gray-300 mt-3 pt-3 border-t-2 border-purple-200 dark:border-gray-600">
+          <div className="text-base sm:text-lg text-skin-secondary mt-3 pt-3 border-t-2 border-skin-subtle">
             Total Score: <span className="font-bold">{gameState.teamScores.team2}</span>
           </div>
         </UICard>
@@ -668,7 +668,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
         <section className="animate-fadeInUp delay-150" aria-label="Round rewards" role="region">
           <UICard
             variant="bordered"
-            className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 border-2 border-emerald-300 dark:border-emerald-700"
+            className="bg-skin-success border-2 border-skin-success"
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               {/* XP Section */}
@@ -682,13 +682,13 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
                 </span>
                 <div>
                   <h4
-                    className="text-sm font-semibold text-emerald-800 dark:text-emerald-300"
+                    className="text-sm font-semibold text-skin-success"
                     id="xp-label"
                   >
                     {XP_STRINGS.XP_EARNED}
                   </h4>
                   <div
-                    className="text-2xl font-black text-emerald-600 dark:text-emerald-400"
+                    className="text-2xl font-black text-skin-success"
                     aria-labelledby="xp-label"
                   >
                     +{rewardsEarned.xp.total} XP
@@ -698,7 +698,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
 
               {/* Coins Section */}
               <div
-                className="flex items-center gap-3 sm:border-l sm:border-emerald-300 dark:sm:border-emerald-700 sm:pl-4"
+                className="flex items-center gap-3 sm:border-l sm:border-skin-success sm:pl-4"
                 role="group"
                 aria-label="Coins earned"
               >
@@ -707,13 +707,13 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
                 </span>
                 <div>
                   <h4
-                    className="text-sm font-semibold text-amber-700 dark:text-amber-400"
+                    className="text-sm font-semibold text-skin-warning"
                     id="coins-label"
                   >
                     {XP_STRINGS.COINS_EARNED}
                   </h4>
                   <div
-                    className="text-2xl font-black text-amber-600 dark:text-amber-400"
+                    className="text-2xl font-black text-skin-warning"
                     aria-labelledby="coins-label"
                   >
                     +{rewardsEarned.coins.total}
@@ -723,10 +723,10 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
 
               {/* Breakdown */}
               <div
-                className="text-right text-xs space-y-1 border-t sm:border-t-0 sm:border-l border-emerald-300 dark:border-emerald-700 pt-3 sm:pt-0 sm:pl-4"
+                className="text-right text-xs space-y-1 border-t sm:border-t-0 sm:border-l border-skin-success pt-3 sm:pt-0 sm:pl-4"
                 aria-label="Reward breakdown"
               >
-                <div className="text-emerald-700 dark:text-emerald-400">
+                <div className="text-skin-success">
                   {rewardsEarned.xp.breakdown.tricks > 0 && (
                     <div>
                       {rewardsEarned.tricksWon} tricks = +{rewardsEarned.xp.breakdown.tricks} XP
@@ -742,7 +742,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
                     </div>
                   )}
                 </div>
-                <div className="text-amber-600 dark:text-amber-400">
+                <div className="text-skin-warning">
                   {rewardsEarned.coins.breakdown.round > 0 && (
                     <div>Round = +{rewardsEarned.coins.breakdown.round} coins</div>
                   )}
@@ -759,7 +759,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
       {/* Round Highlights - Only 3 stats, cycling */}
       {displayedStats.length > 0 && (
         <div className="space-y-3">
-          <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200 animate-fadeInUp delay-200">
+          <h3 className="font-bold text-lg sm:text-xl text-skin-primary animate-fadeInUp delay-200">
             ⭐ Round Highlights
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -773,12 +773,12 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
       {/* Trick History */}
       {lastRound.tricks && lastRound.tricks.length > 0 && (
         <div className="space-y-3 animate-fadeInUp delay-300">
-          <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">
+          <h3 className="font-bold text-lg sm:text-xl text-skin-primary">
             🃏 Trick History
           </h3>
           <UICard
             variant="bordered"
-            className="bg-parchment-100 dark:bg-gray-800 border-2 border-amber-200 dark:border-gray-600"
+            className="bg-skin-secondary border-2 border-skin-accent"
           >
             <TrickHistory
               tricks={lastRound.tricks}
@@ -793,29 +793,29 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
 
       {/* Detailed Player Statistics */}
       <div className="space-y-3 animate-fadeInUp delay-[400ms]">
-        <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">
+        <h3 className="font-bold text-lg sm:text-xl text-skin-primary">
           📊 Player Performance
         </h3>
         <UICard
           variant="bordered"
-          className="bg-parchment-100 dark:bg-gray-800 overflow-hidden border-2 border-amber-200 dark:border-gray-600"
+          className="bg-skin-secondary overflow-hidden border-2 border-skin-accent"
         >
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px]">
-              <thead className="bg-amber-100 dark:bg-gray-700">
+              <thead className="bg-skin-tertiary">
                 <tr>
-                  <th className="px-3 sm:px-4 py-3 text-left text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">
+                  <th className="px-3 sm:px-4 py-3 text-left text-xs font-bold text-skin-accent uppercase tracking-wider">
                     Player
                   </th>
-                  <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">
+                  <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-skin-accent uppercase tracking-wider">
                     Tricks
                   </th>
-                  <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">
+                  <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-skin-accent uppercase tracking-wider">
                     Points
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-amber-100 dark:divide-gray-700">
+              <tbody className="divide-y divide-skin-default">
                 {gameState.players.map((player) => {
                   const redZeros =
                     lastRound.playerStats?.find((ps) => ps.playerName === player.name)
@@ -827,9 +827,9 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
                   return (
                     <tr
                       key={player.id}
-                      className="hover:bg-amber-50 dark:hover:bg-gray-700/50 transition-colors"
+                      className="hover:bg-skin-tertiary transition-colors"
                     >
-                      <td className="px-3 sm:px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <td className="px-3 sm:px-4 py-3 text-sm font-semibold text-skin-primary">
                         <div className="flex items-center gap-2">
                           <span>{player.name}</span>
                           {redZeros > 0 && (
@@ -838,7 +838,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
                               title={`${redZeros} Red 0 card${redZeros > 1 ? 's' : ''} collected`}
                             >
                               <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                              <span className="font-bold text-green-600 dark:text-green-400">
+                              <span className="font-bold text-skin-success">
                                 ×{redZeros}
                               </span>
                             </span>
@@ -849,17 +849,17 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
                               title={`${brownZeros} Brown 0 card${brownZeros > 1 ? 's' : ''} received`}
                             >
                               <span className="w-2 h-2 rounded-full bg-amber-800"></span>
-                              <span className="font-bold text-red-600 dark:text-red-400">
+                              <span className="font-bold text-skin-error">
                                 ×{brownZeros}
                               </span>
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="px-3 sm:px-4 py-3 text-sm text-center font-medium text-gray-800 dark:text-gray-200">
+                      <td className="px-3 sm:px-4 py-3 text-sm text-center font-medium text-skin-primary">
                         {player.tricksWon}
                       </td>
-                      <td className="px-3 sm:px-4 py-3 text-sm text-center font-bold text-gray-900 dark:text-gray-100">
+                      <td className="px-3 sm:px-4 py-3 text-sm text-center font-bold text-skin-primary">
                         {player.pointsWon}
                       </td>
                     </tr>
@@ -873,7 +873,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
 
       {/* Bets and Starting Hands */}
       <div className="space-y-3 animate-fadeInUp delay-500">
-        <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">
+        <h3 className="font-bold text-lg sm:text-xl text-skin-primary">
           🃏 Bets & Starting Hands
         </h3>
         <div className="space-y-3">
@@ -881,15 +881,15 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
             <UICard
               key={player.id}
               variant="bordered"
-              className="bg-amber-50 dark:bg-gray-800 border-amber-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+              className="bg-skin-tertiary border-skin-accent hover:shadow-md transition-shadow"
             >
               {/* Player Name and Team */}
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-base text-gray-900 dark:text-gray-100">
+                <span className="font-bold text-base text-skin-primary">
                   {player.name}
                 </span>
                 <span
-                  className={`px-2 py-1 rounded-md text-xs font-bold ${player.teamId === 1 ? 'bg-orange-500 text-white' : 'bg-purple-500 text-white'}`}
+                  className={`px-2 py-1 rounded-md text-xs font-bold ${player.teamId === 1 ? 'bg-team1' : 'bg-team2'}`}
                 >
                   Team {player.teamId}
                 </span>
@@ -897,13 +897,13 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
 
               {/* Bet */}
               <div className="mb-3 text-sm">
-                <span className="text-gray-600 dark:text-gray-400 font-medium">Bet: </span>
+                <span className="text-skin-secondary font-medium">Bet: </span>
                 {renderBet(player.name)}
               </div>
 
               {/* Starting Hand */}
               <div className="text-sm">
-                <span className="text-gray-600 dark:text-gray-400 font-medium mb-1 block">
+                <span className="text-skin-secondary font-medium mb-1 block">
                   Starting Hand:
                 </span>
                 {renderHand(player.name)}

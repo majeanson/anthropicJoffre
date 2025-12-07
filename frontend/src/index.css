@@ -643,6 +643,29 @@ button:not(:disabled):active {
 
 .border-skin-default { border-color: var(--color-border-default); }
 .border-skin-accent { border-color: var(--color-border-accent); }
+.border-skin-subtle { border-color: var(--color-border-subtle); }
+
+/* Semantic skin colors */
+.text-skin-success { color: var(--color-success); }
+.text-skin-warning { color: var(--color-warning); }
+.text-skin-error { color: var(--color-error); }
+.text-skin-info { color: var(--color-info); }
+.text-skin-inverse { color: var(--color-text-inverse); }
+
+.bg-skin-success { background-color: color-mix(in srgb, var(--color-success) 15%, var(--color-bg-primary)); }
+.bg-skin-warning { background-color: color-mix(in srgb, var(--color-warning) 15%, var(--color-bg-primary)); }
+.bg-skin-error { background-color: color-mix(in srgb, var(--color-error) 15%, var(--color-bg-primary)); }
+.bg-skin-info { background-color: color-mix(in srgb, var(--color-info) 15%, var(--color-bg-primary)); }
+
+.border-skin-success { border-color: var(--color-success); }
+.border-skin-warning { border-color: var(--color-warning); }
+.border-skin-error { border-color: var(--color-error); }
+.border-skin-info { border-color: var(--color-info); }
+
+/* Hover state utilities */
+.hover\:bg-skin-secondary:hover { background-color: var(--color-bg-secondary); }
+.hover\:bg-skin-tertiary:hover { background-color: var(--color-bg-tertiary); }
+.hover\:text-skin-accent:hover { color: var(--color-text-accent); }
 
 .bg-team1 {
   background-color: var(--color-team1-primary);
