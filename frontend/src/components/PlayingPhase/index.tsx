@@ -140,6 +140,21 @@ function PlayingPhaseComponent({
     autoplayEnabledRef.current = autoplayEnabled;
   }, [autoplayEnabled]);
 
+  // Scroll to top and lock body scroll when entering playing phase
+  useEffect(() => {
+    // Scroll to top immediately
+    window.scrollTo(0, 0);
+
+    // Lock body scroll to prevent any scrolling
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      // Restore original overflow on unmount
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   // Track which trick we've already played sound for
   const lastSoundedTrickWinnerRef = useRef<string | null>(null);
 
@@ -448,7 +463,7 @@ function PlayingPhaseComponent({
   }, [isCurrentTurn, isSpectator, gameState, currentPlayerId]);
 
   return (
-    <div className="h-screen-safe md:min-h-screen-safe flex flex-col overflow-y-auto overflow-x-hidden md:overflow-visible game-container bg-skin-primary">
+    <div className="h-screen-safe md:min-h-screen-safe flex flex-col overflow-hidden game-container bg-skin-primary">
       <GameHeader
         gameId={gameId || ''}
         roundNumber={gameState.roundNumber}
