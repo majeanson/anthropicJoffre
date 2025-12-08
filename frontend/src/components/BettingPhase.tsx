@@ -149,11 +149,15 @@ function BettingPhaseComponent({
   const handlePlaceBet = () => {
     sounds.betPlaced();
     onPlaceBet(selectedAmount, withoutTrump, false);
+    // Scroll back to top after betting
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSkip = () => {
     sounds.betSkipped();
     onPlaceBet(-1, false, true);
+    // Scroll back to top after skipping
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const scrollToLevel = (level: number) => {
