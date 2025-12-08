@@ -96,8 +96,8 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
 
   return (
     <div
-      className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[10000] transition-all duration-500 ${
-        isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+      className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[10000] transition-all duration-300 ${
+        isVisible ? 'scale-100 translate-y-0' : 'scale-95 -translate-y-4 pointer-events-none'
       }`}
     >
       {/* Clickable card - click anywhere to dismiss */}
@@ -109,12 +109,13 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
           animate-bounce-once cursor-pointer
           hover:scale-105 active:scale-95 transition-transform
           text-left w-full max-w-md
+          relative
         `}
         aria-label="Click to dismiss achievement notification"
       >
-        {/* Close hint */}
-        <div className="absolute top-2 right-3 text-white/60 text-xs">
-          tap to close
+        {/* Close button */}
+        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/20 hover:bg-black/40 flex items-center justify-center text-white font-bold text-sm transition-colors">
+          ✕
         </div>
 
         <div className="flex items-center gap-4">
@@ -124,12 +125,12 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
           </div>
 
           {/* Content - Always white text on colored gradient backgrounds */}
-          <div className="flex-1">
-            <div className="text-xs uppercase tracking-wider mb-1 text-white/90 font-semibold">
+          <div className="flex-1 pr-6">
+            <div className="text-xs uppercase tracking-wider mb-1 text-white font-bold drop-shadow-sm">
               {achievement.is_secret ? '🔓 Secret Achievement Unlocked!' : 'Achievement Unlocked!'}
             </div>
-            <div className="font-bold text-xl mb-1 text-white">{name}</div>
-            <div className="text-sm text-white/90">
+            <div className="font-bold text-xl mb-1 text-white drop-shadow-sm">{name}</div>
+            <div className="text-sm text-white font-medium drop-shadow-sm">
               {achievement.description}
             </div>
           </div>
@@ -140,8 +141,8 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
           </div>
         </div>
 
-        {/* Progress Bar Animation - white on colored bg */}
-        <div className="mt-3 h-1 bg-white/30 rounded-full overflow-hidden">
+        {/* Progress Bar Animation - solid white on colored bg */}
+        <div className="mt-3 h-1.5 bg-black/20 rounded-full overflow-hidden">
           <div className="h-full bg-white animate-progress-fill" />
         </div>
       </button>
