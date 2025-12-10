@@ -132,6 +132,8 @@ export const PlayerHand = memo(function PlayerHand({
 
   // Dealing animation on new round
   useEffect(() => {
+    let dealingEndTimer: number | null = null;
+
     if (animationsEnabled && hand.length > 0 && !showDealingAnimation) {
       setShowDealingAnimation(true);
       setDealingCardIndex(0);
@@ -142,7 +144,7 @@ export const PlayerHand = memo(function PlayerHand({
         setDealingCardIndex((prev) => {
           if (prev >= hand.length - 1) {
             clearInterval(interval);
-            setTimeout(() => setShowDealingAnimation(false), 300);
+            dealingEndTimer = window.setTimeout(() => setShowDealingAnimation(false), 300);
             return prev;
           }
           sounds.cardDeal();
@@ -150,7 +152,10 @@ export const PlayerHand = memo(function PlayerHand({
         });
       }, 120);
 
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        if (dealingEndTimer) clearTimeout(dealingEndTimer);
+      };
     }
   }, [roundNumber, animationsEnabled, hand.length]);
 

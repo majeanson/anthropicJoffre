@@ -6,7 +6,7 @@
  * Click anywhere on the popup to dismiss
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Achievement } from '../types/achievements';
 import { sounds } from '../utils/sounds';
 
@@ -17,10 +17,16 @@ interface AchievementUnlockedProps {
 
 export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnlockedProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const dismissTimerRef = useRef<number | null>(null);
 
   const handleClose = () => {
     setIsVisible(false);
-    setTimeout(onDismiss, 500); // Wait for fade-out animation
+    // Clear any existing dismiss timer
+    if (dismissTimerRef.current) {
+      clearTimeout(dismissTimerRef.current);
+    }
+    // Schedule dismiss after fade-out animation
+    dismissTimerRef.current = window.setTimeout(onDismiss, 500);
   };
 
   useEffect(() => {
@@ -33,7 +39,13 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
         handleClose();
       }, 5000);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        // Also cleanup dismiss timer on unmount
+        if (dismissTimerRef.current) {
+          clearTimeout(dismissTimerRef.current);
+        }
+      };
     }
   }, [achievement, onDismiss]);
 
