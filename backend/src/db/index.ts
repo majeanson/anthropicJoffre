@@ -321,25 +321,6 @@ export const calculateEloChange = (
 };
 
 /**
- * @deprecated Use updateRoundStats() and updateGameStats() instead.
- * This function was replaced by the two new functions that separate
- * round-level stats from game-level stats. Kept for backwards compatibility
- * but no longer called anywhere in the codebase.
- *
- * TODO: Remove this function in a future cleanup sprint once confirmed
- * that it's not used by any external callers.
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _deprecatedUpdatePlayerStats = async (
-  _playerName: string,
-  _update: PlayerStatsUpdate,
-  _eloChange: number
-) => {
-  console.warn('updatePlayerStats is deprecated. Use updateRoundStats and updateGameStats instead.');
-  return null;
-};
-
-/**
  * Update round-level statistics after each round
  * This updates stats that don't require game completion
  */

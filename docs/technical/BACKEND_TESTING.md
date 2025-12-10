@@ -1,6 +1,6 @@
 # Backend Testing Architecture
 
-**Status**: ✅ **113 passing tests** (as of October 2025)
+**Status**: ✅ **778 passing tests** (as of December 2025)
 **Framework**: Vitest v4.0.2
 **Test Location**: `backend/src/game/*.test.ts`, `backend/src/db/*.test.ts`
 **Coverage**: Comprehensive unit and integration testing of all game logic
@@ -15,7 +15,7 @@ The backend test suite provides comprehensive coverage of the core game logic th
 
 **Pure Function Testing**: Game logic is extracted into pure functions that can be tested in isolation without mocking external dependencies.
 
-**Fast Execution**: ~3 seconds for complete backend test suite (113 tests)
+**Fast Execution**: ~6 seconds for complete backend test suite (778 tests)
 
 **TDD-Ready**: Tests serve as both validation and documentation of game behavior
 
@@ -666,15 +666,15 @@ jobs:
 
 ## Conclusion
 
-The backend test suite provides **comprehensive, fast, and reliable** coverage of all game logic. With 113 passing tests covering every rule, validation, and state transition, developers can confidently refactor and extend the codebase knowing that any breaking changes will be immediately detected.
+The backend test suite provides **comprehensive, fast, and reliable** coverage of all game logic. With 778 passing tests covering every rule, validation, and state transition, developers can confidently refactor and extend the codebase knowing that any breaking changes will be immediately detected.
 
-**Test execution**: ~3 seconds
+**Test execution**: ~6 seconds
 **Confidence level**: ✅ **Very High**
 **Maintenance burden**: ✅ **Low** (pure functions, no mocks)
 
 ---
 
-**Last Updated**: October 2025
+**Last Updated**: December 2025
 **Author**: anthropicJoffre Team
 **Related Docs**:
 - [Testing Architecture](./TESTING_ARCHITECTURE.md)
