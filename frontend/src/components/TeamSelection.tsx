@@ -9,7 +9,7 @@ import { Player, ChatMessage, VoiceParticipant } from '../types/game';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { HowToPlay } from './HowToPlay';
-import { BotDifficulty } from '../utils/botPlayer';
+import { BotDifficulty } from '../utils/botPlayerEnhanced';
 import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
 import { UnifiedChat } from './UnifiedChat';
 import { TeamSelectionSocialSidebar } from './TeamSelectionSocialSidebar';

@@ -196,10 +196,10 @@ async function handleClaimQuestReward(
     // Refresh quest list
     const updatedQuests = await getPlayerDailyQuests(playerName);
     this.emit('daily_quests', { quests: updatedQuests });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Quests] Error claiming quest reward:', error);
     this.emit('error', {
-      message: error.message || 'Failed to claim quest reward. Please try again.',
+      message: error instanceof Error ? error.message : 'Failed to claim quest reward. Please try again.',
     });
   }
 }
@@ -427,10 +427,10 @@ async function handleClaimCalendarReward(
       currentDay: progress.currentDay,
       rewardsClaimed: progress.rewardsClaimed,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Quests] Error claiming calendar reward:', error);
     this.emit('error', {
-      message: error.message || 'Failed to claim calendar reward. Please try again.',
+      message: error instanceof Error ? error.message : 'Failed to claim calendar reward. Please try again.',
     });
   }
 }
@@ -559,10 +559,10 @@ async function handleClaimWeeklyReward(
     // Refresh weekly progress
     const progress = await getPlayerWeeklyProgress(playerName);
     this.emit('weekly_progress', progress);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[Quests] Error claiming weekly reward:', error);
     this.emit('error', {
-      message: error.message || 'Failed to claim weekly reward. Please try again.',
+      message: error instanceof Error ? error.message : 'Failed to claim weekly reward. Please try again.',
     });
   }
 }

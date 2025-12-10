@@ -1,9 +1,16 @@
+/**
+ * @deprecated This file is deprecated. Use botPlayerEnhanced.ts instead.
+ * This file is kept for backwards compatibility only.
+ * All new code should import from './botPlayerEnhanced'.
+ */
+
 import { Card, GameState, CardColor } from '../types/game';
 
-/**
- * Bot difficulty levels
- */
-export type BotDifficulty = 'easy' | 'medium' | 'hard';
+// Re-export BotDifficulty from enhanced for backwards compatibility
+export type { BotDifficulty } from './botPlayerEnhanced';
+
+// Local type alias for internal use (since we re-export as type)
+type LocalBotDifficulty = 'easy' | 'medium' | 'hard';
 
 /**
  * Hand strength evaluation result
@@ -33,13 +40,13 @@ interface CardImpact {
  * Bot player AI for automated gameplay with difficulty levels
  */
 export class BotPlayer {
-  private static difficulty: BotDifficulty = 'medium';
+  private static difficulty: LocalBotDifficulty = 'medium';
   private static cardMemory: Map<string, Card[]> = new Map(); // Track played cards per game
 
   /**
    * Set the bot difficulty level
    */
-  static setDifficulty(difficulty: BotDifficulty): void {
+  static setDifficulty(difficulty: LocalBotDifficulty): void {
     this.difficulty = difficulty;
   }
 

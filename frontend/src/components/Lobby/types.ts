@@ -3,7 +3,7 @@
  */
 
 import { Socket } from 'socket.io-client';
-import { BotDifficulty } from '../../utils/botPlayer';
+import { BotDifficulty } from '../../utils/botPlayerEnhanced';
 import { OnlinePlayer } from '../../types/game';
 import type { SocialPanelTabType } from '../SocialPanel';
 

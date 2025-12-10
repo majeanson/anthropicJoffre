@@ -11,7 +11,7 @@
 import { ActiveGames } from './ActiveGames';
 import { QuickPlayPanel } from './QuickPlayPanel';
 import { Socket } from 'socket.io-client';
-import { BotDifficulty } from '../utils/botPlayer';
+import { BotDifficulty } from '../utils/botPlayerEnhanced';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
 import { getUserTierInfo } from '../utils/userTier';

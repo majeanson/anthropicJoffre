@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithProviders, screen, userEvent } from '../test/utils';
 import { QuickPlayPanel } from './QuickPlayPanel';
-import { BotDifficulty } from '../utils/botPlayer';
+import { BotDifficulty } from '../utils/botPlayerEnhanced';
 
 describe('QuickPlayPanel', () => {
   const mockOnBotDifficultyChange = vi.fn();

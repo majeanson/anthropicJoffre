@@ -16,7 +16,7 @@
  */
 
 import { useState } from 'react';
-import { BotDifficulty } from '../utils/botPlayer';
+import { BotDifficulty } from '../utils/botPlayerEnhanced';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
 import { getUserTierInfo } from '../utils/userTier';
