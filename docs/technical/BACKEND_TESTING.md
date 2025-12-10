@@ -1,8 +1,8 @@
 # Backend Testing Architecture
 
-**Status**: ✅ **778 passing tests** (as of December 2025)
+**Status**: ✅ **798 passing tests** (as of December 2025)
 **Framework**: Vitest v4.0.2
-**Test Location**: `backend/src/game/*.test.ts`, `backend/src/db/*.test.ts`
+**Test Location**: `backend/src/game/*.test.ts`, `backend/src/db/*.test.ts`, `backend/src/socketHandlers/*.test.ts`
 **Coverage**: Comprehensive unit and integration testing of all game logic
 
 ---
@@ -15,7 +15,7 @@ The backend test suite provides comprehensive coverage of the core game logic th
 
 **Pure Function Testing**: Game logic is extracted into pure functions that can be tested in isolation without mocking external dependencies.
 
-**Fast Execution**: ~6 seconds for complete backend test suite (778 tests)
+**Fast Execution**: ~6 seconds for complete backend test suite (798 tests)
 
 **TDD-Ready**: Tests serve as both validation and documentation of game behavior
 
@@ -424,6 +424,112 @@ describe('Database Stats Functions', () => {
 
 ---
 
+### 6. Bot Logic (`botLogic.test.ts`)
+**Tests**: 20
+**Coverage**: AI decision-making for bot card selection
+
+```typescript
+describe('Bot Card Selection', () => {
+  describe('selectBotCard - Basic Play', () => {
+    ✓ should select a valid card from hand
+    ✓ should follow led suit when possible
+    ✓ should play off-suit when cannot follow suit
+  });
+
+  describe('selectBotCard - Trump Strategy', () => {
+    ✓ should play trump when cannot follow suit
+    ✓ should play low trump when teammate is winning
+    ✓ should play high trump to beat opponent's trump
+    ✓ should not waste high trump when low trump wins
+  });
+
+  describe('selectBotCard - Leading Tricks', () => {
+    ✓ should lead with high card to win trick
+    ✓ should avoid leading with special cards when risky
+    ✓ should lead trump when holding many trumps
+  });
+
+  describe('selectBotCard - End Game Strategy', () => {
+    ✓ should play remaining cards strategically
+    ✓ should dump bad cards when trick is lost
+    ✓ should save good cards for winnable tricks
+  });
+
+  describe('Edge Cases', () => {
+    ✓ should handle empty hand gracefully
+    ✓ should handle single card in hand
+    ✓ should handle all trump hand
+    ✓ should handle no trump hand
+  });
+});
+```
+
+**Bot Strategy Layers**:
+1. Suit-following rules (mandatory)
+2. Winning vs losing trick assessment
+3. Trump conservation
+4. Special card avoidance (red 0, brown 0)
+5. Difficulty-based randomization
+
+---
+
+### 7. Socket Handlers (`socketHandlers/*.test.ts`)
+**Tests**: 25+
+**Coverage**: Socket event handlers for game features
+
+#### Bots Handler Tests (`bots.test.ts`)
+```typescript
+describe('Bot Socket Handlers', () => {
+  ✓ should add bot to empty slot
+  ✓ should reject adding bot to occupied slot
+  ✓ should set bot difficulty
+  ✓ should replace bot with new difficulty
+});
+```
+
+#### Direct Messages Handler Tests (`directMessages.test.ts`)
+```typescript
+describe('Direct Message Handlers', () => {
+  ✓ should send message to recipient
+  ✓ should mark messages as read
+  ✓ should get conversation history
+  ✓ should delete own messages
+});
+```
+
+#### Friends Handler Tests (`friends.test.ts`)
+```typescript
+describe('Friends Handlers', () => {
+  ✓ should send friend request
+  ✓ should accept friend request
+  ✓ should reject friend request
+  ✓ should remove friend
+  ✓ should get friends list
+});
+```
+
+#### Quests Handler Tests (`quests.test.ts`)
+```typescript
+describe('Quest Handlers', () => {
+  ✓ should get daily quests
+  ✓ should track quest progress
+  ✓ should claim quest reward
+  ✓ should reset daily quests
+});
+```
+
+#### Side Bets Handler Tests (`sideBets.test.ts`)
+```typescript
+describe('Side Bet Handlers', () => {
+  ✓ should create side bet
+  ✓ should accept side bet
+  ✓ should resolve side bet on game end
+  ✓ should cancel unaccepted bets
+});
+```
+
+---
+
 ## Running Tests
 
 ### All Backend Tests
@@ -666,7 +772,7 @@ jobs:
 
 ## Conclusion
 
-The backend test suite provides **comprehensive, fast, and reliable** coverage of all game logic. With 778 passing tests covering every rule, validation, and state transition, developers can confidently refactor and extend the codebase knowing that any breaking changes will be immediately detected.
+The backend test suite provides **comprehensive, fast, and reliable** coverage of all game logic. With 798 passing tests covering every rule, validation, and state transition, developers can confidently refactor and extend the codebase knowing that any breaking changes will be immediately detected.
 
 **Test execution**: ~6 seconds
 **Confidence level**: ✅ **Very High**
