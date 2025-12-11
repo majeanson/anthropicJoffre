@@ -16,6 +16,7 @@ import { useLobbyChat } from '../../hooks/useLobbyChat';
 import { SocialPanel } from '../SocialPanel';
 import { StatsPanel } from '../StatsPanel';
 import { GameCreationForm } from '../GameCreationForm';
+import { GameWithBotCreationForm } from '../GameWithBotCreationForm';
 import { JoinGameForm } from '../JoinGameForm';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { LobbyErrorFallback } from '../fallbacks/LobbyErrorFallback';
@@ -196,6 +197,19 @@ export function Lobby({
         setShowLeaderboard={setShowLeaderboard}
         selectedPlayerName={selectedPlayerName}
         setSelectedPlayerName={setSelectedPlayerName}
+      />
+    );
+  }
+
+  if (mode === 'bot') {
+    return (
+      <GameWithBotCreationForm
+        playerName={playerName}
+        setPlayerName={setPlayerName}
+        onCreateGame={onQuickPlay}
+        onBack={() => setMode('menu')}
+        user={user}
+        defaultDifficulty={botDifficulty}
       />
     );
   }
@@ -406,6 +420,7 @@ export function Lobby({
                     }}
                     onCreateGame={() => setMode('create')}
                     onBrowseGames={() => setShowBrowser(true)}
+                    onPlayVsBots={() => setMode('bot')}
                     botDifficulty={botDifficulty}
                     onBotDifficultyChange={onBotDifficultyChange}
                     quickPlayPersistence={quickPlayPersistence}

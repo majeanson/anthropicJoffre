@@ -197,6 +197,18 @@ export default {
       fontFamily: {
         serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },
+      // Standardized animation timing system
+      // Maps to CSS variables from index.css for consistency
+      // Usage: duration-fast, duration-normal, duration-slow
+      transitionDuration: {
+        'fast': 'var(--duration-fast)',      // 180ms - micro-interactions
+        'normal': 'var(--duration-normal)',  // 350ms - standard transitions
+        'slow': 'var(--duration-slow)',      // 600ms - emphasis/attention
+      },
+      // Easing function that matches the CSS --easing variable
+      transitionTimingFunction: {
+        'skin': 'var(--easing)',  // Use with ease-skin
+      },
       keyframes: {
         'slide-from-bottom': {
           '0%': { transform: 'translateY(300px)', opacity: '0' },

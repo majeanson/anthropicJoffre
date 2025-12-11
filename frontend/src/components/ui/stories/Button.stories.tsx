@@ -75,6 +75,10 @@ Use the skin selector in the toolbar to see how buttons adapt to different theme
       control: 'boolean',
       description: 'Disabled state',
     },
+    disabledReason: {
+      control: 'text',
+      description: 'Tooltip text shown when hovering a disabled button',
+    },
     loading: {
       control: 'boolean',
       description: 'Loading state with alchemical spinner',
@@ -292,6 +296,24 @@ export const Disabled: Story = {
   },
 };
 
+export const DisabledWithReason: Story = {
+  args: {
+    children: 'Premium Feature',
+    disabled: true,
+    disabledReason: 'Reach level 10 to unlock this feature',
+    variant: 'primary',
+    size: 'lg',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Disabled buttons can show a tooltip explaining why they are disabled. Hover to see the reason.',
+      },
+    },
+  },
+};
+
 export const DisabledVariants: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4 items-center p-6 bg-skin-primary rounded-xl border border-skin-default">
@@ -309,6 +331,33 @@ export const DisabledVariants: Story = {
       </Button>
     </div>
   ),
+};
+
+export const DisabledReasonsShowcase: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-4 items-center p-6 bg-skin-primary rounded-xl border border-skin-default">
+      <Button variant="primary" disabled disabledReason="Insufficient coins (need 100)">
+        Place Bet
+      </Button>
+      <Button variant="success" disabled disabledReason="Must follow the led suit">
+        Play Card
+      </Button>
+      <Button variant="arcane" disabled disabledReason="Reach level 15 to unlock">
+        Ranked Mode
+      </Button>
+      <Button variant="danger" disabled disabledReason="Game is in progress">
+        Leave Table
+      </Button>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Multiple buttons with different disabled reasons. Hover each to see contextual explanations.',
+      },
+    },
+  },
 };
 
 export const FullWidth: Story = {

@@ -91,6 +91,24 @@ export const PlayerHand = memo(function PlayerHand({
     [trump]
   );
 
+  // Get the reason why a card is disabled (for tooltip)
+  const getDisabledReason = useCallback(
+    (card: CardType): string | undefined => {
+      if (!isCurrentTurn) return undefined;
+      if (isCardPlayable(card)) return undefined;
+
+      // If there's a trick in progress with cards, explain suit-following
+      if (currentTrick.length > 0 && currentTrick.length < 4) {
+        const ledSuit = currentTrick[0].card.color;
+        const ledSuitName = ledSuit.charAt(0).toUpperCase() + ledSuit.slice(1);
+        return `Must follow suit: play a ${ledSuitName} card`;
+      }
+
+      return undefined;
+    },
+    [isCurrentTurn, isCardPlayable, currentTrick]
+  );
+
   // Handle card click with debouncing and validation
   const handleCardClick = useCallback(
     (card: CardType, event?: React.MouseEvent) => {
@@ -472,6 +490,7 @@ export const PlayerHand = memo(function PlayerHand({
                           size="large"
                           onClick={(e) => handleCardClick(card, e)}
                           disabled={isCurrentTurn ? !playable || !!isTransitioning : false}
+                          disabledReason={getDisabledReason(card)}
                           isPlayable={isCurrentTurn ? playable : !isQueued}
                           isKeyboardSelected={isSelected}
                         />
@@ -481,6 +500,7 @@ export const PlayerHand = memo(function PlayerHand({
                 </div>
               ) : (
                 // Cards don't fit: Fan-style with swipe navigation (no rotation)
+                <>
                 <div className="relative flex items-end justify-center w-full h-full">
                   {displayHand.map((card, index) => {
                     const playable = isCardPlayable(card);
@@ -500,24 +520,24 @@ export const PlayerHand = memo(function PlayerHand({
 
                     // Calculate fan position - spread cards to use more width
                     const centerOffset = index - activeIndex;
-                    // Wider card spacing for better visibility (~55px visible edge)
-                    const cardVisibleEdge = 55;
+                    // Wider card spacing for better visibility (~60px visible edge)
+                    const cardVisibleEdge = 60;
                     const xOffset = centerOffset * cardVisibleEdge;
 
                     // Z-index: focused card always on top, others stack by distance
                     const zIndex = isFocused ? 100 : 50 - Math.abs(centerOffset);
 
-                    // Focused card is scaled up prominently; others are slightly smaller
-                    const scale = isFocused ? 1.15 : 0.85;
+                    // Focused card is scaled up prominently; others are slightly smaller but still readable
+                    const scale = isFocused ? 1.15 : 0.9;
 
                     // Focused card pops up above the others
-                    const yOffset = isFocused ? -12 : 4;
+                    const yOffset = isFocused ? -16 : 0;
 
                     // NO rotation - cards stay straight
                     // const rotation = 0;
 
-                    // Opacity: slightly dim non-focused cards
-                    const opacity = isFocused ? 1 : 0.75;
+                    // Opacity: very slight dim on non-focused cards for better readability
+                    const opacity = isFocused ? 1 : 0.85;
 
                     return (
                       <div
@@ -585,6 +605,7 @@ export const PlayerHand = memo(function PlayerHand({
                             }
                           }}
                           disabled={isCurrentTurn ? !playable || !!isTransitioning : false}
+                          disabledReason={getDisabledReason(card)}
                           isPlayable={isCurrentTurn ? playable : !isQueued}
                           isKeyboardSelected={isSelected}
                         />
@@ -592,6 +613,25 @@ export const PlayerHand = memo(function PlayerHand({
                     );
                   })}
                 </div>
+                {/* Card position indicator for fan view */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-1.5 pb-1" aria-hidden="true">
+                  {displayHand.map((_, index) => {
+                    const activeIndex = previewCardIndex !== null ? previewCardIndex : focusedCardIndex;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => { handleCardFocus(index); sounds.cardDeal(); }}
+                        className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                          index === activeIndex
+                            ? 'bg-skin-text-accent scale-125'
+                            : 'bg-skin-muted/50 hover:bg-skin-muted'
+                        }`}
+                        aria-label={`Go to card ${index + 1}`}
+                      />
+                    );
+                  })}
+                </div>
+                </>
               )}
             </div>
           );
@@ -653,6 +693,7 @@ export const PlayerHand = memo(function PlayerHand({
                     size="small"
                     onClick={(e) => handleCardClick(card, e)}
                     disabled={isCurrentTurn ? !playable || !!isTransitioning : false}
+                    disabledReason={getDisabledReason(card)}
                     isPlayable={isCurrentTurn ? playable && isCurrentTurn : !isQueued}
                     isKeyboardSelected={isSelected}
                   />

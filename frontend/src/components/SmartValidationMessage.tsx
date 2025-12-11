@@ -44,7 +44,7 @@ export function SmartValidationMessage({ messages }: SmartValidationMessageProps
       variant="gradient"
       gradient={gradientMap[topMessage.type]}
       size="sm"
-      className="border-2 flex items-center gap-2 shadow-md transition-all duration-200 h-14"
+      className="border-2 flex items-center gap-2 shadow-md transition-all duration-fast h-14"
       data-testid={`validation-message-${topMessage.type}`}
     >
       <div role="alert" aria-live="polite" className="flex items-center gap-2 w-full">

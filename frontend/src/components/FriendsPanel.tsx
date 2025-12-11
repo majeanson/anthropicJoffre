@@ -386,6 +386,7 @@ export default function FriendsPanel({
                 variant="primary"
                 onClick={handleSearch}
                 disabled={searchQuery.trim().length < 2}
+                disabledReason="Enter at least 2 characters"
                 className="bg-purple-600 hover:bg-purple-700 border-purple-700"
               >
                 Search

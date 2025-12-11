@@ -98,6 +98,8 @@ import { useSkin } from './contexts/SkinContext';
 // Retention features: XP popup and quest completion toast
 import { useXPGainPopup } from './components/XPGainPopup';
 import { useQuestCompletedToast } from './components/QuestCompletedToast';
+// Autoplay countdown indicator
+import { AutoplayCountdown } from './components/AutoplayCountdown';
 
 function AppContent() {
   // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
@@ -696,7 +698,7 @@ function AppContent() {
   );
 
   // Sprint 3 Refactoring: Autoplay management hook (must be after handlePlaceBet and handlePlayCard)
-  const { autoplayEnabled, toggleAutoplay } = useAutoplay({
+  const { autoplayEnabled, toggleAutoplay, countdownSeconds, isCountingDown } = useAutoplay({
     gameState,
     socket,
     onPlaceBet: handlePlaceBet,
@@ -1120,6 +1122,7 @@ function AppContent() {
     return (
       <>
         <GlobalUI {...globalUIProps} />
+        <AutoplayCountdown countdownSeconds={countdownSeconds} isCountingDown={isCountingDown} />
         <DebugControls
           gameState={gameState}
           gameId={gameId}
@@ -1221,6 +1224,7 @@ function AppContent() {
     return (
       <>
         <GlobalUI {...globalUIProps} />
+        <AutoplayCountdown countdownSeconds={countdownSeconds} isCountingDown={isCountingDown} />
         <DebugControls
           gameState={gameState}
           gameId={gameId}

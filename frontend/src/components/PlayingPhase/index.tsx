@@ -128,6 +128,10 @@ function PlayingPhaseComponent({
   const [openThinkingButtons, setOpenThinkingButtons] = useState<Set<string>>(new Set());
   const [suggestionOpen, setSuggestionOpen] = useState(false);
 
+  // Track trick collection animation state (persists turn indicator during collection)
+  const [isTrickCollecting, setIsTrickCollecting] = useState(false);
+  const [lastTrickWinnerName, setLastTrickWinnerName] = useState<string | null>(null);
+
   // Achievement badge cache for player cards
   const { getCachedBadges, fetchAchievements } = useAchievementCache(socket ?? null);
   const [playerAchievements, setPlayerAchievements] = useState<Map<string, AchievementProgress[]>>(
@@ -144,6 +148,25 @@ function PlayingPhaseComponent({
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Track trick collection state - when 4 cards are in trick, set collecting for 2 seconds
+  useEffect(() => {
+    if (gameState.currentTrick.length === 4) {
+      // Find the winner (based on previousTrick when it gets updated, or infer from currentTrick)
+      const winnerInfo = currentTrickWinnerId
+        ? gameState.players.find((p) => p.id === currentTrickWinnerId)
+        : null;
+      if (winnerInfo) {
+        setLastTrickWinnerName(winnerInfo.name);
+      }
+      setIsTrickCollecting(true);
+      const timeout = setTimeout(() => {
+        setIsTrickCollecting(false);
+        setLastTrickWinnerName(null);
+      }, 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [gameState.currentTrick.length, currentTrickWinnerId, gameState.players]);
 
   // Track which trick we've already played sound for
   const lastSoundedTrickWinnerRef = useRef<string | null>(null);
@@ -314,6 +337,9 @@ function PlayingPhaseComponent({
 
   // Auto-play queued card when turn comes
   useEffect(() => {
+    // Don't process queue during trick collection animation - keep card queued
+    if (isTrickCollecting) return;
+
     if (!isCurrentTurn || !queuedCard || !currentPlayer) return;
 
     const cardInHand = currentPlayer.hand.some(
@@ -366,6 +392,7 @@ function PlayingPhaseComponent({
     return () => clearTimeout(timeoutId);
   }, [
     isCurrentTurn,
+    isTrickCollecting,
     queuedCard,
     queuedDuringOwnTurn,
     currentPlayer,
@@ -402,44 +429,133 @@ function PlayingPhaseComponent({
     [queuedCard, isCurrentTurn]
   );
 
-  // Empty state message when no trick
-  const EmptyTrickMessage = () => {
-    if (gameState.currentTrick.length > 0) return null;
+  // Turn indicator - shows throughout the trick (large when empty, compact when cards in play)
+  const TurnIndicator = () => {
+    // During trick collection, show who won
+    if (isTrickCollecting) {
+      const winnerName = lastTrickWinnerName || 'Player';
+      const isMyWin =
+        winnerName === currentPlayerId ||
+        gameState.players.find((p) => p.name === winnerName)?.id === currentPlayerId;
 
+      return (
+        <div
+          className="absolute top-0 right-0 z-50"
+          role="status"
+          aria-live="polite"
+          aria-label={`${winnerName} won the trick`}
+        >
+          <div
+            className={`
+              rounded-[var(--radius-md)] px-3 py-1.5 sm:px-4 sm:py-2
+              border transition-all duration-[var(--duration-fast)]
+              ${isMyWin ? 'bg-[var(--color-success)]/20 border-[var(--color-success)] shadow-[0_0_10px_rgba(74,156,109,0.3)]' : 'bg-skin-tertiary/90 border-skin-border-default'}
+            `}
+            data-testid="turn-indicator-collecting"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-base sm:text-lg" aria-hidden="true">
+                {isMyWin ? '🏆' : '📥'}
+              </span>
+              <p
+                className={`
+                  text-xs sm:text-sm font-display uppercase tracking-wider
+                  ${isMyWin ? 'text-[var(--color-success)] font-bold' : 'text-skin-secondary'}
+                `}
+              >
+                {isMyWin ? 'You won!' : `${winnerName} won`}
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const turnMessage = isCurrentTurn
+      ? 'Your Turn - Play a card!'
+      : `Waiting for ${gameState.players[gameState.currentPlayerIndex]?.name}...`;
+    const compactMessage = isCurrentTurn
+      ? 'Your Turn'
+      : `${gameState.players[gameState.currentPlayerIndex]?.name}'s turn`;
+
+    // Large centered indicator when no cards in trick
+    if (gameState.currentTrick.length === 0) {
+      return (
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-50"
+          role="status"
+          aria-live="polite"
+          aria-label={turnMessage}
+        >
+          <div
+            className={`
+              relative rounded-[var(--radius-xl)] px-6 py-4 lg:px-8 lg:py-6
+              border-2 transition-all duration-[var(--duration-fast)]
+              bg-skin-tertiary
+              ${isCurrentTurn ? 'border-skin-text-accent shadow-[var(--shadow-glow)]' : 'border-skin-border-default shadow-[var(--shadow-lg)]'}
+            `}
+            data-testid="turn-indicator"
+          >
+            {isCurrentTurn && (
+              <div className="mb-2" aria-hidden="true">
+                <span className="text-4xl animate-bounce">👇</span>
+              </div>
+            )}
+            <p
+              className="text-lg md:text-2xl lg:text-3xl font-display uppercase tracking-wider text-skin-primary"
+              data-testid="current-turn-player"
+            >
+              {turnMessage}
+            </p>
+            <div className="mt-2 flex gap-1 justify-center" aria-hidden="true">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce bg-skin-text-accent"
+                  style={{
+                    animationDelay: `${i * 0.1}s`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Compact indicator when cards are in play (top-right corner)
     return (
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-50">
+      <div
+        className="absolute top-1 right-1 sm:top-0 sm:right-0 z-50"
+        role="status"
+        aria-live="polite"
+        aria-label={compactMessage}
+      >
         <div
           className={`
-            relative rounded-[var(--radius-xl)] px-6 py-4 lg:px-8 lg:py-6
+            rounded-[var(--radius-md)] px-2 py-1 sm:px-4 sm:py-2
             border-2 transition-all duration-[var(--duration-fast)]
-            bg-skin-tertiary
-            ${isCurrentTurn ? 'border-skin-text-accent shadow-[var(--shadow-glow)]' : 'border-skin-border-default shadow-[var(--shadow-lg)]'}
+            ${isCurrentTurn ? 'bg-[var(--color-warning)]/30 border-[var(--color-warning)] shadow-[0_0_15px_rgba(251,191,36,0.4)]' : 'bg-skin-tertiary/95 border-skin-border-default'}
           `}
-          data-testid="turn-indicator"
+          data-testid="turn-indicator-compact"
         >
-          {isCurrentTurn && (
-            <div className="mb-2">
-              <span className="text-4xl animate-bounce">👇</span>
-            </div>
-          )}
-          <p
-            className="text-lg md:text-2xl lg:text-3xl font-display uppercase tracking-wider text-skin-primary"
-            data-testid="current-turn-player"
-          >
-            {isCurrentTurn
-              ? 'Your Turn - Play a card!'
-              : `Waiting for ${gameState.players[gameState.currentPlayerIndex]?.name}...`}
-          </p>
-          <div className="mt-2 flex gap-1 justify-center" aria-hidden="true">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce bg-skin-text-accent"
-                style={{
-                  animationDelay: `${i * 0.1}s`,
-                }}
-              />
-            ))}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {isCurrentTurn && (
+              <span className="text-sm sm:text-lg animate-pulse" aria-hidden="true">
+                👉
+              </span>
+            )}
+            <p
+              className={`
+                text-[11px] sm:text-sm font-display uppercase tracking-wider
+                ${isCurrentTurn ? 'text-[var(--color-warning)] font-bold' : 'text-skin-secondary'}
+              `}
+            >
+              {compactMessage}
+            </p>
+            {!isCurrentTurn && (
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-skin-text-accent" aria-hidden="true" />
+            )}
           </div>
         </div>
       </div>
@@ -514,7 +630,7 @@ function PlayingPhaseComponent({
               bg-skin-secondary border-skin-accent shadow-[var(--shadow-glow)]
             "
           >
-            <EmptyTrickMessage />
+            <TurnIndicator />
 
             <TrickArea
               gameState={gameState}

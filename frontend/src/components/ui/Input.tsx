@@ -190,6 +190,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           id={inputId}
           type={actualType}
           disabled={disabled}
+          aria-invalid={!!error}
+          aria-describedby={error || helperText ? `${inputId}-description` : undefined}
           onFocus={(e) => {
             setIsFocused(true);
             props.onFocus?.(e);
@@ -347,12 +349,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       {/* Helper Text or Error Message */}
       {(helperText || error) && (
         <p
+          id={`${inputId}-description`}
           className={`
           mt-2.5
           text-sm
           font-body italic
           ${error ? 'text-[var(--color-error)]' : 'text-[var(--color-text-muted)]'}
         `}
+          role={error ? 'alert' : undefined}
         >
           {error || helperText}
         </p>

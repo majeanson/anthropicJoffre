@@ -20,7 +20,7 @@
  * ```
  */
 
-import { useEffect, useState, ReactNode } from 'react';
+import { useEffect, useState, ReactNode, createContext, useContext, useCallback, useReducer } from 'react';
 
 export type ToastVariant = 'success' | 'warning' | 'error' | 'info';
 
@@ -310,3 +310,180 @@ export const ErrorToast = (props: PresetToastProps) => <Toast variant="error" {.
 export const InfoToast = (props: PresetToastProps) => <Toast variant="info" {...props} />;
 
 export default Toast;
+
+// ============================================================================
+// TOAST QUEUE SYSTEM
+// A hook-based toast queue for managing multiple toast notifications
+// ============================================================================
+
+export interface ToastItem {
+  id: string;
+  variant: ToastVariant;
+  message?: string;
+  title?: string;
+  icon?: ReactNode;
+  autoDismiss?: number;
+}
+
+type ToastAction =
+  | { type: 'ADD_TOAST'; toast: ToastItem }
+  | { type: 'REMOVE_TOAST'; id: string }
+  | { type: 'CLEAR_ALL' };
+
+function toastReducer(state: ToastItem[], action: ToastAction): ToastItem[] {
+  switch (action.type) {
+    case 'ADD_TOAST':
+      // Limit to 5 toasts max, remove oldest if exceeded
+      const newState = [...state, action.toast];
+      return newState.slice(-5);
+    case 'REMOVE_TOAST':
+      return state.filter((t) => t.id !== action.id);
+    case 'CLEAR_ALL':
+      return [];
+    default:
+      return state;
+  }
+}
+
+interface ToastContextValue {
+  toasts: ToastItem[];
+  addToast: (toast: Omit<ToastItem, 'id'>) => string;
+  removeToast: (id: string) => void;
+  clearAll: () => void;
+  success: (message: string, options?: Partial<Omit<ToastItem, 'id' | 'variant' | 'message'>>) => string;
+  warning: (message: string, options?: Partial<Omit<ToastItem, 'id' | 'variant' | 'message'>>) => string;
+  error: (message: string, options?: Partial<Omit<ToastItem, 'id' | 'variant' | 'message'>>) => string;
+  info: (message: string, options?: Partial<Omit<ToastItem, 'id' | 'variant' | 'message'>>) => string;
+}
+
+const ToastContext = createContext<ToastContextValue | null>(null);
+
+let toastIdCounter = 0;
+function generateToastId(): string {
+  return `toast-${++toastIdCounter}-${Date.now()}`;
+}
+
+export interface ToastProviderProps {
+  children: ReactNode;
+  /** Position for toast container */
+  position?: ToastContainerProps['position'];
+  /** Default auto-dismiss time in ms (0 = no auto-dismiss) */
+  defaultAutoDismiss?: number;
+}
+
+export function ToastProvider({
+  children,
+  position = 'top-right',
+  defaultAutoDismiss = 5000,
+}: ToastProviderProps) {
+  const [toasts, dispatch] = useReducer(toastReducer, []);
+
+  const removeToast = useCallback((id: string) => {
+    dispatch({ type: 'REMOVE_TOAST', id });
+  }, []);
+
+  const addToast = useCallback(
+    (toast: Omit<ToastItem, 'id'>): string => {
+      const id = generateToastId();
+      dispatch({
+        type: 'ADD_TOAST',
+        toast: {
+          ...toast,
+          id,
+          autoDismiss: toast.autoDismiss ?? defaultAutoDismiss,
+        },
+      });
+      return id;
+    },
+    [defaultAutoDismiss]
+  );
+
+  const clearAll = useCallback(() => {
+    dispatch({ type: 'CLEAR_ALL' });
+  }, []);
+
+  // Convenience methods
+  const success = useCallback(
+    (message: string, options?: Partial<Omit<ToastItem, 'id' | 'variant' | 'message'>>) =>
+      addToast({ variant: 'success', message, ...options }),
+    [addToast]
+  );
+
+  const warning = useCallback(
+    (message: string, options?: Partial<Omit<ToastItem, 'id' | 'variant' | 'message'>>) =>
+      addToast({ variant: 'warning', message, ...options }),
+    [addToast]
+  );
+
+  const error = useCallback(
+    (message: string, options?: Partial<Omit<ToastItem, 'id' | 'variant' | 'message'>>) =>
+      addToast({ variant: 'error', message, autoDismiss: 0, ...options }), // Errors don't auto-dismiss by default
+    [addToast]
+  );
+
+  const info = useCallback(
+    (message: string, options?: Partial<Omit<ToastItem, 'id' | 'variant' | 'message'>>) =>
+      addToast({ variant: 'info', message, ...options }),
+    [addToast]
+  );
+
+  const contextValue: ToastContextValue = {
+    toasts,
+    addToast,
+    removeToast,
+    clearAll,
+    success,
+    warning,
+    error,
+    info,
+  };
+
+  return (
+    <ToastContext.Provider value={contextValue}>
+      {children}
+      <ToastContainer position={position}>
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            variant={toast.variant}
+            message={toast.message}
+            title={toast.title}
+            icon={toast.icon}
+            autoDismiss={toast.autoDismiss}
+            onClose={() => removeToast(toast.id)}
+          />
+        ))}
+      </ToastContainer>
+    </ToastContext.Provider>
+  );
+}
+
+/**
+ * Hook to access the toast queue system
+ *
+ * @example
+ * ```tsx
+ * const toast = useToast();
+ *
+ * // Show different toast types
+ * toast.success('Game saved successfully!');
+ * toast.warning('Low on coins');
+ * toast.error('Failed to join game');
+ * toast.info('New player joined');
+ *
+ * // With options
+ * toast.success('Achievement unlocked!', { title: 'Congratulations', autoDismiss: 8000 });
+ *
+ * // Programmatic control
+ * const id = toast.info('Loading...');
+ * // Later...
+ * toast.removeToast(id);
+ * ```
+ */
+export function useToast(): ToastContextValue {
+  const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error('useToast must be used within a ToastProvider');
+  }
+  return context;
+}

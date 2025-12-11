@@ -65,6 +65,9 @@ export function JoinGameForm({
   selectedPlayerName,
   setSelectedPlayerName,
 }: JoinGameFormProps) {
+  // Loading state for form submission
+  const [isLoading, setIsLoading] = useState(false);
+
   // Keyboard navigation state - grid-based like GameBoy
   // Row 0: Join type radios (Player | Spectator)
   // Row 1: Game ID input
@@ -233,13 +236,17 @@ export function JoinGameForm({
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
+
     if (joinType === 'player') {
       if (playerName.trim() && gameId.trim()) {
+        setIsLoading(true);
         onJoinGame(gameId, playerName);
       }
     } else {
       // Spectator mode
       if (gameId.trim()) {
+        setIsLoading(true);
         onSpectateGame(gameId, playerName.trim() || undefined);
       }
     }
@@ -373,7 +380,7 @@ export function JoinGameForm({
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               {/* Show appropriate back button based on context */}
               {autoJoinGameId ? (
                 <Button
@@ -410,6 +417,8 @@ export function JoinGameForm({
                 variant={joinType === 'player' ? 'secondary' : 'primary'}
                 size="lg"
                 className="flex-1"
+                loading={isLoading}
+                disabled={isLoading}
               >
                 {joinType === 'player' ? 'Join as Player' : 'Join as Spectator'}
               </Button>

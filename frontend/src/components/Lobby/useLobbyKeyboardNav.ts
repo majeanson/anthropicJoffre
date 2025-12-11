@@ -5,11 +5,11 @@
 
 import { useEffect, useCallback } from 'react';
 import { sounds } from '../../utils/sounds';
-import type { LobbyMainTab, LobbySocialTab } from './types';
+import type { LobbyMainTab, LobbySocialTab, LobbyMode } from './types';
 import type { User } from '../../types/auth';
 
 interface UseLobbyKeyboardNavOptions {
-  mode: 'menu' | 'create' | 'join' | 'spectate';
+  mode: LobbyMode;
   mainTab: LobbyMainTab;
   socialTab: LobbySocialTab;
   navRow: number;

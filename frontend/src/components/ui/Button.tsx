@@ -22,6 +22,7 @@
 
 import { ButtonHTMLAttributes, ReactNode, forwardRef } from 'react';
 import { useSkin } from '../../contexts/SkinContext';
+import { Tooltip } from './Tooltip';
 
 export type ButtonVariant =
   | 'primary'
@@ -51,6 +52,8 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   loading?: boolean;
   /** Disable button */
   disabled?: boolean;
+  /** Explanation shown in tooltip when button is disabled */
+  disabledReason?: string;
   /** Make button full width */
   fullWidth?: boolean;
   /** Enable mechanical press effect with shadow */
@@ -93,6 +96,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     rightIcon,
     loading = false,
     disabled = false,
+    disabledReason,
     fullWidth = false,
     arcade = false,
     glow = false,
@@ -104,6 +108,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 ) {
   useSkin(); // Provides skin context for CSS variables
   const isDisabled = disabled || loading;
+  const showDisabledTooltip = isDisabled && disabledReason;
 
   // Size classes with alchemical proportions (golden ratio inspired)
   // Mobile touch targets: min 44x44px per WCAG 2.1 guidelines
@@ -306,7 +311,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   // Text transform based on variant
   const textTransform = variant === 'link' || variant === 'ghost' ? '' : 'uppercase';
 
-  return (
+  const buttonElement = (
     <button
       ref={ref}
       type={type}
@@ -344,6 +349,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       )}
     </button>
   );
+
+  // Wrap in tooltip when disabled with a reason
+  // Using span wrapper because disabled buttons don't receive pointer events
+  if (showDisabledTooltip) {
+    return (
+      <Tooltip content={disabledReason} variant="warning" position="top">
+        <span className={`inline-block ${fullWidth ? 'w-full' : ''}`}>{buttonElement}</span>
+      </Tooltip>
+    );
+  }
+
+  return buttonElement;
 });
 
 // ============================================================================

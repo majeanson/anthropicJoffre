@@ -25,6 +25,7 @@ interface PlayContentProps {
   onResumeGame: (gameId: string) => void;
   onCreateGame: () => void;
   onBrowseGames: () => void;
+  onPlayVsBots?: () => void;
   botDifficulty?: BotDifficulty;
   onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
   quickPlayPersistence: 'elo' | 'casual';
@@ -47,6 +48,7 @@ export function PlayContent({
   onResumeGame,
   onCreateGame,
   onBrowseGames,
+  onPlayVsBots,
   botDifficulty = 'medium',
   onBotDifficultyChange,
   quickPlayPersistence,
@@ -136,6 +138,48 @@ export function PlayContent({
       {/* Active Games (Resumable) */}
       <ActiveGames playerName={playerName} socket={socket} onResumeGame={onResumeGame} />
 
+      {/* Solo Play Section - Play against bots */}
+      <div
+        className="
+          p-4
+          rounded-[var(--radius-lg)]
+          border border-[var(--color-border-default)]
+          bg-[var(--color-bg-tertiary)]
+        "
+      >
+        <h3 className="text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-3 text-center">
+          Solo Play
+        </h3>
+        <div className="space-y-3">
+          {onPlayVsBots ? (
+            <Button
+              data-testid="play-vs-bots-button"
+              data-keyboard-nav="play-vs-bots"
+              variant="primary"
+              size="md"
+              onClick={() => {
+                sounds.buttonClick();
+                onPlayVsBots();
+              }}
+              fullWidth
+              leftIcon={<span>🤖</span>}
+            >
+              Play vs Bots
+            </Button>
+          ) : (
+            <QuickPlayPanel
+              botDifficulty={botDifficulty}
+              onBotDifficultyChange={onBotDifficultyChange}
+              quickPlayPersistence={quickPlayPersistence}
+              setQuickPlayPersistence={setQuickPlayPersistence}
+              onQuickPlay={onQuickPlay}
+              user={user}
+              playerName={playerName}
+            />
+          )}
+        </div>
+      </div>
+
       {/* Multiplayer Section */}
       <div
         className="
@@ -159,6 +203,7 @@ export function PlayContent({
               onCreateGame();
             }}
             disabled={!tierInfo.canCreateGame}
+            disabledReason="Log in to create games"
             fullWidth
             leftIcon={<span>{tierInfo.canCreateGame ? '➕' : '🔒'}</span>}
           >
@@ -180,17 +225,6 @@ export function PlayContent({
           </ElegantButton>
         </div>
       </div>
-
-      {/* Quick Play Section - Available for all users including guests */}
-      <QuickPlayPanel
-        botDifficulty={botDifficulty}
-        onBotDifficultyChange={onBotDifficultyChange}
-        quickPlayPersistence={quickPlayPersistence}
-        setQuickPlayPersistence={setQuickPlayPersistence}
-        onQuickPlay={onQuickPlay}
-        user={user}
-        playerName={playerName}
-      />
     </div>
   );
 }

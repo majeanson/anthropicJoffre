@@ -49,13 +49,15 @@ export interface HeaderActionButtonProps
 const sizeClasses: Record<HeaderActionButtonSize, { button: string; icon: string; label: string }> =
   {
     sm: {
-      button: 'p-1',
-      icon: 'text-sm',
+      // Minimum 44x44px touch target for WCAG compliance
+      button: 'p-2 min-w-[44px] min-h-[44px]',
+      icon: 'text-base',
       label: 'text-xs',
     },
     md: {
-      button: 'p-1.5 md:px-3 md:py-1.5',
-      icon: 'text-base md:text-lg',
+      // Minimum 44x44px touch target for WCAG compliance
+      button: 'p-2.5 min-w-[44px] min-h-[44px] md:px-3 md:py-2',
+      icon: 'text-lg md:text-xl',
       label: 'text-sm',
     },
   };

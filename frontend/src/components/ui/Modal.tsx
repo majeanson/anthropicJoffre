@@ -4,28 +4,48 @@
  * Mystical modal system with ethereal lighting and brass frame aesthetics.
  * Each modal feels like opening an ancient grimoire or alchemist's cabinet.
  *
- * Themes:
- * - arcane: Copper accents with mystical glow (default)
- * - midnight: Deep blue celestial atmosphere
- * - ember: Warm orange transmutation glow
- * - void: Pure darkness with subtle starlight
- * - parchment: Classic manuscript appearance
- * - teal: Alchemical teal transformation
+ * ## Recommended Themes (Core 6):
+ * - `minimal`: Clean, neutral - uses CSS variables for skin compatibility (most versatile)
+ * - `arcane`: Copper accents with mystical glow (default, primary modals)
+ * - `blue`: Blue celestial atmosphere (info, primary actions)
+ * - `purple`: Purple mystical (social features, profiles)
+ * - `red`: Red danger/error styling (errors, destructive actions)
+ * - `green`: Teal/green transformation (success, positive actions)
  *
- * Features:
+ * ## Legacy Themes (maintained for compatibility):
+ * These themes are still supported but mapped to core themes:
+ * - midnight → blue (equivalent)
+ * - teal → green (equivalent)
+ * - ember/orange → arcane (similar warm tones)
+ * - void, parchment, velvet, neon, etc. → kept for specific use cases
+ *
+ * ## Features:
  * - Multiple size variants (sm, md, lg, xl, full)
  * - Ethereal shadow and copper glow effects
- * - Mobile full-screen optimization
+ * - Mobile full-screen optimization (85vh max height)
  * - Keyboard handling (ESC to close)
+ * - Focus trap (Tab/Shift+Tab)
  * - Body scroll lock
  * - Stacking support for nested modals
  * - Sacred geometry corner decorations
+ *
+ * ## Usage:
+ * ```tsx
+ * // Recommended - use core themes
+ * <Modal theme="minimal" title="Settings">...</Modal>
+ * <Modal theme="blue" title="Information">...</Modal>
+ * <Modal theme="red" title="Delete Confirmation">...</Modal>
+ *
+ * // Or use preset components
+ * <MinimalModal title="Settings">...</MinimalModal>
+ * ```
  */
 
-import { ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { getModalZIndex } from '../../config/zIndex';
 import { sizes } from '../../config/layout';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 export type ModalTheme =
@@ -343,23 +363,23 @@ export function Modal({
   ariaLabel,
   testId = 'modal',
 }: ModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
   const config = themeConfigs[theme];
   const modalZIndex = customZIndex || getModalZIndex(stackLevel);
 
-  // Handle ESC key
-  useEffect(() => {
-    if (!isOpen || !closeOnEscape) return;
+  // Stable callback for escape handler
+  const handleEscape = useCallback(() => {
+    if (closeOnEscape) {
+      onClose();
+    }
+  }, [closeOnEscape, onClose]);
 
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, closeOnEscape, onClose]);
+  // Use focus trap hook for proper focus management
+  const { containerRef } = useFocusTrap({
+    isActive: isOpen,
+    onEscape: closeOnEscape ? handleEscape : undefined,
+    autoFocus: true,
+    restoreFocus: true,
+  });
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -376,13 +396,6 @@ export function Modal({
     };
   }, [isOpen, preventBodyScroll]);
 
-  // Focus trap and initial focus
-  useEffect(() => {
-    if (isOpen && modalRef.current) {
-      modalRef.current.focus();
-    }
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   const handleBackdropClick = () => {
@@ -396,10 +409,10 @@ export function Modal({
     e.stopPropagation();
   };
 
-  // Mobile responsive classes
+  // Mobile responsive classes - using 85vh to leave room for mobile browser UI
   const mobileClasses = mobileFullScreen
-    ? 'sm:rounded-[var(--radius-xl)] sm:max-h-[90vh] max-sm:rounded-none max-sm:h-full max-sm:max-h-full max-sm:w-full max-sm:max-w-full'
-    : 'rounded-[var(--radius-xl)] max-h-[90vh]';
+    ? 'sm:rounded-[var(--radius-xl)] sm:max-h-[85vh] max-sm:rounded-none max-sm:h-full max-sm:max-h-full max-sm:w-full max-sm:max-w-full'
+    : 'rounded-[var(--radius-xl)] max-h-[85vh]';
 
   const hasHeader = title || icon || subtitle || showCloseButton;
 
@@ -427,7 +440,7 @@ export function Modal({
 
       {/* Modal Content */}
       <div
-        ref={modalRef}
+        ref={containerRef}
         tabIndex={-1}
         className={`
           relative
@@ -569,27 +582,54 @@ export function Modal({
 }
 
 // ============================================================================
-// PRESET MODAL COMPONENTS
+// PRESET MODAL COMPONENTS - Recommended Core 6
 // ============================================================================
 
 export interface PresetModalProps extends Omit<ModalProps, 'theme'> {}
 
-/** Arcane copper-accented modal (default) */
+// ---- RECOMMENDED PRESETS (Core 6) ----
+
+/** Minimal theme modal - uses CSS variables for skin compatibility (most versatile) */
+export const MinimalModal = (props: PresetModalProps) => <Modal theme="minimal" {...props} />;
+
+/** Arcane copper-accented modal (default, primary modals) */
 export const ArcaneModal = (props: PresetModalProps) => (
   <Modal theme="arcane" glowAnimation {...props} />
 );
 
-/** Deep midnight celestial modal */
+/** Blue celestial modal (info, primary actions) */
+export const BlueModal = (props: PresetModalProps) => (
+  <Modal theme="blue" glowAnimation {...props} />
+);
+
+/** Purple mystical modal (social features, profiles) */
+export const PurpleModal = (props: PresetModalProps) => (
+  <Modal theme="purple" glowAnimation {...props} />
+);
+
+/** Red danger modal (errors, destructive actions) */
+export const RedModal = (props: PresetModalProps) => (
+  <Modal theme="red" glowAnimation {...props} />
+);
+
+/** Green success modal (success, positive actions) */
+export const GreenModal = (props: PresetModalProps) => (
+  <Modal theme="green" glowAnimation {...props} />
+);
+
+// ---- LEGACY PRESETS (maintained for backwards compatibility) ----
+
+/** @deprecated Use BlueModal instead */
 export const MidnightModal = (props: PresetModalProps) => (
   <Modal theme="midnight" glowAnimation {...props} />
 );
 
-/** Warm ember transmutation modal */
+/** @deprecated Use ArcaneModal instead */
 export const EmberModal = (props: PresetModalProps) => (
   <Modal theme="ember" glowAnimation {...props} />
 );
 
-/** Alchemical teal transformation modal */
+/** @deprecated Use GreenModal instead */
 export const TealModal = (props: PresetModalProps) => (
   <Modal theme="teal" glowAnimation {...props} />
 );
@@ -602,18 +642,23 @@ export const TerminalModal = (props: PresetModalProps) => (
   <Modal theme="terminal" scanlines {...props} />
 );
 
-/** Minimal theme modal - uses CSS variables for skin compatibility */
-export const MinimalModal = (props: PresetModalProps) => <Modal theme="minimal" {...props} />;
-
-// Legacy exports for backward compatibility
+/** @deprecated Use ArcaneModal instead */
 export const ElegantModal = ArcaneModal;
+
+/** @deprecated Use ArcaneModal instead */
 export const NeonModal = ArcaneModal;
+
+/** @deprecated Use RedModal or PurpleModal instead */
 export const VelvetModal = (props: PresetModalProps) => (
   <Modal theme="velvet" glowAnimation {...props} />
 );
+
+/** @deprecated Use ArcaneModal instead */
 export const ArcadeModal = (props: PresetModalProps) => (
   <Modal theme="arcade" glowAnimation {...props} />
 );
+
+/** @deprecated Use BlueModal instead */
 export const HologramModal = (props: PresetModalProps) => (
   <Modal theme="hologram" glowAnimation {...props} />
 );

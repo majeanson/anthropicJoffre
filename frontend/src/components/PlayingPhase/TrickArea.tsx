@@ -96,6 +96,18 @@ export const TrickArea = memo(function TrickArea({
     );
   };
 
+  // Generate screen reader description of current trick
+  const trickDescription = useMemo(() => {
+    if (gameState.currentTrick.length === 0) {
+      return 'No cards played yet in this trick.';
+    }
+    const cardsPlayed = gameState.currentTrick
+      .map((tc) => `${tc.playerName} played ${tc.card.value} of ${tc.card.color}`)
+      .join('. ');
+    const leadSuit = gameState.currentTrick[0]?.card.color;
+    return `${gameState.currentTrick.length} cards played. ${cardsPlayed}. Lead suit is ${leadSuit}.`;
+  }, [gameState.currentTrick]);
+
   // Render individual card with animations
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false, positionIndex?: number) => {
     if (!tc) {
@@ -193,6 +205,11 @@ export const TrickArea = memo(function TrickArea({
 
   return (
     <div className="flex-1 flex items-center justify-center mb-2 sm:mb-4 md:mb-6 relative touch-manipulation">
+      {/* Screen reader description - visually hidden but announced */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {trickDescription}
+      </div>
+
       {/* Previous Trick Button - Inside playing field top-left, z-60 to stay above modal */}
       {gameState.previousTrick && (
         <div className="absolute top-0 left-0 z-[60]">
@@ -200,6 +217,8 @@ export const TrickArea = memo(function TrickArea({
             onClick={() => setShowPreviousTrick(!showPreviousTrick)}
             variant={showPreviousTrick ? 'primary' : 'warning'}
             size="sm"
+            aria-label={showPreviousTrick ? 'Show current trick' : 'Show previous trick'}
+            aria-pressed={showPreviousTrick}
           >
             <span className="md:hidden" aria-hidden="true">
               {showPreviousTrick ? '▶️' : '⏮️'}

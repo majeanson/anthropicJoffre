@@ -182,6 +182,34 @@ export function GameHeader({
             </p>
           </div>
 
+          {/* Connection Status Indicator */}
+          {connectionStats && (
+            <div
+              className="flex items-center gap-1 px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0 bg-skin-tertiary"
+              title={`Connection: ${connectionStats.quality}${connectionStats.ping ? ` (${connectionStats.ping}ms)` : ''}`}
+              role="status"
+              aria-label={`Connection quality: ${connectionStats.quality}`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  connectionStats.quality === 'offline'
+                    ? 'bg-red-500 animate-pulse'
+                    : connectionStats.quality === 'poor'
+                      ? 'bg-red-500'
+                      : connectionStats.quality === 'fair'
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
+                }`}
+              />
+              {connectionStats.quality === 'offline' && (
+                <span className="text-[10px] text-red-400 font-semibold">Offline</span>
+              )}
+              {connectionStats.quality === 'poor' && (
+                <span className="text-[10px] text-red-400 font-semibold">Poor</span>
+              )}
+            </div>
+          )}
+
           {/* Bet and Trump Display */}
           {(highestBet || trump) && (
             <div className="flex items-center gap-1 px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0 bg-skin-tertiary">
@@ -190,7 +218,7 @@ export function GameHeader({
                   <span className="text-xs text-skin-muted">Bet:</span>
                   <span className="text-xs font-bold text-skin-primary">{highestBet.amount}</span>
                   {highestBet.withoutTrump && (
-                    <span className="text-xs font-bold text-skin-warning" title="Without Trump">
+                    <span className="text-xs font-bold text-skin-warning" title="No Trump = 2x points (if met, double points; if lost, double penalty)">
                       !
                     </span>
                   )}
@@ -203,7 +231,7 @@ export function GameHeader({
                   <div
                     className="w-3 h-3 rounded-sm"
                     style={getTrumpColorStyle(trump)}
-                    title={getTrumpColorName(trump)}
+                    title={`Trump suit: ${getTrumpColorName(trump)} (trumps beat other suits)`}
                   />
                 </div>
               )}
@@ -402,17 +430,50 @@ export function GameHeader({
               <p className="text-xs font-bold text-skin-primary">R{roundNumber}</p>
             </div>
 
+            {/* Mobile Connection Status Indicator */}
+            {connectionStats && (
+              <div
+                className="flex items-center gap-0.5 px-1.5 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0 bg-skin-tertiary"
+                title={`Connection: ${connectionStats.quality}${connectionStats.ping ? ` (${connectionStats.ping}ms)` : ''}`}
+                role="status"
+                aria-label={`Connection quality: ${connectionStats.quality}`}
+              >
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    connectionStats.quality === 'offline'
+                      ? 'bg-red-500 animate-pulse'
+                      : connectionStats.quality === 'poor'
+                        ? 'bg-red-500'
+                        : connectionStats.quality === 'fair'
+                          ? 'bg-yellow-500'
+                          : 'bg-green-500'
+                  }`}
+                />
+                {connectionStats.quality === 'offline' && (
+                  <span className="text-[10px] text-red-400 font-semibold">!</span>
+                )}
+              </div>
+            )}
+
             {/* Mobile Bet and Trump Display */}
             {(highestBet || trump) && (
-              <div className="flex items-center gap-0.5 px-1.5 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0 bg-skin-tertiary">
+              <div
+                className="flex items-center gap-0.5 px-1.5 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0 bg-skin-tertiary"
+                title={highestBet ? `Bet: ${highestBet.amount}${highestBet.withoutTrump ? ' (No Trump = 2x points)' : ''}${trump ? ` | Trump: ${getTrumpColorName(trump)}` : ''}` : trump ? `Trump: ${getTrumpColorName(trump)}` : undefined}
+                aria-label={highestBet ? `Current bet: ${highestBet.amount} points${highestBet.withoutTrump ? ', without trump doubles points' : ''}${trump ? `, Trump suit: ${getTrumpColorName(trump)}` : ''}` : trump ? `Trump suit: ${getTrumpColorName(trump)}` : undefined}
+              >
                 {highestBet && (
                   <span className="text-[10px] font-bold text-skin-primary">
                     {highestBet.amount}
-                    {highestBet.withoutTrump ? '!' : ''}
+                    {highestBet.withoutTrump && <span className="text-skin-warning" title="No Trump = 2x points">!</span>}
                   </span>
                 )}
                 {trump && (
-                  <div className="w-2.5 h-2.5 rounded-sm" style={getTrumpColorStyle(trump)} />
+                  <div
+                    className="w-2.5 h-2.5 rounded-sm"
+                    style={getTrumpColorStyle(trump)}
+                    title={getTrumpColorName(trump)}
+                  />
                 )}
               </div>
             )}

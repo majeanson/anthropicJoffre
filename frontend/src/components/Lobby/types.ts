@@ -7,7 +7,7 @@ import { BotDifficulty } from '../../utils/botPlayerEnhanced';
 import { OnlinePlayer } from '../../types/game';
 import type { SocialPanelTabType } from '../SocialPanel';
 
-export type LobbyMode = 'menu' | 'create' | 'join' | 'spectate';
+export type LobbyMode = 'menu' | 'create' | 'join' | 'spectate' | 'bot';
 export type LobbyMainTab = 'play' | 'social' | 'stats' | 'settings';
 /** @deprecated Use SocialPanelTabType instead */
 export type LobbySocialTab = SocialPanelTabType;

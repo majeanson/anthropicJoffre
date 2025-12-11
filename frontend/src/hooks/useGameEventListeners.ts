@@ -144,6 +144,12 @@ export function useGameEventListeners({
       setError(message);
     };
 
+    // Invalid move (card play validation failed)
+    const handleInvalidMove = ({ message }: { message: string }) => {
+      playErrorSound();
+      showToast(message, 'error', 3000);
+    };
+
     // Player left
     const handlePlayerLeft = ({ gameState: newGameState }: { gameState: GameState }) => {
       setGameState(newGameState);
@@ -381,6 +387,7 @@ export function useGameEventListeners({
     socket.on('timeout_warning', handleTimeoutWarning);
     socket.on('auto_action_taken', handleAutoActionTaken);
     socket.on('error', handleError);
+    socket.on('invalid_move', handleInvalidMove);
     socket.on('player_left', handlePlayerLeft);
     socket.on('kicked_from_game', handleKickedFromGame);
     socket.on('leave_game_success', handleLeaveGameSuccess);
@@ -402,6 +409,7 @@ export function useGameEventListeners({
       socket.off('timeout_warning', handleTimeoutWarning);
       socket.off('auto_action_taken', handleAutoActionTaken);
       socket.off('error', handleError);
+      socket.off('invalid_move', handleInvalidMove);
       socket.off('player_left', handlePlayerLeft);
       socket.off('kicked_from_game', handleKickedFromGame);
       socket.off('leave_game_success', handleLeaveGameSuccess);

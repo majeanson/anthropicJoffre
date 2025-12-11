@@ -103,9 +103,14 @@ function BettingPhaseComponent({
     [players, currentPlayerIndex, currentPlayer]
   );
 
-  const isDealer = useMemo(
-    () => currentPlayerIndex === dealerIndex,
-    [currentPlayerIndex, dealerIndex]
+  // Check if I am the dealer (not if it's the dealer's turn)
+  const iAmDealer = useMemo(
+    () => {
+      if (!currentPlayer) return false;
+      const myIndex = players.findIndex((p) => p.id === currentPlayer.id);
+      return myIndex === dealerIndex;
+    },
+    [players, currentPlayer, dealerIndex]
   );
 
   const playerHand = useMemo(() => currentPlayer?.hand || [], [currentPlayer]);
@@ -141,7 +146,7 @@ function BettingPhaseComponent({
   }, [currentBets]);
 
   const canSkip = (): boolean => {
-    if (!isDealer) return true;
+    if (!iAmDealer) return true;
     const hasValidBets = currentBets.some((b) => !b.skipped);
     return hasValidBets;
   };
@@ -233,13 +238,13 @@ function BettingPhaseComponent({
 
   const isBetAmountValid = (amount: number): boolean => {
     if (!highestBet) return true;
-    if (isDealer) return amount >= highestBet.amount;
+    if (iAmDealer) return amount >= highestBet.amount;
     return amount > highestBet.amount;
   };
 
   const isCurrentBetValid = (): boolean => {
     if (!highestBet) return true;
-    if (isDealer) return selectedAmount >= highestBet.amount;
+    if (iAmDealer) return selectedAmount >= highestBet.amount;
     return (
       selectedAmount > highestBet.amount ||
       (selectedAmount === highestBet.amount && withoutTrump && !highestBet.withoutTrump)
@@ -546,11 +551,11 @@ function BettingPhaseComponent({
                         ? [
                             {
                               type: 'warning' as const,
-                              text: `Too low: Current highest is ${highestBet.amount} points${highestBet.withoutTrump ? ' (No Trump)' : ''}. ${isDealer ? 'You can match or raise.' : 'You must raise.'}`,
+                              text: `Too low: Current highest is ${highestBet.amount} points${highestBet.withoutTrump ? ' (No Trump)' : ''}. ${iAmDealer ? 'You can match or raise.' : 'You must raise.'}`,
                             },
                           ]
                         : []),
-                      ...(isDealer && currentBets.length > 0 && currentBets.some((b) => !b.skipped)
+                      ...(iAmDealer && isMyTurn && currentBets.length > 0 && currentBets.some((b) => !b.skipped)
                         ? [
                             {
                               type: 'info' as const,
@@ -558,7 +563,7 @@ function BettingPhaseComponent({
                             },
                           ]
                         : []),
-                      ...(isDealer && !currentBets.some((b) => !b.skipped)
+                      ...(iAmDealer && isMyTurn && !currentBets.some((b) => !b.skipped)
                         ? [
                             {
                               type: 'info' as const,

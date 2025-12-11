@@ -21,7 +21,7 @@
  * - No inline styles - all styling via Tailwind or CSS classes
  */
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { Card as CardType, CardColor } from '../types/game';
 import { useCardSkin, useSpecialCardSkins } from '../contexts/SkinContext';
 
@@ -29,6 +29,8 @@ interface CardProps {
   card: CardType;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
+  /** Reason why card is disabled - shown as tooltip */
+  disabledReason?: string;
   size?: 'tiny' | 'small' | 'medium' | 'large';
   isPlayable?: boolean;
   isKeyboardSelected?: boolean;
@@ -73,13 +75,14 @@ const suitClasses: Record<
 };
 
 // Size configurations - all Tailwind classes, no inline styles
+// Note: Badge text minimum 10px on mobile for readability (WCAG)
 const sizeStyles = {
   tiny: {
     container: 'w-[2.75rem] h-[4rem] sm:w-12 sm:h-20 border-2',
     text: 'text-base',
     cornerText: 'text-sm font-black',
     emblem: 'w-6 h-6 sm:w-6 sm:h-6',
-    badge: 'text-[9px] px-1 py-0.5',
+    badge: 'text-[10px] sm:text-[10px] px-1 py-0.5',
     badgeSize: 'min-w-[18px] h-[18px]',
     cornerOffset: 'top-0.5 left-0.5',
     cornerOffsetBottom: 'bottom-0.5 right-0.5',
@@ -89,7 +92,7 @@ const sizeStyles = {
     text: 'text-base sm:text-lg',
     cornerText: 'text-sm sm:text-base font-black',
     emblem: 'w-8 h-8 sm:w-10 sm:h-10 md:w-10 md:h-10',
-    badge: 'text-[9px] sm:text-[10px] px-1 py-0.5',
+    badge: 'text-[10px] sm:text-xs px-1 py-0.5',
     badgeSize: 'min-w-[22px] h-[22px]',
     cornerOffset: 'top-0.5 left-1 sm:top-1 sm:left-1.5',
     cornerOffsetBottom: 'bottom-0.5 right-1 sm:bottom-1 sm:right-1.5',
@@ -99,7 +102,7 @@ const sizeStyles = {
     text: 'text-lg sm:text-2xl',
     cornerText: 'text-base sm:text-lg font-black',
     emblem: 'w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12',
-    badge: 'text-[10px] sm:text-xs px-1 sm:px-1.5 py-0.5',
+    badge: 'text-[11px] sm:text-xs px-1 sm:px-1.5 py-0.5',
     badgeSize: 'min-w-[26px] h-[26px]',
     cornerOffset: 'top-0.5 left-1 sm:top-1 sm:left-1.5',
     cornerOffsetBottom: 'bottom-0.5 right-1 sm:bottom-1 sm:right-1.5',
@@ -116,15 +119,92 @@ const sizeStyles = {
   },
 };
 
+// ============================================================================
+// CARD TOOLTIP COMPONENT (for disabled card explanations)
+// ============================================================================
+
+interface CardTooltipProps {
+  content: string;
+  isVisible: boolean;
+}
+
+function CardTooltip({ content, isVisible }: CardTooltipProps) {
+  if (!isVisible) return null;
+
+  return (
+    <div
+      role="tooltip"
+      className={`
+        absolute z-50
+        bottom-full left-1/2 -translate-x-1/2 mb-2
+        px-3 py-2
+        text-xs sm:text-sm font-medium
+        rounded-lg
+        whitespace-nowrap
+        pointer-events-none
+        transition-all duration-200
+        border-2 border-solid
+        bg-error text-white border-error
+        shadow-lg
+        ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-1 scale-95'}
+      `}
+    >
+      {content}
+      {/* Arrow pointing down */}
+      <div
+        className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0"
+        style={{
+          borderLeft: '6px solid transparent',
+          borderRight: '6px solid transparent',
+          borderTop: '6px solid var(--color-error)',
+        }}
+      />
+    </div>
+  );
+}
+
 function CardComponent({
   card,
   onClick,
   disabled,
+  disabledReason,
   size = 'medium',
   isPlayable = false,
   isKeyboardSelected = false,
   faceDown = false,
 }: CardProps) {
+  // Tooltip state for disabled card explanations
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipTimeoutRef = useRef<number | null>(null);
+  const tooltipId = useRef(`card-tooltip-${Math.random().toString(36).substr(2, 9)}`);
+
+  // Show tooltip with small delay to prevent flicker
+  const handleShowTooltip = useCallback(() => {
+    if (!disabled || !disabledReason) return;
+
+    tooltipTimeoutRef.current = window.setTimeout(() => {
+      setShowTooltip(true);
+    }, 200); // 200ms delay before showing
+  }, [disabled, disabledReason]);
+
+  // Hide tooltip immediately
+  const handleHideTooltip = useCallback(() => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+      tooltipTimeoutRef.current = null;
+    }
+    setShowTooltip(false);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (tooltipTimeoutRef.current) {
+        clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Get card skin for value formatting
   const { cardSkin } = useCardSkin();
 
@@ -241,37 +321,53 @@ function CardComponent({
   // Brown cards get thicker border
   const borderThicknessClass = card.color === 'brown' ? 'border-4' : '';
 
+  // Show tooltip for disabled cards with a reason
+  const hasTooltip = disabled && disabledReason;
+
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={ariaLabel}
-      data-testid={`card-${card.color}-${card.value}`}
-      data-card-value={card.value}
-      data-card-color={card.color}
-      className={`
-        ${sizeConfig.container}
-        ${borderThicknessClass}
-        ${suitClass.border}
-        ${suitClass.borderStyle}
-        ${stateClasses}
-        ${specialEffectClass}
-        rounded-[var(--radius-lg)]
-        font-display
-        flex flex-col items-center justify-center gap-1
-        relative overflow-hidden
-        touch-manipulation
-        select-none
-        ${!disabled && onClick ? 'cursor-pointer active:scale-95 hover:card-playable' : 'cursor-default'}
-        ${disabled ? 'opacity-50' : ''}
-        ${isKeyboardSelected ? 'ring-[3px] ring-skin-accent ring-offset-2 ring-offset-skin-primary' : ''}
-        focus-visible:outline-none
-        focus-visible:ring-[3px]
-        focus-visible:ring-skin-accent
-        focus-visible:ring-offset-2
-        focus-visible:ring-offset-skin-primary
-      `}
-    >
+    <div className="relative">
+      {/* Tooltip for disabled card explanation */}
+      {hasTooltip && (
+        <CardTooltip
+          content={disabledReason}
+          isVisible={showTooltip}
+        />
+      )}
+
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={ariaLabel}
+        aria-describedby={hasTooltip && showTooltip ? tooltipId.current : undefined}
+        data-testid={`card-${card.color}-${card.value}`}
+        data-card-value={card.value}
+        data-card-color={card.color}
+        onMouseEnter={handleShowTooltip}
+        onMouseLeave={handleHideTooltip}
+        onFocus={handleShowTooltip}
+        onBlur={handleHideTooltip}
+        className={`
+          ${sizeConfig.container}
+          ${borderThicknessClass}
+          ${suitClass.border}
+          ${suitClass.borderStyle}
+          ${stateClasses}
+          ${specialEffectClass}
+          rounded-[var(--radius-lg)]
+          font-display
+          flex flex-col items-center justify-center gap-1
+          relative overflow-hidden
+          touch-manipulation
+          select-none
+          ${!disabled && onClick ? 'cursor-pointer active:scale-95 hover:card-playable' : 'cursor-default'}
+          ${isKeyboardSelected ? 'ring-[3px] ring-skin-accent ring-offset-2 ring-offset-skin-primary' : ''}
+          focus-visible:outline-none
+          focus-visible:ring-[3px]
+          focus-visible:ring-skin-accent
+          focus-visible:ring-offset-2
+          focus-visible:ring-offset-skin-primary
+        `}
+      >
       {/* Parchment texture overlay */}
       <div className="absolute inset-0 rounded-[var(--radius-lg)] pointer-events-none opacity-40 card-parchment-overlay" />
 
@@ -405,7 +501,8 @@ function CardComponent({
           </div>
         </div>
       )}
-    </button>
+      </button>
+    </div>
   );
 }
 
@@ -415,6 +512,7 @@ function arePropsEqual(prevProps: CardProps, nextProps: CardProps) {
     prevProps.card.color === nextProps.card.color &&
     prevProps.card.value === nextProps.card.value &&
     prevProps.disabled === nextProps.disabled &&
+    prevProps.disabledReason === nextProps.disabledReason &&
     prevProps.size === nextProps.size &&
     prevProps.onClick === nextProps.onClick &&
     prevProps.isPlayable === nextProps.isPlayable &&

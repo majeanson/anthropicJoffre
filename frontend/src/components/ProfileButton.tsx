@@ -122,7 +122,7 @@ export function ProfileButton({
   const triggerButton = (
     <button
       onClick={!user ? handleGuestClick : undefined}
-      className={`flex items-center gap-3 bg-gradient-to-r from-skin-secondary to-skin-tertiary hover:from-skin-tertiary hover:to-skin-secondary px-4 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg border-2 border-skin-default focus:outline-none focus:ring-2 focus:ring-amber-500 ${className}`}
+      className={`flex items-center gap-3 bg-gradient-to-r from-skin-secondary to-skin-tertiary hover:from-skin-tertiary hover:to-skin-secondary px-4 py-3 rounded-xl transition-all duration-fast shadow-md hover:shadow-lg border-2 border-skin-default focus:outline-none focus:ring-2 focus:ring-amber-500 ${className}`}
       title={user ? `View ${user.username}'s profile` : 'Click to learn why you should register!'}
     >
       <Avatar
