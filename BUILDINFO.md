@@ -1,6 +1,6 @@
 # Build Information
 
-**Last Updated**: 2025-12-02
+**Last Updated**: 2025-12-11
 **Build Status**: Development
 **Version**: 1.0.0-dev
 
@@ -319,70 +319,79 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
 
 ---
 
-## 📝 Recent Changes (2025-11-26)
+## 📝 Recent Changes (2025-12-11)
 
-### Completed
-1. ✅ Move Suggestion Algorithm - Major Rewrite
-   - Complete rewrite with full team awareness
-   - Strategic priority system: Red 0 bonus > Win Red 0 from opponents > Win tricks > Avoid Brown 0
-   - Detects teammate winning and suggests adding Red 0 for +5 bonus
-   - Always tries to win Red 0 tricks from opponents
-   - Avoids giving Brown 0 (-2 points) to opponents
-   - Proper trump vs non-trump mechanics
-   - New helper functions: getTrickWinner(), canBeatCard()
-   - Smart card suggestions based on game state
+### Completed - Major Component Refactoring
+1. ✅ **Card Component Modularization** (662 lines → modular folder)
+   - Extracted to `components/Card/` folder structure:
+     - `Card.tsx` - Main card component (memoized)
+     - `CardTooltip.tsx` - Tooltip for disabled cards
+     - `CardBack.tsx` - Card back with team colors
+     - `CardStack.tsx` - Deck visualization
+     - `ElegantCardDisplay.tsx` - Featured card display
+     - `cardStyles.ts` - Shared style constants
+   - Original `Card.tsx` re-exports for backwards compatibility
 
-2. ✅ playerName Migration (Complete)
-   - Migrated all code from volatile `playerId` to stable `playerName` identifiers
-   - Updated all bet lookups to use playerName instead of playerId
-   - Fixed duplicate bet checks across backend and frontend
-   - Updated type comments to warn against using playerId for comparisons
-   - All 485 backend tests passing
-   - Fixed frontend test files (BettingPhase.test.tsx, GameReplay.test.tsx)
+2. ✅ **Selector Component System** (new reusable pattern)
+   - Created `components/ui/Selector/` with:
+     - `SelectorCard.tsx` - Reusable card for selection UIs
+     - `SelectorGrid.tsx` - Responsive grid layout
+     - `SelectorPreview.tsx` - Preview area with gradients
+     - `SelectorInfo.tsx` - Title/subtitle/description
+   - Reduces duplication across skin/card/avatar selectors
 
-2. ✅ Beginner Mode UI Enhancements
-   - Added Tutorial Progress modal accessible from game header
-   - Shows all 9 tutorial phases with completion status
-   - Progress bar with percentage and checkmarks
-   - Only visible when beginner mode is enabled
-   - Modal shows "Master Student" achievement completion status
+3. ✅ **Enhanced useSocketEvent Hook**
+   - Added `useRef` pattern to prevent stale closures
+   - Added `useSocketEvents` - Multi-event subscription
+   - Added `useSocketEmit` - Memoized emit function
 
-3. ✅ Move Suggestion Panel UX Improvement
-   - Changed from vertical layout to overlay positioning
-   - Now appears above PlayerHand area (no layout shift)
-   - 95% opacity for better visual integration
-   - Only shows when player has cards in hand
-   - Prevents vertical stack changes during gameplay
+4. ✅ **Deprecated Code Cleanup** (~7,450 lines removed)
+   - Deleted `botPlayer.ts` (1,052 lines) - superseded by `botPlayerEnhanced.ts`
+   - Deleted `DebugPanel.tsx` (710 lines) - replaced by `UnifiedDebugPanel`
+   - Deleted `UnifiedDebugModal.tsx` (750 lines) - unused
+   - Deleted `temp_add_imports.js` - temporary script
+   - Consolidated monolithic components into folder structures
 
-4. ✅ Clickable Player Profiles (Gaming Phases)
-   - Added clickable profiles in BettingPhase (InlineBetStatus component)
-   - Added clickable profiles in PlayingPhase (PlayerPosition component)
-   - Players can click their own profile to view profile modal
-   - Players can click other real players (not bots) to view profiles
-   - Consistent with existing profile click functionality
-   - Hover underline on clickable names
+5. ✅ **Component Folder Refactoring**
+   - `BettingPhase/` - Split into sub-components
+   - `GameHeader/` - Split into sub-components
+   - `TeamSelection/` - Split into sub-components
+   - `PlayingPhase/` - Added 8 extracted hooks
+   - `LobbyBrowser/` - Added 3 extracted hooks
+   - `SocialPanel/` - Added 3 extracted hooks
 
-5. ✅ TypeScript Error Fixes
-   - Fixed TutorialProgressModal import error (re-exported TutorialPhase)
-   - Fixed test file Bet objects missing playerName field
-   - Both backend and frontend builds pass successfully
-   - No TypeScript compilation errors
+6. ✅ **Form Component Refactoring**
+   - Created `useFormKeyboardNav` hook (shared keyboard navigation)
+   - Created `FormPageLayout` component (shared decorative elements)
+   - Created `FormActionButtons` component (shared button layout)
+   - Refactored: GameCreationForm, JoinGameForm, GameWithBotCreationForm
 
-### In Progress
-- None (ready for Sprint 10)
+7. ✅ **Console.log Cleanup**
+   - Replaced production console.log with logger utility
+   - Files updated: App.tsx, useVoiceChat.ts, useTutorialAchievement.ts
+
+### Code Quality Metrics
+- **Lines Removed**: ~7,450 lines of deprecated/redundant code
+- **New Reusable Components**: 10+ atomic components
+- **New Hooks**: 15+ extracted hooks
+- **TypeScript Status**: Both frontend and backend compile cleanly
+
+### Previous Changes (2025-11-26)
+- Move Suggestion Algorithm rewrite with team awareness
+- playerName Migration (volatile playerId → stable playerName)
+- Beginner Mode UI enhancements
+- Move Suggestion Panel UX improvements
+- Clickable Player Profiles in gaming phases
 
 ### Next Steps
-1. Sprint 10: Code Quality
-   - Duplicate code analysis
-   - Complex function refactoring
-   - JSDoc documentation
-   - ESLint & Prettier setup
-   - Image optimization
+1. Sprint 10: Code Quality (continued)
+   - Migrate existing selectors to use new Selector components
+   - Consider SkinContext split (deferred - requires significant changes)
+   - Performance profiling
 
 2. Sprint 11: Security & Production
    - Security audit
    - REST API documentation (Swagger)
-   - Performance profiling
    - Monitoring setup
    - Production deployment
 
@@ -430,4 +439,4 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
 
 ---
 
-*This buildinfo is automatically updated with each major change. Last update: 2025-12-02*
+*This buildinfo is automatically updated with each major change. Last update: 2025-12-11*

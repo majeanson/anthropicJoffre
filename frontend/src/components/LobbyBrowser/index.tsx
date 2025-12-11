@@ -1,29 +1,28 @@
 /**
  * LobbyBrowser Component - Retro Gaming Edition
- * Version 2.0.0 - Modular Architecture
+ * Version 3.0.0 - Modular Architecture with Extracted Hooks
  *
  * Browse and join active games, or watch replays of recent finished games.
- * Refactored into sub-components:
- * - GameCard: Individual active game display
- * - RecentGameCard: Individual recent game display
- * - FilterBar: Filter and sort controls
- * - JoinWithIdSection: Join game by ID input
+ *
+ * Refactored structure:
+ * - Sub-components: GameCard, RecentGameCard, FilterBar, JoinWithIdSection
+ * - Hooks: useLobbyGames, useLobbyFilters, useLobbyKeyboardNav
  */
 
-import { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
+import { useState, useMemo, useCallback, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 import { useAuth } from '../../contexts/AuthContext';
-import { API_ENDPOINTS } from '../../config/constants';
-import { ERROR_MESSAGES, getErrorMessage } from '../../config/errorMessages';
-import logger from '../../utils/logger';
 import { sounds } from '../../utils/sounds';
 import { Button } from '../ui/Button';
 import { Tabs, Tab } from '../ui/Tabs';
-import { LobbyGame, RecentGame, LobbyBrowserTabType, GameModeFilter, SortOption } from './types';
+import { LobbyGame, LobbyBrowserTabType } from './types';
 import { GameCard } from './GameCard';
 import { RecentGameCard } from './RecentGameCard';
 import { FilterBar } from './FilterBar';
 import { JoinWithIdSection } from './JoinWithIdSection';
+import { useLobbyGames } from './useLobbyGames';
+import { useLobbyFilters } from './useLobbyFilters';
+import { useLobbyKeyboardNav } from './useLobbyKeyboardNav';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('../GameReplay').then((m) => ({ default: m.GameReplay })));
@@ -45,305 +44,87 @@ export function LobbyBrowser({
 }: LobbyBrowserProps) {
   const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<LobbyBrowserTabType>('active');
-  const [games, setGames] = useState<LobbyGame[]>([]);
-  const [recentGames, setRecentGames] = useState<RecentGame[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [correlationId, setCorrelationId] = useState<string | null>(null);
-  const [isRetrying, setIsRetrying] = useState(false);
   const [replayGameId, setReplayGameId] = useState<string | null>(null);
 
-  // Filter and sort state
-  const [filterWithBots, setFilterWithBots] = useState(false);
-  const [filterNeedsPlayers, setFilterNeedsPlayers] = useState(false);
-  const [filterInProgress, setFilterInProgress] = useState(false);
-  const [filterGameMode, setFilterGameMode] = useState<GameModeFilter>('all');
-  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  // Use extracted hooks
+  const {
+    games,
+    recentGames,
+    loading,
+    error,
+    correlationId,
+    isRetrying,
+    refreshGames,
+  } = useLobbyGames({ activeTab });
 
-  // Keyboard navigation state
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const {
+    filterWithBots,
+    setFilterWithBots,
+    filterNeedsPlayers,
+    setFilterNeedsPlayers,
+    filterInProgress,
+    setFilterInProgress,
+    filterGameMode,
+    setFilterGameMode,
+    sortBy,
+    setSortBy,
+    getFilteredGames,
+  } = useLobbyFilters();
 
-  // Track if we've done the initial load for each tab
-  const hasLoadedActiveGames = useRef(false);
-  const hasLoadedRecentGames = useRef(false);
-
-  // Handler to validate join game request
-  const handleJoinGameClick = (game: LobbyGame) => {
-    if (game.persistenceMode === 'elo' && !isAuthenticated) {
-      if (onShowWhyRegister) {
-        onShowWhyRegister();
-      }
-      return;
-    }
-    onJoinGame(game.gameId);
-  };
-
-  const fetchGames = async (isInitialLoad = false, retryCount = 0) => {
-    try {
-      if (isInitialLoad && !hasLoadedActiveGames.current) {
-        setLoading(true);
-      }
-      if (retryCount > 0) {
-        setIsRetrying(true);
-      }
-
-      const response = await fetch(API_ENDPOINTS.gamesLobby(), {
-        signal: AbortSignal.timeout(10000),
-      });
-
-      if (!response.ok) {
-        let errorData: { message?: string; correlationId?: string; correlation_id?: string };
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = { message: await response.text() };
-        }
-
-        logger.error('[LobbyBrowser] Server error:', errorData);
-        const corrId = errorData.correlationId || errorData.correlation_id || null;
-        if (corrId) {
-          setCorrelationId(corrId);
-        }
-
-        if (response.status >= 500 && retryCount < 2) {
-          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
-          return fetchGames(isInitialLoad, retryCount + 1);
-        }
-
-        throw new Error(errorData.message || `Server error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setGames(data.games);
-      setError(null);
-      setCorrelationId(null);
-      hasLoadedActiveGames.current = true;
-    } catch (err) {
-      if (err instanceof TypeError && err.message.includes('fetch')) {
-        logger.error('[LobbyBrowser] Network error:', err);
-        setError(ERROR_MESSAGES.NETWORK_ERROR);
-
-        if (retryCount < 2) {
-          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
-          return fetchGames(isInitialLoad, retryCount + 1);
-        }
-      } else {
-        const errorMessage = getErrorMessage(err, 'UNKNOWN_ERROR');
-        logger.error('[LobbyBrowser] Failed to load games:', errorMessage, { error: String(err) });
-        setError(`${ERROR_MESSAGES.GAMES_LOAD_FAILED}: ${errorMessage}`);
-      }
-    } finally {
-      setLoading(false);
-      setIsRetrying(false);
-    }
-  };
-
-  const fetchRecentGames = async (isInitialLoad = false, retryCount = 0) => {
-    try {
-      if (isInitialLoad && !hasLoadedRecentGames.current) {
-        setLoading(true);
-      }
-      if (retryCount > 0) {
-        setIsRetrying(true);
-      }
-
-      const response = await fetch(API_ENDPOINTS.recentGames(), {
-        signal: AbortSignal.timeout(10000),
-      });
-
-      if (!response.ok) {
-        let errorData: { message?: string; correlationId?: string; correlation_id?: string };
-        try {
-          errorData = await response.json();
-        } catch {
-          errorData = { message: await response.text() };
-        }
-
-        logger.error('[LobbyBrowser] Server error:', errorData);
-        const corrId = errorData.correlationId || errorData.correlation_id || null;
-        if (corrId) {
-          setCorrelationId(corrId);
-        }
-
-        if (response.status >= 500 && retryCount < 2) {
-          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
-          return fetchRecentGames(isInitialLoad, retryCount + 1);
-        }
-
-        throw new Error(errorData.message || `Server error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setRecentGames(data.games);
-      setError(null);
-      setCorrelationId(null);
-      hasLoadedRecentGames.current = true;
-    } catch (err) {
-      if (err instanceof TypeError && err.message.includes('fetch')) {
-        const errorMessage = 'Network error. Please check your connection.';
-        logger.error('[LobbyBrowser] Network error:', err);
-        setError(errorMessage);
-
-        if (retryCount < 2) {
-          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
-          return fetchRecentGames(isInitialLoad, retryCount + 1);
-        }
-      } else {
-        const errorMessage = getErrorMessage(err, 'UNKNOWN_ERROR');
-        logger.error('[LobbyBrowser] Failed to load recent games:', errorMessage, {
-          error: String(err),
-        });
-        setError(`${ERROR_MESSAGES.RECENT_GAMES_LOAD_FAILED}: ${errorMessage}`);
-      }
-    } finally {
-      setLoading(false);
-      setIsRetrying(false);
-    }
-  };
-
-  useEffect(() => {
-    if (activeTab === 'active') {
-      fetchGames(true);
-      const interval = setInterval(() => fetchGames(false), 5000);
-      return () => clearInterval(interval);
-    } else {
-      fetchRecentGames(true);
-    }
-  }, [activeTab]);
-
-  // Filter and sort games
-  const filteredAndSortedGames = useMemo(() => {
-    let filtered = [...games];
-
-    if (filterWithBots) {
-      filtered = filtered.filter((game) => game.botPlayerCount > 0);
-    }
-    if (filterNeedsPlayers) {
-      filtered = filtered.filter((game) => game.humanPlayerCount < 4 || game.botPlayerCount > 0);
-    }
-    if (filterInProgress) {
-      filtered = filtered.filter((game) => game.isInProgress);
-    }
-    if (filterGameMode === 'ranked') {
-      filtered = filtered.filter((game) => game.persistenceMode === 'elo');
-    } else if (filterGameMode === 'casual') {
-      filtered = filtered.filter((game) => game.persistenceMode === 'casual');
-    }
-
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return b.createdAt - a.createdAt;
-        case 'players':
-          return b.humanPlayerCount - a.humanPlayerCount;
-        case 'score':
-          const aScore = a.teamScores.team1 + a.teamScores.team2;
-          const bScore = b.teamScores.team1 + b.teamScores.team2;
-          return bScore - aScore;
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [games, filterWithBots, filterNeedsPlayers, filterInProgress, filterGameMode, sortBy]);
+  // Get filtered games
+  const filteredAndSortedGames = useMemo(
+    () => getFilteredGames(games),
+    [games, getFilteredGames]
+  );
 
   // Get current list for keyboard navigation
   const currentList = activeTab === 'active' ? filteredAndSortedGames : recentGames;
-  const currentListLength = currentList.length;
 
-  // Reset selection when tab or list changes
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [activeTab, currentListLength]);
-
-  // Keyboard navigation handler
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.tagName === 'SELECT'
-      ) {
+  // Handler to validate join game request
+  const handleJoinGameClick = useCallback(
+    (game: LobbyGame) => {
+      if (game.persistenceMode === 'elo' && !isAuthenticated) {
+        if (onShowWhyRegister) {
+          onShowWhyRegister();
+        }
         return;
       }
+      onJoinGame(game.gameId);
+    },
+    [isAuthenticated, onJoinGame, onShowWhyRegister]
+  );
 
-      switch (e.key) {
-        case 'Escape':
-          e.preventDefault();
-          onClose();
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          if (currentListLength > 0) {
-            setSelectedIndex((prev) => (prev - 1 + currentListLength) % currentListLength);
-            sounds.buttonClick();
-          }
-          break;
-        case 'ArrowDown':
-          e.preventDefault();
-          if (currentListLength > 0) {
-            setSelectedIndex((prev) => (prev + 1) % currentListLength);
-            sounds.buttonClick();
-          }
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          if (activeTab === 'recent') {
-            setActiveTab('active');
-            sounds.buttonClick();
-          }
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          if (activeTab === 'active') {
-            setActiveTab('recent');
-            sounds.buttonClick();
-          }
-          break;
-        case 'Enter':
-        case ' ':
-          e.preventDefault();
-          if (currentListLength > 0 && selectedIndex < currentListLength) {
-            if (activeTab === 'active') {
-              const game = filteredAndSortedGames[selectedIndex];
-              if (game.isJoinable || (game.isInProgress && game.botPlayerCount > 0)) {
-                handleJoinGameClick(game);
-              } else if (game.isInProgress) {
-                onSpectateGame(game.gameId);
-                onClose();
-              }
-            } else {
-              const game = recentGames[selectedIndex];
-              setReplayGameId(game.game_id);
-            }
-          }
-          break;
-        case 'Home':
-          e.preventDefault();
-          setSelectedIndex(0);
-          break;
-        case 'End':
-          e.preventDefault();
-          if (currentListLength > 0) {
-            setSelectedIndex(currentListLength - 1);
-          }
-          break;
+  // Handle keyboard action
+  const handleKeyboardAction = useCallback(() => {
+    if (currentList.length === 0) return;
+
+    const { selectedIndex } = keyboardNav;
+    if (selectedIndex >= currentList.length) return;
+
+    if (activeTab === 'active') {
+      const game = filteredAndSortedGames[selectedIndex];
+      if (game.isJoinable || (game.isInProgress && game.botPlayerCount > 0)) {
+        handleJoinGameClick(game);
+      } else if (game.isInProgress) {
+        onSpectateGame(game.gameId);
+        onClose();
       }
-    };
+    } else {
+      const game = recentGames[selectedIndex];
+      setReplayGameId(game.game_id);
+    }
+  }, [activeTab, currentList, filteredAndSortedGames, recentGames, handleJoinGameClick, onSpectateGame, onClose]);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [
+  // Use keyboard navigation hook
+  const keyboardNav = useLobbyKeyboardNav({
     activeTab,
-    currentListLength,
-    selectedIndex,
-    filteredAndSortedGames,
-    recentGames,
+    setActiveTab,
+    listLength: currentList.length,
     onClose,
-    onSpectateGame,
-  ]);
+    onAction: handleKeyboardAction,
+  });
+
+  const { selectedIndex } = keyboardNav;
 
   // Show GameReplay if a game is selected for replay
   if (replayGameId) {
@@ -514,15 +295,7 @@ export function LobbyBrowser({
                     </p>
                   )}
                   <Button
-                    onClick={() => {
-                      setError(null);
-                      setCorrelationId(null);
-                      if (activeTab === 'active') {
-                        fetchGames(true);
-                      } else {
-                        fetchRecentGames(true);
-                      }
-                    }}
+                    onClick={refreshGames}
                     disabled={isRetrying}
                     variant="danger"
                     size="sm"

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, Suspense, lazy } from 'react';
 import { Card, PlayerSession, ChatMessage } from './types/game';
 import { Lobby } from './components/Lobby';
 import GlobalUI from './components/GlobalUI';
+import logger from './utils/logger';
 
 // Lazy load heavy components for better initial load performance
 // Game phase components (only loaded when needed)
@@ -34,10 +35,8 @@ const VictoryConfetti = lazy(() =>
 );
 
 // Debug components (only loaded in debug mode)
+// Note: DebugControls already includes UnifiedDebugPanel internally
 const DebugControls = lazy(() => import('./components/DebugControls'));
-const DebugPanel = lazy(() =>
-  import('./components/DebugPanel').then((m) => ({ default: m.DebugPanel }))
-);
 // Task 10 Phase 2: Keyboard navigation help
 const KeyboardShortcutsModal = lazy(() =>
   import('./components/KeyboardShortcutsModal').then((m) => ({ default: m.KeyboardShortcutsModal }))
@@ -480,7 +479,7 @@ function AppContent() {
           },
         }
       );
-      console.log(`[Social] Game invite received from ${fromPlayer} for game ${inviteGameId}`);
+      logger.info(`[Social] Game invite received from ${fromPlayer} for game ${inviteGameId}`);
     };
 
     socket.on('game_invite_received', handleGameInviteReceived);
@@ -1040,17 +1039,6 @@ function AppContent() {
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
-        <ErrorBoundary componentName="DebugPanel">
-          <Suspense fallback={<div />}>
-            <DebugPanel
-              gameState={gameState}
-              gameId={gameId}
-              isOpen={debugPanelOpen}
-              socket={socket}
-              onClose={() => setDebugPanelOpen(false)}
-            />
-          </Suspense>
-        </ErrorBoundary>
         <ErrorBoundary componentName="TeamSelection">
           <Suspense
             fallback={
@@ -1134,17 +1122,6 @@ function AppContent() {
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
-        <ErrorBoundary componentName="DebugPanel">
-          <Suspense fallback={<div />}>
-            <DebugPanel
-              gameState={gameState}
-              gameId={gameId}
-              isOpen={debugPanelOpen}
-              socket={socket}
-              onClose={() => setDebugPanelOpen(false)}
-            />
-          </Suspense>
-        </ErrorBoundary>
         <ErrorBoundary>
           <Suspense
             fallback={
@@ -1236,17 +1213,6 @@ function AppContent() {
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
-        <ErrorBoundary componentName="DebugPanel">
-          <Suspense fallback={<div />}>
-            <DebugPanel
-              gameState={gameState}
-              gameId={gameId}
-              isOpen={debugPanelOpen}
-              socket={socket}
-              onClose={() => setDebugPanelOpen(false)}
-            />
-          </Suspense>
-        </ErrorBoundary>
         <ErrorBoundary>
           <Suspense
             fallback={
@@ -1340,17 +1306,6 @@ function AppContent() {
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
-        <ErrorBoundary componentName="DebugPanel">
-          <Suspense fallback={<div />}>
-            <DebugPanel
-              gameState={gameState}
-              gameId={gameId}
-              isOpen={debugPanelOpen}
-              socket={socket}
-              onClose={() => setDebugPanelOpen(false)}
-            />
-          </Suspense>
-        </ErrorBoundary>
         <ErrorBoundary>
           <Suspense
             fallback={
@@ -1427,15 +1382,6 @@ function AppContent() {
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
-        <Suspense fallback={<div />}>
-          <DebugPanel
-            gameState={gameState}
-            gameId={gameId}
-            isOpen={debugPanelOpen}
-            socket={socket}
-            onClose={() => setDebugPanelOpen(false)}
-          />
-        </Suspense>
         <div className="min-h-screen bg-skin-primary flex items-center justify-center p-6">
           <div className="bg-skin-secondary rounded-2xl p-8 shadow-2xl max-w-4xl w-full border-4 border-skin-accent">
             {/* Victory Banner */}

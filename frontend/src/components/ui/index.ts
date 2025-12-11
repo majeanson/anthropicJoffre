@@ -100,6 +100,13 @@ export type {
   DataStateProps,
 } from './StateDisplay';
 
+// Form Layout Components
+export { FormPageLayout } from './FormPageLayout';
+export type { FormPageLayoutProps } from './FormPageLayout';
+
+export { FormActionButtons } from './FormActionButtons';
+export type { FormActionButtonsProps } from './FormActionButtons';
+
 // Layout components
 export { UICard } from './UICard';
 export type {
@@ -144,6 +151,16 @@ export type { UnreadBadgeVariant, UnreadBadgeSize, UnreadBadgePosition } from '.
 
 // Stats & Progress components
 export { StatCard } from './StatCard';
+
+// Selector components (for skin/theme/avatar pickers)
+export { SelectorCard, SelectorGrid, SelectorPreview, SelectorInfo } from './Selector';
+export type {
+  SelectorCardProps,
+  SelectorCardLockInfo,
+  SelectorGridProps,
+  SelectorPreviewProps,
+  SelectorInfoProps,
+} from './Selector';
 
 // Export config for convenience
 export { themes, getTheme } from '../../config/themes';

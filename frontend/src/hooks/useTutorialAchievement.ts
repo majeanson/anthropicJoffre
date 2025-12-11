@@ -7,6 +7,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import { areAllTutorialsCompleted } from '../utils/tutorialProgress';
 import { useAuth } from '../contexts/AuthContext';
+import logger from '../utils/logger';
 
 interface UseTutorialAchievementProps {
   socket: Socket | null;
@@ -45,7 +46,7 @@ export function useTutorialAchievement({
         playerName: user.username,
       });
 
-      console.log('🎓 All tutorials completed! Requesting Master Student achievement unlock...');
+      logger.info('All tutorials completed! Requesting Master Student achievement unlock...');
     }
   }, [socket, isAuthenticated, user]);
 

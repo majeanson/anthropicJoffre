@@ -6,6 +6,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { VoiceParticipant } from '../types/game';
+import logger from '../utils/logger';
 
 // ICE servers for NAT traversal (using free public STUN servers)
 const ICE_SERVERS: RTCConfiguration = {
@@ -123,10 +124,10 @@ export function useVoiceChat({
 
       // Handle connection state changes
       pc.onconnectionstatechange = () => {
-        console.log(`[Voice] Connection to ${remoteId}: ${pc.connectionState}`);
+        logger.debug(`[Voice] Connection to ${remoteId}: ${pc.connectionState}`);
         if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
           // Connection failed, could implement retry logic here
-          console.warn(`[Voice] Connection to ${remoteId} ${pc.connectionState}`);
+          logger.warn(`[Voice] Connection to ${remoteId} ${pc.connectionState}`);
         }
       };
 
