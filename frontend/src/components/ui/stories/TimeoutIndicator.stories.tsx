@@ -372,7 +372,7 @@ export const ThresholdVisualization: Story = {
           <div className="w-1/4 bg-red-500 flex items-center justify-center text-white text-xs font-bold">
             Critical
           </div>
-          <div className="w-1/4 bg-yellow-500 flex items-center justify-center text-gray-900 text-xs font-bold">
+          <div className="w-1/4 bg-yellow-500 flex items-center justify-center text-yellow-900 text-xs font-bold">
             Warning
           </div>
           <div className="flex-1 bg-green-500 flex items-center justify-center text-white text-xs font-bold">

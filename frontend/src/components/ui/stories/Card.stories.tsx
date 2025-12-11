@@ -1,8 +1,8 @@
 /**
- * Card Component Stories - Midnight Alchemy Edition
+ * Card Component Stories
  *
- * Showcases the playing card component with alchemical aesthetics,
- * elemental color theming, and ethereal glow effects.
+ * Showcases the playing card component with elemental color theming
+ * and various visual states. Adapts to the selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -10,38 +10,27 @@ import { Card, CardBack, CardStack, ElegantCardDisplay } from '../../Card';
 import { CardColor, CardValue, Card as CardType } from '../../../types/game';
 
 const meta = {
-  title: 'Midnight Alchemy/Card',
+  title: 'Game/Card',
   component: Card,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Playing Cards
+# Playing Cards
 
-Mystical playing cards with alchemical aesthetics and elemental color theming.
+Playing cards with elemental color theming. Adapts to the selected skin theme.
 
 ## Features
 - **4 elemental suits**: Fire (Red), Earth (Brown), Nature (Green), Water (Blue)
 - **4 sizes**: tiny, small, medium, large
-- **Special cards**: Fire Zero (+5 essence), Earth Zero (-2 essence)
-- **Playable state**: Ethereal pulse animation for valid plays
-- **Keyboard navigation**: Sacred geometry focus ring
-- **Card back**: Alchemical circle pattern
-- **Card stack**: Mystical deck visualization
+- **Special cards**: Fire Zero (+5 points), Earth Zero (-2 points)
+- **Playable state**: Pulse animation for valid plays
+- **Keyboard navigation**: Focus ring for accessibility
+- **Card back**: Decorative pattern
+- **Card stack**: Deck visualization
 
-## Elemental Correspondences
-- 🔥 **Fire (Red)**: Passion, transformation, energy
-- 🌍 **Earth (Brown)**: Stability, grounding, material
-- 🌿 **Nature (Green)**: Growth, harmony, life force
-- 💧 **Water (Blue)**: Intuition, emotion, flow
+Use the skin selector in the toolbar to see how cards adapt to different themes.
         `,
       },
     },
@@ -154,22 +143,8 @@ export const ElementalQuartet: Story = {
     ];
 
     return (
-      <div
-        className="p-8 rounded-xl"
-        style={{
-          background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-          border: '2px solid #C17F59',
-          boxShadow: '0 0 40px rgba(193, 127, 89, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
-        }}
-      >
-        <h3
-          className="text-center uppercase tracking-[0.15em] mb-6"
-          style={{
-            fontFamily: '"Cinzel Decorative", Georgia, serif',
-            color: '#D4A574',
-            textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
-          }}
-        >
+      <div className="p-8 rounded-xl bg-skin-secondary border-2 border-skin-accent shadow-lg">
+        <h3 className="text-center uppercase tracking-[0.15em] mb-6 text-skin-accent">
           The Four Elements
         </h3>
         <div className="flex gap-6">
@@ -178,12 +153,7 @@ export const ElementalQuartet: Story = {
               <Card card={{ color, value: 7 }} size="medium" />
               <div className="text-center">
                 <div className="text-2xl mb-1">{symbol}</div>
-                <span
-                  className="text-xs uppercase tracking-wider"
-                  style={{ color: '#9CA3AF', fontFamily: '"Cinzel", Georgia, serif' }}
-                >
-                  {name}
-                </span>
+                <span className="text-xs uppercase tracking-wider text-skin-muted">{name}</span>
               </div>
             </div>
           ))}
@@ -232,71 +202,31 @@ export const EarthArcana: Story = {
   },
 };
 
-export const ArcanaCards: Story = {
+export const SpecialCards: Story = {
   args: {
     card: { color: 'red', value: 0 },
   },
   render: () => (
-    <div
-      className="p-8 rounded-xl"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '2px solid #C17F59',
-        boxShadow: '0 0 40px rgba(193, 127, 89, 0.15)',
-      }}
-    >
-      <h3
-        className="text-center uppercase tracking-[0.15em] mb-6"
-        style={{
-          fontFamily: '"Cinzel Decorative", Georgia, serif',
-          color: '#D4A574',
-          textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
-        }}
-      >
-        The Arcana
+    <div className="p-8 rounded-xl bg-skin-secondary border-2 border-skin-accent shadow-lg">
+      <h3 className="text-center uppercase tracking-[0.15em] mb-6 text-skin-accent">
+        Special Cards
       </h3>
       <div className="flex gap-12 justify-center">
         <div className="flex flex-col items-center gap-4">
           <ElegantCardDisplay card={{ color: 'red', value: 0 }} size="large" spotlight />
           <div className="text-center">
-            <div
-              className="text-sm uppercase tracking-wider mb-1"
-              style={{ color: '#D4A574', fontFamily: '"Cinzel", Georgia, serif' }}
-            >
-              The Phoenix
-            </div>
-            <span
-              className="px-3 py-1 rounded-full text-xs inline-block"
-              style={{
-                backgroundColor: '#4A9C6D',
-                color: '#0B0E14',
-                fontFamily: '"Cinzel", Georgia, serif',
-                boxShadow: '0 2px 10px rgba(74, 156, 109, 0.4)',
-              }}
-            >
-              +5 Essence
+            <div className="text-sm uppercase tracking-wider mb-1 text-skin-accent">Red Zero</div>
+            <span className="px-3 py-1 rounded-full text-xs inline-block bg-green-500/30 text-green-300 border border-green-500/50">
+              +5 Points
             </span>
           </div>
         </div>
         <div className="flex flex-col items-center gap-4">
           <ElegantCardDisplay card={{ color: 'brown', value: 0 }} size="large" spotlight />
           <div className="text-center">
-            <div
-              className="text-sm uppercase tracking-wider mb-1"
-              style={{ color: '#D4A574', fontFamily: '"Cinzel", Georgia, serif' }}
-            >
-              The Void
-            </div>
-            <span
-              className="px-3 py-1 rounded-full text-xs inline-block"
-              style={{
-                backgroundColor: '#A63D3D',
-                color: '#E8E4DC',
-                fontFamily: '"Cinzel", Georgia, serif',
-                boxShadow: '0 2px 10px rgba(166, 61, 61, 0.4)',
-              }}
-            >
-              -2 Essence
+            <div className="text-sm uppercase tracking-wider mb-1 text-skin-accent">Brown Zero</div>
+            <span className="px-3 py-1 rounded-full text-xs inline-block bg-red-500/30 text-red-300 border border-red-500/50">
+              -2 Points
             </span>
           </div>
         </div>
@@ -318,23 +248,12 @@ export const ArcanaCards: Story = {
 
 export const AllSizes: RenderOnlyStory = {
   render: () => (
-    <div
-      className="p-8 rounded-xl"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
+    <div className="p-8 rounded-xl bg-skin-primary border border-skin-default">
       <div className="flex items-end gap-6">
         {(['tiny', 'small', 'medium', 'large'] as const).map((size) => (
           <div key={size} className="flex flex-col items-center gap-3">
             <Card card={{ color: 'blue', value: 5 }} size={size} />
-            <span
-              className="text-xs uppercase tracking-wider"
-              style={{ color: '#6B7280', fontFamily: '"Cinzel", Georgia, serif' }}
-            >
-              {size}
-            </span>
+            <span className="text-xs uppercase tracking-wider text-skin-muted">{size}</span>
           </div>
         ))}
       </div>
@@ -422,23 +341,8 @@ export const Hidden: Story = {
 
 export const WaterSuit: RenderOnlyStory = {
   render: () => (
-    <div
-      className="p-8 rounded-xl"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="uppercase tracking-wider mb-4"
-        style={{
-          color: '#4682B4',
-          fontFamily: '"Cinzel", Georgia, serif',
-          textShadow: '0 0 10px rgba(70, 130, 180, 0.5)',
-        }}
-      >
-        Water Suit (0-7)
-      </h3>
+    <div className="p-8 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="uppercase tracking-wider mb-4 text-suit-blue">Water Suit (0-7)</h3>
       <div className="flex flex-wrap gap-2">
         {([0, 1, 2, 3, 4, 5, 6, 7] as const).map((value) => (
           <Card key={value} card={{ color: 'blue', value }} size="small" />
@@ -459,24 +363,10 @@ export const WaterSuit: RenderOnlyStory = {
 // CARD BACK COMPONENT
 // ============================================================================
 
-export const AlchemicalBack: RenderOnlyStory = {
+export const CardBackDesign: RenderOnlyStory = {
   render: () => (
-    <div
-      className="p-8 rounded-xl"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-center uppercase tracking-wider mb-4"
-        style={{
-          color: '#D4A574',
-          fontFamily: '"Cinzel", Georgia, serif',
-        }}
-      >
-        Alchemical Seal
-      </h3>
+    <div className="p-8 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="text-center uppercase tracking-wider mb-4 text-skin-accent">Card Back</h3>
       <div className="flex justify-center">
         <CardBack size="large" />
       </div>
@@ -491,42 +381,18 @@ export const AlchemicalBack: RenderOnlyStory = {
   },
 };
 
-export const GuildCards: RenderOnlyStory = {
+export const TeamCards: RenderOnlyStory = {
   render: () => (
-    <div
-      className="p-8 rounded-xl"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-center uppercase tracking-wider mb-4"
-        style={{
-          color: '#D4A574',
-          fontFamily: '"Cinzel", Georgia, serif',
-        }}
-      >
-        Guild Allegiances
-      </h3>
+    <div className="p-8 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="text-center uppercase tracking-wider mb-4 text-skin-accent">Team Cards</h3>
       <div className="flex gap-8 justify-center">
         <div className="flex flex-col items-center gap-3">
           <CardBack size="medium" teamColor={1} />
-          <span
-            className="text-xs uppercase"
-            style={{ color: '#d97706', fontFamily: '"Cinzel", Georgia, serif' }}
-          >
-            Solar Guild
-          </span>
+          <span className="text-xs uppercase text-team1">Team 1</span>
         </div>
         <div className="flex flex-col items-center gap-3">
           <CardBack size="medium" teamColor={2} />
-          <span
-            className="text-xs uppercase"
-            style={{ color: '#7c3aed', fontFamily: '"Cinzel", Georgia, serif' }}
-          >
-            Lunar Guild
-          </span>
+          <span className="text-xs uppercase text-team2">Team 2</span>
         </div>
       </div>
     </div>
@@ -544,24 +410,10 @@ export const GuildCards: RenderOnlyStory = {
 // CARD STACK COMPONENT
 // ============================================================================
 
-export const MysticalDeck: RenderOnlyStory = {
+export const DeckStack: RenderOnlyStory = {
   render: () => (
-    <div
-      className="p-8 rounded-xl"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-center uppercase tracking-wider mb-4"
-        style={{
-          color: '#D4A574',
-          fontFamily: '"Cinzel", Georgia, serif',
-        }}
-      >
-        The Deck
-      </h3>
+    <div className="p-8 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="text-center uppercase tracking-wider mb-4 text-skin-accent">The Deck</h3>
       <div className="flex justify-center">
         <CardStack count={32} size="medium" />
       </div>
@@ -582,23 +434,9 @@ export const MysticalDeck: RenderOnlyStory = {
 
 export const SpotlightDisplay: RenderOnlyStory = {
   render: () => (
-    <div
-      className="p-8 rounded-xl"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '2px solid #C17F59',
-        boxShadow: '0 0 40px rgba(193, 127, 89, 0.15)',
-      }}
-    >
-      <h3
-        className="text-center uppercase tracking-[0.15em] mb-6"
-        style={{
-          fontFamily: '"Cinzel Decorative", Georgia, serif',
-          color: '#D4A574',
-          textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
-        }}
-      >
-        Featured Artifact
+    <div className="p-8 rounded-xl bg-skin-secondary border-2 border-skin-accent shadow-lg">
+      <h3 className="text-center uppercase tracking-[0.15em] mb-6 text-skin-accent">
+        Featured Card
       </h3>
       <div className="flex justify-center">
         <ElegantCardDisplay card={{ color: 'red', value: 7 }} size="large" spotlight />
@@ -618,7 +456,7 @@ export const SpotlightDisplay: RenderOnlyStory = {
 // GAME UI EXAMPLES
 // ============================================================================
 
-export const AlchemistHand: RenderOnlyStory = {
+export const PlayerHand: RenderOnlyStory = {
   render: () => {
     const hand: CardType[] = [
       { color: 'red', value: 3 as CardValue },
@@ -633,23 +471,10 @@ export const AlchemistHand: RenderOnlyStory = {
     const playableIndices = [1, 5]; // Water cards are playable (led suit)
 
     return (
-      <div
-        className="p-8 rounded-xl"
-        style={{
-          background: '#0B0E14',
-          border: '1px solid #2D3548',
-        }}
-      >
+      <div className="p-8 rounded-xl bg-skin-primary border border-skin-default">
         <div className="flex items-center gap-2 mb-4">
-          <span
-            className="text-sm uppercase tracking-wider"
-            style={{
-              color: '#4682B4',
-              fontFamily: '"Cinzel", Georgia, serif',
-              textShadow: '0 0 10px rgba(70, 130, 180, 0.5)',
-            }}
-          >
-            Led Element: Water ▽
+          <span className="text-sm uppercase tracking-wider text-suit-blue">
+            Led Suit: Blue (Water)
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -660,7 +485,7 @@ export const AlchemistHand: RenderOnlyStory = {
               size="small"
               isPlayable={playableIndices.includes(i)}
               disabled={!playableIndices.includes(i)}
-              onClick={() => console.log(`Channeled ${card.color} ${card.value}`)}
+              onClick={() => console.log(`Played ${card.color} ${card.value}`)}
             />
           ))}
         </div>
@@ -676,60 +501,31 @@ export const AlchemistHand: RenderOnlyStory = {
   },
 };
 
-export const RitualInProgress: RenderOnlyStory = {
+export const TrickInProgress: RenderOnlyStory = {
   render: () => {
-    const ritual: { card: CardType; player: string }[] = [
-      { card: { color: 'blue', value: 5 as CardValue }, player: 'Sage' },
-      { card: { color: 'blue', value: 7 as CardValue }, player: 'Mystic' },
-      { card: { color: 'green', value: 3 as CardValue }, player: 'Oracle' },
+    const trick: { card: CardType; player: string }[] = [
+      { card: { color: 'blue', value: 5 as CardValue }, player: 'Player 1' },
+      { card: { color: 'blue', value: 7 as CardValue }, player: 'Player 2' },
+      { card: { color: 'green', value: 3 as CardValue }, player: 'Player 3' },
     ];
 
     return (
-      <div
-        className="p-8 rounded-xl"
-        style={{
-          background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-          border: '2px solid #C17F59',
-          boxShadow: '0 0 40px rgba(193, 127, 89, 0.15)',
-        }}
-      >
-        <h3
-          className="text-center uppercase tracking-[0.15em] mb-6"
-          style={{
-            fontFamily: '"Cinzel Decorative", Georgia, serif',
-            color: '#D4A574',
-            textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
-          }}
-        >
-          Current Ritual
+      <div className="p-8 rounded-xl bg-skin-secondary border-2 border-skin-accent shadow-lg">
+        <h3 className="text-center uppercase tracking-[0.15em] mb-6 text-skin-accent">
+          Current Trick
         </h3>
         <div className="flex justify-center gap-4">
-          {ritual.map(({ card, player }, i) => (
+          {trick.map(({ card, player }, i) => (
             <div key={i} className="flex flex-col items-center gap-3">
               <Card card={card} size="medium" />
-              <span
-                className="text-xs"
-                style={{ color: '#6B7280', fontFamily: '"Cormorant Garamond", Georgia, serif' }}
-              >
-                {player}
-              </span>
+              <span className="text-xs text-skin-muted">{player}</span>
             </div>
           ))}
           <div className="flex flex-col items-center gap-3 opacity-50">
-            <div
-              className="w-24 h-36 rounded-lg border-2 border-dashed flex items-center justify-center"
-              style={{ borderColor: '#C17F59' }}
-            >
-              <span style={{ color: '#6B7280' }} className="text-2xl">
-                ?
-              </span>
+            <div className="w-24 h-36 rounded-lg border-2 border-dashed border-skin-accent flex items-center justify-center">
+              <span className="text-2xl text-skin-muted">?</span>
             </div>
-            <span
-              className="text-xs"
-              style={{ color: '#6B7280', fontFamily: '"Cormorant Garamond", Georgia, serif' }}
-            >
-              Awaiting...
-            </span>
+            <span className="text-xs text-skin-muted">Awaiting...</span>
           </div>
         </div>
       </div>
@@ -745,34 +541,20 @@ export const RitualInProgress: RenderOnlyStory = {
 };
 
 // ============================================================================
-// MIDNIGHT ALCHEMY SHOWCASE
+// CARD SHOWCASE
 // ============================================================================
 
-export const MidnightAlchemyShowcase: RenderOnlyStory = {
+export const CardShowcase: RenderOnlyStory = {
   render: () => (
-    <div
-      className="p-10 rounded-xl relative"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '2px solid #C17F59',
-        boxShadow: '0 0 60px rgba(193, 127, 89, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
-      }}
-    >
-      {/* Sacred geometry corners */}
-      <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-[#C17F59] opacity-60" />
-      <div className="absolute top-2 right-2 w-6 h-6 border-r-2 border-t-2 border-[#C17F59] opacity-60" />
-      <div className="absolute bottom-2 left-2 w-6 h-6 border-l-2 border-b-2 border-[#C17F59] opacity-60" />
-      <div className="absolute bottom-2 right-2 w-6 h-6 border-r-2 border-b-2 border-[#C17F59] opacity-60" />
+    <div className="p-10 rounded-xl relative bg-skin-secondary border-2 border-skin-accent shadow-xl">
+      {/* Decorative corners */}
+      <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-skin-accent opacity-60" />
+      <div className="absolute top-2 right-2 w-6 h-6 border-r-2 border-t-2 border-skin-accent opacity-60" />
+      <div className="absolute bottom-2 left-2 w-6 h-6 border-l-2 border-b-2 border-skin-accent opacity-60" />
+      <div className="absolute bottom-2 right-2 w-6 h-6 border-r-2 border-b-2 border-skin-accent opacity-60" />
 
-      <h2
-        className="text-2xl text-center uppercase tracking-[0.2em] mb-8"
-        style={{
-          fontFamily: '"Cinzel Decorative", Georgia, serif',
-          color: '#D4A574',
-          textShadow: '0 0 20px rgba(212, 165, 116, 0.5)',
-        }}
-      >
-        The Alchemist's Deck
+      <h2 className="text-2xl text-center uppercase tracking-[0.2em] mb-8 text-skin-accent">
+        Card Showcase
       </h2>
 
       {/* Feature cards with spotlight */}
@@ -784,17 +566,9 @@ export const MidnightAlchemyShowcase: RenderOnlyStory = {
 
       {/* Decorative divider */}
       <div className="flex items-center gap-4 my-6">
-        <div className="flex-1 h-px bg-[#C17F59] opacity-40"></div>
-        <span
-          className="text-sm"
-          style={{
-            color: '#D4A574',
-            fontFamily: '"Cinzel Decorative", Georgia, serif',
-          }}
-        >
-          △ ▽ ◇ ○
-        </span>
-        <div className="flex-1 h-px bg-[#C17F59] opacity-40"></div>
+        <div className="flex-1 h-px bg-skin-accent opacity-40"></div>
+        <span className="text-sm text-skin-accent">△ ▽ ◇ ○</span>
+        <div className="flex-1 h-px bg-skin-accent opacity-40"></div>
       </div>
 
       {/* All elements row */}
@@ -804,23 +578,16 @@ export const MidnightAlchemyShowcase: RenderOnlyStory = {
         ))}
       </div>
 
-      {/* Quote */}
-      <p
-        className="text-center mt-8 italic"
-        style={{
-          color: '#6B7280',
-          fontFamily: '"Cormorant Garamond", Georgia, serif',
-          fontSize: '0.875rem',
-        }}
-      >
-        "In the dance of elements, the wise alchemist finds truth."
+      {/* Tagline */}
+      <p className="text-center mt-8 italic text-sm text-skin-muted">
+        All four suits displayed with the current skin theme
       </p>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Full Midnight Alchemy showcase demonstrating the mystical card design system.',
+        story: 'Full card showcase demonstrating the card design system with the selected skin.',
       },
     },
   },

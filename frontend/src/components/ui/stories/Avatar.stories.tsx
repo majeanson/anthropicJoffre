@@ -379,7 +379,7 @@ export const PlayerList: Story = {
                     ? 'bg-green-500'
                     : player.status === 'away'
                       ? 'bg-yellow-500'
-                      : 'bg-gray-500'
+                      : 'bg-skin-muted'
                 }`}
               />
             </div>
@@ -446,7 +446,7 @@ export const LeaderboardEntry: Story = {
       <div className="space-y-2">
         {[
           { rank: 1, name: 'ChampionX', avatar: 'crown', wins: 142, color: 'text-yellow-400' },
-          { rank: 2, name: 'ProGamer', avatar: 'trophy', wins: 128, color: 'text-gray-300' },
+          { rank: 2, name: 'ProGamer', avatar: 'trophy', wins: 128, color: 'text-skin-secondary' },
           { rank: 3, name: 'CardMaster', avatar: 'cards', wins: 115, color: 'text-amber-600' },
           {
             rank: 4,

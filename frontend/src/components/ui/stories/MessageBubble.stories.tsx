@@ -1,6 +1,8 @@
 /**
  * MessageBubble Component Stories
- * Sprint 20 - Storybook Integration
+ *
+ * Chat message bubbles for direct messages.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -11,6 +13,22 @@ const meta = {
   component: MessageBubble,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+# Message Bubble Component
+
+Chat bubbles for sent and received messages. Adapts to the selected skin theme.
+
+## Features
+- **Sent/received styling**: Different alignment and colors
+- **Read indicators**: Shows when messages are read
+- **Timestamps**: Relative time display
+
+Use the skin selector in the toolbar to see how messages adapt to different themes.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
@@ -83,7 +101,7 @@ export const ConversationExample: Story = {
     timestamp: new Date().toISOString(),
   },
   render: () => (
-    <div className="max-w-2xl space-y-3 bg-gray-900 p-4 rounded-lg">
+    <div className="max-w-2xl space-y-3 p-4 rounded-lg bg-skin-secondary border border-skin-default">
       <MessageBubble
         text="Hey! Want to play a game?"
         isSent={false}

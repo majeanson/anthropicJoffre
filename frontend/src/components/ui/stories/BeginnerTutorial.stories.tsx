@@ -123,8 +123,8 @@ const meta: Meta<typeof BeginnerTutorial> = {
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <div className="min-h-[400px] relative p-4">
-        <div className="text-white text-center mb-4">
+      <div className="min-h-[400px] relative p-4 bg-skin-primary">
+        <div className="text-skin-primary text-center mb-4">
           Tutorial panel appears in top-right corner
         </div>
         <Story />

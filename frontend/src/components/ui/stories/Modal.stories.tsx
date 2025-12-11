@@ -1,8 +1,8 @@
 /**
- * Modal Component Stories - Midnight Alchemy Edition
+ * Modal Component Stories
  *
- * Showcases the mystical modal system with ethereal glows,
- * sacred geometry corners, and alchemical theme presets.
+ * Showcases the modal system with various themes and sizes.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -11,39 +11,34 @@ import { Modal, ArcaneModal, MidnightModal, EmberModal, TealModal, MinimalModal 
 import { Button, ArcaneButton, DangerButton, SuccessButton } from '../Button';
 
 const meta = {
-  title: 'Midnight Alchemy/Modal',
+  title: 'UI/Modal',
   component: Modal,
   parameters: {
     layout: 'fullscreen',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Modals
+# Modal Component
 
-Mystical modal dialogs with brass frame aesthetics and ethereal glow effects.
-Each theme evokes a different aspect of the alchemist's study.
+Modal dialogs with multiple theme presets. Use the 'minimal' theme for automatic skin compatibility.
 
 ## Themes
-- **arcane**: Copper/rose gold glow (default mystical style)
-- **midnight**: Deep blue chamber aesthetic
-- **ember**: Warm fire-like orange glow
-- **void**: Dark cosmic purple essence
-- **parchment**: Ancient manuscript style
-- **teal**: Ethereal teal/cyan glow
+- **arcane**: Copper/rose gold glow
+- **midnight**: Deep blue aesthetic
+- **ember**: Warm orange glow
+- **void**: Purple/violet essence
+- **parchment**: Light manuscript style
+- **teal**: Cyan glow
+- **minimal**: Uses CSS variables (skin-compatible)
 
 ## Features
 - 5 sizes: sm, md, lg, xl, full
-- Sacred geometry corner decorations
-- Ethereal glow animation
-- Mobile full-screen optimization
+- Corner decorations
+- Glow animation
+- Mobile optimization
 - ESC to close, backdrop click to close
+
+Use the skin selector in the toolbar to see how modals adapt.
         `,
       },
     },
@@ -88,10 +83,10 @@ const ModalWrapper = (args: any) => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#0B0E14] p-8">
-      <ArcaneButton onClick={() => setIsOpen(true)} glow>
+    <div className="min-h-screen bg-skin-primary p-8">
+      <Button variant="primary" onClick={() => setIsOpen(true)}>
         Open Modal
-      </ArcaneButton>
+      </Button>
       <Modal {...args} isOpen={isOpen} onClose={() => setIsOpen(false)}>
         {args.children}
       </Modal>
@@ -108,35 +103,20 @@ export const ArcaneTheme: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Arcane Mysteries',
-    subtitle: 'The signature alchemical style',
+    title: 'Arcane Theme',
+    subtitle: 'Copper and rose gold accents',
     icon: '⚗',
     theme: 'arcane',
     children: (
       <div className="space-y-4">
-        <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-          This is the default arcane theme with copper and rose gold ethereal glow effects. Perfect
-          for that mystical alchemist's study aesthetic.
+        <p className="text-skin-secondary">
+          This is the arcane theme with copper and rose gold glow effects.
         </p>
         <div className="flex gap-2">
-          <span
-            className="px-3 py-1 rounded-full text-sm"
-            style={{
-              backgroundColor: 'rgba(193, 127, 89, 0.2)',
-              color: '#D4A574',
-              fontFamily: '"Cinzel", Georgia, serif',
-            }}
-          >
+          <span className="px-3 py-1 rounded-full text-sm bg-skin-tertiary text-skin-accent">
             Copper Glow
           </span>
-          <span
-            className="px-3 py-1 rounded-full text-sm"
-            style={{
-              backgroundColor: 'rgba(212, 165, 116, 0.2)',
-              color: '#D4A574',
-              fontFamily: '"Cinzel", Georgia, serif',
-            }}
-          >
+          <span className="px-3 py-1 rounded-full text-sm bg-skin-tertiary text-skin-accent">
             Rose Gold
           </span>
         </div>
@@ -158,14 +138,13 @@ export const MidnightTheme: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Midnight Chamber',
-    subtitle: 'Deep within the laboratory',
+    title: 'Midnight Theme',
+    subtitle: 'Deep blue aesthetic',
     icon: '☽',
     theme: 'midnight',
     children: (
-      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The midnight theme evokes the depths of the alchemist's laboratory, with deep blue accents
-        and subtle silver highlights.
+      <p className="text-skin-secondary">
+        The midnight theme with deep blue accents and subtle silver highlights.
       </p>
     ),
   },
@@ -176,14 +155,13 @@ export const EmberTheme: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Ember Crucible',
-    subtitle: 'Forged in flame',
+    title: 'Ember Theme',
+    subtitle: 'Warm fire-like glow',
     icon: '△',
     theme: 'ember',
     children: (
-      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The ember theme brings the warmth of the alchemist's furnace, with fiery orange and gold
-        accents.
+      <p className="text-skin-secondary">
+        The ember theme with fiery orange and gold accents.
       </p>
     ),
   },
@@ -194,14 +172,13 @@ export const VoidTheme: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Void Essence',
-    subtitle: 'Beyond the veil',
+    title: 'Void Theme',
+    subtitle: 'Deep purple essence',
     icon: '☿',
     theme: 'void',
     children: (
-      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The void theme represents the cosmic mysteries, with deep purple gradients and otherworldly
-        energy.
+      <p className="text-skin-secondary">
+        The void theme with deep purple gradients and cosmic energy.
       </p>
     ),
   },
@@ -212,14 +189,13 @@ export const ParchmentTheme: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Ancient Tome',
-    subtitle: 'Knowledge of the ages',
+    title: 'Parchment Theme',
+    subtitle: 'Light manuscript style',
     icon: '📜',
     theme: 'parchment',
     children: (
-      <p style={{ color: '#6B7280', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The parchment theme channels ancient manuscripts, with warm cream tones and weathered
-        aesthetics.
+      <p className="text-skin-secondary">
+        The parchment theme with warm cream tones for light mode.
       </p>
     ),
   },
@@ -230,14 +206,13 @@ export const TealTheme: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Ethereal Waters',
-    subtitle: 'Element of transformation',
+    title: 'Teal Theme',
+    subtitle: 'Cyan glow aesthetic',
     icon: '▽',
     theme: 'teal',
     children: (
-      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The teal theme represents the water element, with ethereal cyan glow and transformative
-        energy.
+      <p className="text-skin-secondary">
+        The teal theme with ethereal cyan glow effects.
       </p>
     ),
   },
@@ -253,7 +228,7 @@ export const MinimalTheme: Story = {
     icon: '◯',
     theme: 'minimal',
     children: (
-      <p style={{ color: 'var(--color-text-secondary)' }}>
+      <p className="text-skin-secondary">
         The minimal theme uses CSS variables, making it automatically compatible with all skin
         themes including light and dark Modern Minimal.
       </p>
@@ -277,42 +252,29 @@ export const AllThemes: RenderOnlyStory = {
     const [activeTheme, setActiveTheme] = useState<string | null>(null);
 
     const themes = [
-      { id: 'arcane', label: 'Arcane', icon: '⚗', color: '#C17F59' },
-      { id: 'midnight', label: 'Midnight', icon: '☽', color: '#4682B4' },
-      { id: 'ember', label: 'Ember', icon: '△', color: '#D97706' },
-      { id: 'void', label: 'Void', icon: '☿', color: '#7C3AED' },
-      { id: 'parchment', label: 'Parchment', icon: '📜', color: '#D4A574' },
-      { id: 'teal', label: 'Teal', icon: '▽', color: '#2DD4BF' },
-      { id: 'minimal', label: 'Minimal', icon: '◯', color: '#6B7280' },
+      { id: 'arcane', label: 'Arcane', icon: '⚗' },
+      { id: 'midnight', label: 'Midnight', icon: '☽' },
+      { id: 'ember', label: 'Ember', icon: '△' },
+      { id: 'void', label: 'Void', icon: '☿' },
+      { id: 'parchment', label: 'Parchment', icon: '📜' },
+      { id: 'teal', label: 'Teal', icon: '▽' },
+      { id: 'minimal', label: 'Minimal', icon: '◯' },
     ] as const;
 
     return (
-      <div className="min-h-screen bg-[#0B0E14] p-8">
-        <h2
-          className="text-xl uppercase tracking-[0.15em] mb-6"
-          style={{
-            fontFamily: '"Cinzel Decorative", Georgia, serif',
-            color: '#D4A574',
-            textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
-          }}
-        >
-          Modal Themes
-        </h2>
+      <div className="min-h-screen bg-skin-primary p-8">
+        <h2 className="text-xl uppercase tracking-[0.15em] mb-6 text-skin-accent">Modal Themes</h2>
         <div className="flex flex-wrap gap-4">
           {themes.map((theme) => (
-            <button
+            <Button
               key={theme.id}
+              variant="secondary"
               onClick={() => setActiveTheme(theme.id)}
-              className="px-6 py-4 rounded-lg border-2 bg-[#131824] uppercase tracking-wider transition-all duration-300 hover:scale-105"
-              style={{
-                fontFamily: '"Cinzel", Georgia, serif',
-                borderColor: theme.color,
-                boxShadow: `0 0 20px ${theme.color}40`,
-              }}
+              className="flex flex-col items-center px-6 py-4"
             >
               <span className="text-2xl block mb-2">{theme.icon}</span>
-              <span style={{ color: '#E8E4DC' }}>{theme.label}</span>
-            </button>
+              <span>{theme.label}</span>
+            </Button>
           ))}
         </div>
 
@@ -325,9 +287,8 @@ export const AllThemes: RenderOnlyStory = {
             icon={themes.find((t) => t.id === activeTheme)?.icon}
             theme={activeTheme as any}
           >
-            <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-              This is the {activeTheme} theme modal. Each theme has its own unique color palette and
-              ethereal glow effect.
+            <p className="text-skin-secondary">
+              This is the {activeTheme} theme modal with its unique color palette and glow effect.
             </p>
           </Modal>
         )}
@@ -354,11 +315,9 @@ export const SmallSize: Story = {
     onClose: () => {},
     title: 'Small Modal',
     size: 'sm',
-    theme: 'arcane',
+    theme: 'minimal',
     children: (
-      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        A compact modal for simple confirmations or brief messages.
-      </p>
+      <p className="text-skin-secondary">A compact modal for simple confirmations or messages.</p>
     ),
   },
 };
@@ -369,33 +328,22 @@ export const LargeSize: Story = {
     isOpen: true,
     onClose: () => {},
     title: 'Large Modal',
-    subtitle: 'More space for complex rituals',
+    subtitle: 'More space for complex content',
     size: 'lg',
-    theme: 'arcane',
+    theme: 'minimal',
     children: (
       <div className="space-y-4">
-        <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-          Large modals provide ample space for complex content, detailed formulae, or comprehensive
-          displays.
+        <p className="text-skin-secondary">
+          Large modals provide ample space for complex content and detailed displays.
         </p>
         <div className="grid grid-cols-2 gap-4 mt-4">
-          <div className="p-4 rounded-lg" style={{ backgroundColor: '#1A1F2E' }}>
-            <div
-              className="text-2xl"
-              style={{ color: '#D4A574', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
-            >
-              42
-            </div>
-            <div style={{ color: '#6B7280', fontSize: '0.875rem' }}>Transmutations</div>
+          <div className="p-4 rounded-lg bg-skin-tertiary">
+            <div className="text-2xl text-skin-accent">42</div>
+            <div className="text-sm text-skin-muted">Games Won</div>
           </div>
-          <div className="p-4 rounded-lg" style={{ backgroundColor: '#1A1F2E' }}>
-            <div
-              className="text-2xl"
-              style={{ color: '#4A9C6D', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
-            >
-              1337
-            </div>
-            <div style={{ color: '#6B7280', fontSize: '0.875rem' }}>Essence Points</div>
+          <div className="p-4 rounded-lg bg-skin-tertiary">
+            <div className="text-2xl text-green-500">1337</div>
+            <div className="text-sm text-skin-muted">Total Points</div>
           </div>
         </div>
       </div>
@@ -412,19 +360,18 @@ export const WithFooter: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Confirm Transmutation',
+    title: 'Confirm Action',
     icon: '⚠',
-    theme: 'arcane',
+    theme: 'minimal',
     children: (
-      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        Are you sure you want to begin this transmutation? The process cannot be reversed once
-        started.
+      <p className="text-skin-secondary">
+        Are you sure you want to proceed? This action cannot be reversed.
       </p>
     ),
     footer: (
       <>
         <Button variant="ghost">Cancel</Button>
-        <DangerButton>Begin Transmutation</DangerButton>
+        <DangerButton>Confirm</DangerButton>
       </>
     ),
   },
@@ -435,24 +382,17 @@ export const ConfirmationDialog: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Begin the Great Work?',
-    icon: '⚗',
-    theme: 'arcane',
+    title: 'Start Game?',
+    icon: '🎮',
+    theme: 'minimal',
     size: 'sm',
-    children: (
-      <p
-        className="text-center"
-        style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}
-      >
-        Ready to embark on your alchemical journey?
-      </p>
-    ),
+    children: <p className="text-center text-skin-secondary">Ready to begin?</p>,
     footer: (
       <>
         <Button variant="secondary" fullWidth>
-          Retreat
+          Cancel
         </Button>
-        <SuccessButton fullWidth>Begin</SuccessButton>
+        <SuccessButton fullWidth>Start</SuccessButton>
       </>
     ),
   },
@@ -475,22 +415,15 @@ export const PresetModals: RenderOnlyStory = {
     ];
 
     return (
-      <div className="min-h-screen bg-[#0B0E14] p-8">
-        <h2
-          className="text-xl uppercase tracking-[0.15em] mb-6"
-          style={{
-            fontFamily: '"Cinzel Decorative", Georgia, serif',
-            color: '#D4A574',
-            textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
-          }}
-        >
+      <div className="min-h-screen bg-skin-primary p-8">
+        <h2 className="text-xl uppercase tracking-[0.15em] mb-6 text-skin-accent">
           Preset Modal Components
         </h2>
         <div className="flex flex-wrap gap-4">
           {presets.map((preset) => (
-            <ArcaneButton key={preset.id} onClick={() => setActivePreset(preset.id)}>
+            <Button key={preset.id} variant="secondary" onClick={() => setActivePreset(preset.id)}>
               {preset.label}
-            </ArcaneButton>
+            </Button>
           ))}
         </div>
 
@@ -503,9 +436,8 @@ export const PresetModals: RenderOnlyStory = {
             subtitle="Pre-configured component"
             icon="⚗"
           >
-            <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-              This is a pre-configured {preset.label.toLowerCase()} with optimal settings for the{' '}
-              {preset.id} theme.
+            <p className="text-skin-secondary">
+              This is a pre-configured {preset.label.toLowerCase()} with optimal settings.
             </p>
           </preset.Component>
         ))}
@@ -530,52 +462,41 @@ export const VictoryModal: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Transmutation Complete!',
-    subtitle: 'The Great Work Succeeds',
-    icon: '☉',
-    theme: 'arcane',
+    title: 'Victory!',
+    subtitle: 'You won the game',
+    icon: '🏆',
+    theme: 'minimal',
     size: 'md',
     children: (
       <div className="text-center space-y-6">
         <div className="text-6xl animate-bounce">🏆</div>
         <div className="space-y-2">
-          <div
-            className="text-4xl"
-            style={{
-              color: '#D4A574',
-              fontFamily: '"Cinzel Decorative", Georgia, serif',
-              textShadow: '0 0 20px rgba(212, 165, 116, 0.5)',
-            }}
-          >
-            41 - 28
-          </div>
-          <div className="text-sm uppercase tracking-wider" style={{ color: '#6B7280' }}>
-            Final Score
-          </div>
+          <div className="text-4xl text-skin-accent">41 - 28</div>
+          <div className="text-sm uppercase tracking-wider text-skin-muted">Final Score</div>
         </div>
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="p-3 rounded-lg" style={{ backgroundColor: '#1A1F2E' }}>
-            <div style={{ color: '#4A9C6D', fontFamily: '"Cinzel", Georgia, serif' }}>+15</div>
-            <div style={{ color: '#6B7280' }}>Essence Gained</div>
+          <div className="p-3 rounded-lg bg-skin-tertiary">
+            <div className="text-green-500">+15</div>
+            <div className="text-skin-muted">Points Gained</div>
           </div>
-          <div className="p-3 rounded-lg" style={{ backgroundColor: '#1A1F2E' }}>
-            <div style={{ color: '#D4A574', fontFamily: '"Cinzel", Georgia, serif' }}>5</div>
-            <div style={{ color: '#6B7280' }}>Win Streak</div>
+          <div className="p-3 rounded-lg bg-skin-tertiary">
+            <div className="text-skin-accent">5</div>
+            <div className="text-skin-muted">Win Streak</div>
           </div>
         </div>
       </div>
     ),
     footer: (
       <>
-        <Button variant="ghost">Return to Laboratory</Button>
-        <SuccessButton glow>Begin Anew</SuccessButton>
+        <Button variant="ghost">Return to Lobby</Button>
+        <SuccessButton>Play Again</SuccessButton>
       </>
     ),
   },
   parameters: {
     docs: {
       description: {
-        story: 'Victory screen modal showing game results with alchemical theming.',
+        story: 'Victory screen modal showing game results.',
       },
     },
   },
@@ -586,119 +507,69 @@ export const DefeatModal: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Transmutation Failed',
-    subtitle: 'The mixture was unstable',
-    icon: '☠',
-    theme: 'arcane',
+    title: 'Defeat',
+    subtitle: 'Better luck next time',
+    icon: '😔',
+    theme: 'minimal',
     size: 'md',
     children: (
       <div className="text-center space-y-6">
-        <div
-          className="text-4xl"
-          style={{
-            color: '#A63D3D',
-            fontFamily: '"Cinzel Decorative", Georgia, serif',
-          }}
-        >
-          28 - 41
-        </div>
-        <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-          Even the greatest alchemists face setbacks. Study your failures, for they contain the
-          seeds of future success.
+        <div className="text-4xl text-red-500">28 - 41</div>
+        <p className="text-skin-secondary">
+          Don't give up! Every loss is a learning opportunity.
         </p>
       </div>
     ),
     footer: (
       <>
-        <Button variant="ghost">Retreat</Button>
-        <ArcaneButton glow>Try Again</ArcaneButton>
+        <Button variant="ghost">Leave</Button>
+        <Button variant="primary">Try Again</Button>
       </>
     ),
   },
 };
 
-export const AlchemistProfile: Story = {
+export const PlayerProfile: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Alchemist Profile',
+    title: 'Player Profile',
     subtitle: 'MysticSage42',
     icon: '☿',
-    theme: 'arcane',
+    theme: 'minimal',
     size: 'lg',
     children: (
       <div className="space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#1A1F2E' }}>
-            <div
-              className="text-2xl"
-              style={{ color: '#4A9C6D', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
-            >
-              156
-            </div>
-            <div
-              className="text-xs uppercase"
-              style={{ color: '#6B7280', fontFamily: '"Cinzel", Georgia, serif' }}
-            >
-              Victories
-            </div>
+          <div className="p-4 rounded-lg text-center bg-skin-tertiary">
+            <div className="text-2xl text-green-500">156</div>
+            <div className="text-xs uppercase text-skin-muted">Victories</div>
           </div>
-          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#1A1F2E' }}>
-            <div
-              className="text-2xl"
-              style={{ color: '#A63D3D', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
-            >
-              89
-            </div>
-            <div
-              className="text-xs uppercase"
-              style={{ color: '#6B7280', fontFamily: '"Cinzel", Georgia, serif' }}
-            >
-              Defeats
-            </div>
+          <div className="p-4 rounded-lg text-center bg-skin-tertiary">
+            <div className="text-2xl text-red-500">89</div>
+            <div className="text-xs uppercase text-skin-muted">Defeats</div>
           </div>
-          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#1A1F2E' }}>
-            <div
-              className="text-2xl"
-              style={{ color: '#D4A574', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
-            >
-              64%
-            </div>
-            <div
-              className="text-xs uppercase"
-              style={{ color: '#6B7280', fontFamily: '"Cinzel", Georgia, serif' }}
-            >
-              Success Rate
-            </div>
+          <div className="p-4 rounded-lg text-center bg-skin-tertiary">
+            <div className="text-2xl text-skin-accent">64%</div>
+            <div className="text-xs uppercase text-skin-muted">Win Rate</div>
           </div>
         </div>
 
-        {/* Recent Transmutations */}
+        {/* Recent Games */}
         <div>
-          <h3
-            className="text-sm uppercase tracking-wider mb-3"
-            style={{ color: '#D4A574', fontFamily: '"Cinzel", Georgia, serif' }}
-          >
-            Recent Transmutations
-          </h3>
+          <h3 className="text-sm uppercase tracking-wider mb-3 text-skin-accent">Recent Games</h3>
           <div className="space-y-2">
             {['W', 'W', 'L', 'W', 'W'].map((result, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between p-3 rounded-lg"
-                style={{ backgroundColor: '#1A1F2E' }}
+                className="flex items-center justify-between p-3 rounded-lg bg-skin-tertiary"
               >
-                <span
-                  style={{
-                    fontFamily: '"Cinzel", Georgia, serif',
-                    color: result === 'W' ? '#4A9C6D' : '#A63D3D',
-                  }}
-                >
-                  {result === 'W' ? 'Success' : 'Failure'}
+                <span className={result === 'W' ? 'text-green-500' : 'text-red-500'}>
+                  {result === 'W' ? 'Victory' : 'Defeat'}
                 </span>
-                <span style={{ color: '#6B7280', fontSize: '0.875rem' }}>
+                <span className="text-sm text-skin-muted">
                   {41 - i * 3} - {28 + i * 2}
                 </span>
               </div>
@@ -709,7 +580,7 @@ export const AlchemistProfile: Story = {
     ),
     footer: (
       <Button variant="secondary" fullWidth>
-        Close Tome
+        Close
       </Button>
     ),
   },
@@ -723,106 +594,55 @@ export const AlchemistProfile: Story = {
 };
 
 // ============================================================================
-// ALCHEMIST'S STUDY SHOWCASE
+// THEMED MODAL SHOWCASE
 // ============================================================================
 
-export const AlchemistStudy: RenderOnlyStory = {
+export const ThemedShowcase: RenderOnlyStory = {
   render: () => {
     const [isOpen, setIsOpen] = useState(true);
 
     return (
-      <div className="min-h-screen bg-[#0B0E14] p-8">
+      <div className="min-h-screen bg-skin-primary p-8">
         <ArcaneButton onClick={() => setIsOpen(true)} glow>
-          Enter the Study
+          Open Showcase
         </ArcaneButton>
 
         <Modal
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
-          title="The Alchemist's Study"
-          subtitle="Where mysteries unfold"
+          title="Themed Showcase"
+          subtitle="Demonstrating skin compatibility"
           icon="⚗"
-          theme="arcane"
+          theme="minimal"
           size="lg"
         >
           <div className="space-y-6">
-            <p
-              className="text-center italic"
-              style={{
-                color: '#9CA3AF',
-                fontFamily: '"Cormorant Garamond", Georgia, serif',
-                fontSize: '1.125rem',
-              }}
-            >
-              "As above, so below. As within, so without."
+            <p className="text-center italic text-skin-secondary text-lg">
+              "This modal adapts to your selected skin theme."
             </p>
 
             <div className="flex justify-center gap-8">
               <div className="text-center">
                 <div className="text-4xl mb-2">△</div>
-                <div
-                  style={{
-                    color: '#A63D3D',
-                    fontFamily: '"Cinzel", Georgia, serif',
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  Fire
-                </div>
+                <div className="text-xs text-red-500">Fire</div>
               </div>
               <div className="text-center">
                 <div className="text-4xl mb-2">▽</div>
-                <div
-                  style={{
-                    color: '#4682B4',
-                    fontFamily: '"Cinzel", Georgia, serif',
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  Water
-                </div>
+                <div className="text-xs text-blue-500">Water</div>
               </div>
               <div className="text-center">
                 <div className="text-4xl mb-2">◇</div>
-                <div
-                  style={{
-                    color: '#4A9C6D',
-                    fontFamily: '"Cinzel", Georgia, serif',
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  Earth
-                </div>
+                <div className="text-xs text-green-500">Earth</div>
               </div>
               <div className="text-center">
                 <div className="text-4xl mb-2">○</div>
-                <div
-                  style={{
-                    color: '#E8E4DC',
-                    fontFamily: '"Cinzel", Georgia, serif',
-                    fontSize: '0.75rem',
-                  }}
-                >
-                  Air
-                </div>
+                <div className="text-xs text-skin-primary">Air</div>
               </div>
             </div>
 
-            <div
-              className="p-4 rounded-lg text-center"
-              style={{
-                backgroundColor: '#0B0E14',
-                border: '1px solid #C17F59',
-              }}
-            >
-              <div
-                className="text-lg uppercase tracking-wider"
-                style={{
-                  color: '#D4A574',
-                  fontFamily: '"Cinzel Decorative", Georgia, serif',
-                }}
-              >
-                The Great Work Awaits
+            <div className="p-4 rounded-lg text-center bg-skin-tertiary border border-skin-accent">
+              <div className="text-lg uppercase tracking-wider text-skin-accent">
+                Ready to Play
               </div>
             </div>
           </div>
@@ -833,7 +653,7 @@ export const AlchemistStudy: RenderOnlyStory = {
   parameters: {
     docs: {
       description: {
-        story: 'Full Midnight Alchemy showcase demonstrating the mystical modal design.',
+        story: 'Full showcase demonstrating skin-compatible modal design.',
       },
     },
   },

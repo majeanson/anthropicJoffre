@@ -1,6 +1,8 @@
 /**
  * Skeleton Component Stories
- * Sprint 21 - Loading state skeletons showcase
+ *
+ * Loading state skeletons for various UI patterns.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -20,6 +22,22 @@ const meta = {
   component: Skeleton,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+# Skeleton Component
+
+Loading state placeholders for various UI patterns. Adapts to the selected skin theme.
+
+## Features
+- **3 variants**: Text, circular, rectangular
+- **Composite skeletons**: Table, card, list, stats grid
+- **Animated shimmer**: Subtle loading animation
+
+Use the skin selector in the toolbar to see how skeletons adapt to different themes.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
@@ -217,10 +235,13 @@ export const ButtonFullWidth: Story = {
   },
 };
 
-// Real-world examples
+// ============================================================================
+// REAL-WORLD EXAMPLES
+// ============================================================================
+
 export const LeaderboardLoading: Story = {
   render: () => (
-    <div className="bg-gray-800 rounded-lg p-6 max-w-2xl">
+    <div className="rounded-lg p-6 max-w-2xl bg-skin-secondary border border-skin-default">
       <div className="mb-4">
         <Skeleton width="200px" height="28px" className="mb-2" />
         <Skeleton width="300px" height="16px" />
@@ -231,7 +252,7 @@ export const LeaderboardLoading: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Complete leaderboard loading state',
+        story: 'Complete leaderboard loading state.',
       },
     },
   },
@@ -239,9 +260,9 @@ export const LeaderboardLoading: Story = {
 
 export const PlayerStatsLoading: Story = {
   render: () => (
-    <div className="bg-gray-800 rounded-lg p-6 max-w-3xl space-y-6">
+    <div className="rounded-lg p-6 max-w-3xl space-y-6 bg-skin-secondary border border-skin-default">
       {/* Player header */}
-      <div className="flex items-center gap-4 pb-4 border-b border-gray-700">
+      <div className="flex items-center gap-4 pb-4 border-b border-skin-subtle">
         <Skeleton variant="circular" width="80px" height="80px" />
         <div className="flex-1 space-y-2">
           <Skeleton width="200px" height="28px" />
@@ -262,7 +283,7 @@ export const PlayerStatsLoading: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Player statistics page loading state',
+        story: 'Player statistics page loading state.',
       },
     },
   },
@@ -270,7 +291,7 @@ export const PlayerStatsLoading: Story = {
 
 export const MessagesLoading: Story = {
   render: () => (
-    <div className="bg-gray-800 rounded-lg p-4 max-w-md">
+    <div className="rounded-lg p-4 max-w-md bg-skin-secondary border border-skin-default">
       <div className="mb-4">
         <Skeleton width="150px" height="24px" />
       </div>
@@ -280,7 +301,7 @@ export const MessagesLoading: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Messages/conversations list loading state',
+        story: 'Messages/conversations list loading state.',
       },
     },
   },
@@ -288,10 +309,10 @@ export const MessagesLoading: Story = {
 
 export const QuestPanelLoading: Story = {
   render: () => (
-    <div className="bg-gray-800 rounded-lg p-6 max-w-md space-y-4">
+    <div className="rounded-lg p-6 max-w-md space-y-4 bg-skin-secondary border border-skin-default">
       <Skeleton width="150px" height="28px" className="mb-4" />
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+        <div key={i} className="rounded-lg p-4 space-y-3 bg-skin-tertiary">
           <div className="flex items-center justify-between">
             <Skeleton width="120px" height="20px" />
             <Skeleton width="60px" height="24px" variant="text" />
@@ -305,7 +326,7 @@ export const QuestPanelLoading: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Daily quests panel loading state',
+        story: 'Daily quests panel loading state.',
       },
     },
   },
@@ -313,7 +334,7 @@ export const QuestPanelLoading: Story = {
 
 export const CalendarLoading: Story = {
   render: () => (
-    <div className="bg-gray-800 rounded-lg p-6 max-w-2xl space-y-4">
+    <div className="rounded-lg p-6 max-w-2xl space-y-4 bg-skin-secondary border border-skin-default">
       <Skeleton width="200px" height="28px" className="mb-4" />
       <div className="grid grid-cols-7 gap-2">
         {Array.from({ length: 28 }).map((_, i) => (
@@ -325,7 +346,7 @@ export const CalendarLoading: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Rewards calendar loading state',
+        story: 'Rewards calendar loading state.',
       },
     },
   },

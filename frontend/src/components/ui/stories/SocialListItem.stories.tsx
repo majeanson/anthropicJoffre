@@ -1,6 +1,8 @@
 /**
  * SocialListItem Component Stories
- * Sprint 20 - Storybook Integration
+ *
+ * Social list items for friends, requests, and search results.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -12,6 +14,22 @@ const meta = {
   component: SocialListItem,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+# Social List Item Component
+
+List items for friends, requests, and search results. Adapts to the selected skin theme.
+
+## Features
+- **Status indicators**: Online, in-game, in-lobby, offline
+- **Metadata display**: Level, stats, timestamps
+- **Action buttons**: Add, remove, accept, reject
+
+Use the skin selector in the toolbar to see how items adapt to different themes.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
@@ -103,7 +121,7 @@ export const PendingRequest: Story = {
     playerName: 'SentRequest',
     metadata: 'Sent 3 days ago',
     actions: (
-      <span className="px-3 py-1 bg-yellow-600 text-white text-sm rounded font-semibold">
+      <span className="px-3 py-1 bg-yellow-500/30 text-yellow-300 border border-yellow-500/50 text-sm rounded font-semibold">
         Pending
       </span>
     ),
@@ -132,8 +150,8 @@ export const ListExample: Story = {
     status: 'online',
   },
   render: () => (
-    <div className="max-w-md space-y-3 bg-gray-900 p-4 rounded-lg">
-      <h3 className="text-white font-bold mb-2">Friends List</h3>
+    <div className="max-w-md space-y-3 p-4 rounded-lg bg-skin-secondary border border-skin-default">
+      <h3 className="text-skin-primary font-bold mb-2">Friends List</h3>
       <SocialListItem
         playerName="JohnDoe"
         status="online"

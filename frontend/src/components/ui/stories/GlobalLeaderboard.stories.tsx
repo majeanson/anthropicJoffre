@@ -229,20 +229,21 @@ const mockPlayers: MockPlayer[] = [
   },
 ];
 
+// Tier colors use semantic gradients that work across all skin themes
 const getTierColor = (tier: string) => {
   switch (tier) {
     case 'Diamond':
-      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200';
+      return 'bg-purple-500/20 text-purple-300 border border-purple-500/30';
     case 'Platinum':
-      return 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-200';
+      return 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30';
     case 'Gold':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200';
+      return 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30';
     case 'Silver':
-      return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200';
+      return 'bg-slate-400/20 text-slate-300 border border-slate-400/30';
     case 'Bronze':
-      return 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200';
+      return 'bg-orange-500/20 text-orange-300 border border-orange-500/30';
     default:
-      return 'bg-gray-100 text-gray-600';
+      return 'bg-skin-tertiary text-skin-muted';
   }
 };
 
@@ -294,7 +295,7 @@ export const FullLeaderboard: Story = {
           </div>
 
           {/* Table Header */}
-          <div className="grid grid-cols-7 gap-4 px-4 py-3 bg-gray-200 dark:bg-gray-700 rounded-lg font-bold text-sm text-gray-700 dark:text-gray-300">
+          <div className="grid grid-cols-7 gap-4 px-4 py-3 rounded-lg font-bold text-sm bg-skin-tertiary text-skin-secondary">
             <div className="col-span-1">Rank</div>
             <div className="col-span-2">Player</div>
             <div className="col-span-1 text-center">ELO</div>
@@ -309,36 +310,36 @@ export const FullLeaderboard: Story = {
               key={player.rank}
               className={`grid grid-cols-7 gap-4 p-4 rounded-lg transition-all cursor-pointer hover:scale-[1.02] ${
                 player.rank <= 3
-                  ? 'bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/40 dark:to-amber-900/40 border-2 border-yellow-400 dark:border-yellow-600'
-                  : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 border border-gray-200 dark:border-gray-600'
+                  ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-2 border-yellow-500/50'
+                  : 'bg-skin-secondary hover:bg-skin-tertiary border border-skin-default'
               }`}
             >
               <div className="col-span-1 flex items-center">
-                <span className="text-2xl font-bold text-gray-800 dark:text-gray-300">
+                <span className="text-2xl font-bold text-skin-primary">
                   {getRankMedal(player.rank)}
                 </span>
               </div>
 
               <div className="col-span-2 flex flex-col justify-center">
-                <p className="font-bold text-lg text-gray-900 dark:text-gray-100">{player.name}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="font-bold text-lg text-skin-primary">{player.name}</p>
+                <p className="text-xs text-skin-muted">
                   {player.wins}W - {player.losses}L
                 </p>
               </div>
 
               <div className="col-span-1 flex flex-col items-center justify-center">
-                <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+                <p className="text-2xl font-bold text-purple-400">
                   {player.elo}
                 </p>
-                <p className="text-xs text-gray-500">Peak: {player.peak}</p>
+                <p className="text-xs text-skin-muted">Peak: {player.peak}</p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-xl font-bold text-gray-700 dark:text-gray-300">{player.games}</p>
+                <p className="text-xl font-bold text-skin-primary">{player.games}</p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                <p className="text-xl font-bold text-green-400">
                   {player.winRate}%
                 </p>
               </div>
@@ -355,7 +356,7 @@ export const FullLeaderboard: Story = {
 
           {/* Footer */}
           <UICard variant="bordered" size="md" className="mt-4">
-            <div className="flex flex-wrap gap-4 justify-center text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-wrap gap-4 justify-center text-sm text-skin-muted">
               <div className="flex items-center gap-2">
                 <span>💎 Diamond:</span>
                 <span className="font-bold">2</span>
@@ -377,7 +378,7 @@ export const FullLeaderboard: Story = {
                 <span className="font-bold">2</span>
               </div>
             </div>
-            <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
+            <p className="text-center text-xs text-skin-muted mt-2">
               Click on a player to view detailed statistics
             </p>
           </UICard>
@@ -411,7 +412,7 @@ export const RoundStatsView: Story = {
           </div>
 
           {/* Table Header - Round Stats */}
-          <div className="grid grid-cols-7 gap-4 px-4 py-3 bg-blue-200 dark:bg-blue-900/60 rounded-lg font-bold text-sm text-blue-900 dark:text-blue-200">
+          <div className="grid grid-cols-7 gap-4 px-4 py-3 bg-blue-500/20 rounded-lg font-bold text-sm text-blue-300 border border-blue-500/30">
             <div className="col-span-1">Rank</div>
             <div className="col-span-2">Player</div>
             <div className="col-span-1 text-center">Rounds</div>
@@ -426,42 +427,42 @@ export const RoundStatsView: Story = {
               key={player.rank}
               className={`grid grid-cols-7 gap-4 p-4 rounded-lg transition-all cursor-pointer hover:scale-[1.02] ${
                 player.rank <= 3
-                  ? 'bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/40 dark:to-amber-900/40 border-2 border-yellow-400'
-                  : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600'
+                  ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-2 border-yellow-500/50'
+                  : 'bg-skin-secondary hover:bg-skin-tertiary border border-skin-default'
               }`}
             >
               <div className="col-span-1 flex items-center">
-                <span className="text-2xl font-bold">{getRankMedal(player.rank)}</span>
+                <span className="text-2xl font-bold text-skin-primary">{getRankMedal(player.rank)}</span>
               </div>
 
               <div className="col-span-2 flex flex-col justify-center">
-                <p className="font-bold text-lg text-gray-900 dark:text-gray-100">{player.name}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="font-bold text-lg text-skin-primary">{player.name}</p>
+                <p className="text-xs text-skin-muted">
                   {Math.round((player.rounds * player.roundWinRate) / 100)}W -{' '}
                   {Math.round((player.rounds * (100 - player.roundWinRate)) / 100)}L
                 </p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+                <p className="text-2xl font-bold text-blue-400">
                   {player.rounds}
                 </p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                <p className="text-xl font-bold text-green-400">
                   {player.roundWinRate}%
                 </p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+                <p className="text-xl font-bold text-orange-400">
                   {player.avgTricks}
                 </p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                <p className="text-xl font-bold text-purple-400">
                   {player.betSuccess}%
                 </p>
               </div>
@@ -480,9 +481,9 @@ export const RoundStatsView: Story = {
 export const TopThreeHighlight: Story = {
   name: 'Top 3 Highlight',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[600px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Top 3 Players</h3>
-      <p className="text-[var(--color-text-secondary)] text-sm mb-4">
+    <div className="p-6 rounded-lg bg-skin-primary w-[600px]">
+      <h3 className="text-skin-primary font-semibold mb-4">Top 3 Players</h3>
+      <p className="text-skin-secondary text-sm mb-4">
         Special golden highlight for top 3 positions
       </p>
 
@@ -490,27 +491,27 @@ export const TopThreeHighlight: Story = {
         {mockPlayers.slice(0, 3).map((player) => (
           <div
             key={player.rank}
-            className="grid grid-cols-7 gap-4 p-4 rounded-lg bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/40 dark:to-amber-900/40 border-2 border-yellow-400 dark:border-yellow-600"
+            className="grid grid-cols-7 gap-4 p-4 rounded-lg bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-2 border-yellow-500/50"
           >
             <div className="col-span-1 flex items-center">
               <span className="text-3xl">{getRankMedal(player.rank)}</span>
             </div>
             <div className="col-span-2">
-              <p className="font-bold text-lg text-gray-900 dark:text-gray-100">{player.name}</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="font-bold text-lg text-skin-primary">{player.name}</p>
+              <p className="text-xs text-skin-muted">
                 {player.wins}W - {player.losses}L
               </p>
             </div>
             <div className="col-span-1 text-center">
-              <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+              <p className="text-2xl font-bold text-purple-400">
                 {player.elo}
               </p>
             </div>
             <div className="col-span-1 text-center">
-              <p className="text-xl font-bold text-gray-700 dark:text-gray-300">{player.games}</p>
+              <p className="text-xl font-bold text-skin-primary">{player.games}</p>
             </div>
             <div className="col-span-1 text-center">
-              <p className="text-xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-xl font-bold text-green-400">
                 {player.winRate}%
               </p>
             </div>
@@ -535,19 +536,19 @@ export const TopThreeHighlight: Story = {
 export const TierBadges: Story = {
   name: 'Tier Badges',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[400px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Ranking Tiers</h3>
+    <div className="p-6 rounded-lg bg-skin-primary w-[400px]">
+      <h3 className="text-skin-primary font-semibold mb-4">Ranking Tiers</h3>
 
       <div className="space-y-3">
         {(['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze'] as const).map((tier) => (
           <div
             key={tier}
-            className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-secondary)]"
+            className="flex items-center justify-between p-3 rounded-lg bg-skin-secondary"
           >
             <span className={`px-4 py-2 rounded-full text-sm font-bold ${getTierColor(tier)}`}>
               {getTierIcon(tier)} {tier}
             </span>
-            <span className="text-[var(--color-text-secondary)] text-sm">
+            <span className="text-skin-secondary text-sm">
               {tier === 'Diamond' && 'ELO 2000+'}
               {tier === 'Platinum' && 'ELO 1800-1999'}
               {tier === 'Gold' && 'ELO 1600-1799'}

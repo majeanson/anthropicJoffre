@@ -96,7 +96,7 @@ export const AllQualityStates: Story = {
 
         {/* Offline */}
         <div className="p-4 rounded-lg bg-[var(--color-bg-secondary)] col-span-2">
-          <p className="text-gray-400 text-sm mb-3">Offline (Disconnected)</p>
+          <p className="text-skin-muted text-sm mb-3">Offline (Disconnected)</p>
           <ConnectionQualityIndicator
             stats={{ ping: null, quality: 'offline', isConnected: false, lastPingTime: null }}
           />

@@ -1,43 +1,34 @@
 /**
- * Input Component Stories - Midnight Alchemy Edition
+ * Input Component Stories
  *
- * Showcases mystical input fields with brass frame aesthetics,
- * ethereal focus states, and arcane corner decorations.
+ * Showcases input fields with various variants and states.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { Input, SearchInput, PasswordInput, ArcaneInput, ElegantInput } from '../Input';
 
 const meta = {
-  title: 'Midnight Alchemy/Input',
+  title: 'UI/Input',
   component: Input,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Inputs
+# Input Component
 
-Mystical input fields with brass frame aesthetics and ethereal focus states.
-Each keystroke feels like inscribing ancient runes.
+Input fields with various variants and states.
 
 ## Features
 - **4 variants**: default, filled, elegant, arcane
 - **3 sizes**: sm, md, lg
-- **Ethereal glow**: Copper glow on focus
-- **Arcane corners**: Sacred geometry decorations
+- **Focus glow**: Visual feedback on focus
+- **Corner decorations**: Decorative corners
 - **Icon support**: Left and right icons
-- **Password toggle**: Eye of Seeing reveal
+- **Password toggle**: Show/hide password
 
-## Typography
-Uses **Cormorant Garamond** for elegant italic placeholders.
+Use the skin selector in the toolbar to see how inputs adapt to different themes.
         `,
       },
     },
@@ -121,11 +112,11 @@ export const Arcane: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="space-y-6 p-6 bg-[#0B0E14] rounded-xl min-w-96">
+    <div className="space-y-6 p-6 bg-skin-primary rounded-xl border border-skin-default min-w-96">
       <Input variant="default" label="Default" placeholder="Standard input field..." />
       <Input variant="filled" label="Filled" placeholder="Filled background variant..." />
       <Input variant="elegant" label="Elegant" placeholder="With focus underline..." />
-      <Input variant="arcane" label="Arcane" placeholder="Sacred geometry corners..." />
+      <Input variant="arcane" label="Arcane" placeholder="Decorative corners..." />
     </div>
   ),
 };
@@ -136,7 +127,7 @@ export const AllVariants: Story = {
 
 export const AllSizes: Story = {
   render: () => (
-    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl min-w-96">
+    <div className="space-y-4 p-6 bg-skin-primary rounded-xl border border-skin-default min-w-96">
       <Input size="sm" label="Small" placeholder="Compact text..." />
       <Input size="md" label="Medium" placeholder="Standard size..." />
       <Input size="lg" label="Large" placeholder="Prominent input..." />
@@ -209,140 +200,105 @@ export const Disabled: Story = {
 
 export const SearchInputExample: Story = {
   render: () => (
-    <div className="p-6 bg-[#0B0E14] rounded-xl min-w-96">
-      <SearchInput label="Search the Archives" />
+    <div className="p-6 bg-skin-primary rounded-xl border border-skin-default min-w-96">
+      <SearchInput label="Search" />
     </div>
   ),
 };
 
 export const PasswordInputExample: Story = {
   render: () => (
-    <div className="p-6 bg-[#0B0E14] rounded-xl min-w-96">
-      <PasswordInput label="Secret Passphrase" placeholder="Enter the hidden word..." />
+    <div className="p-6 bg-skin-primary rounded-xl border border-skin-default min-w-96">
+      <PasswordInput label="Password" placeholder="Enter password..." />
     </div>
   ),
 };
 
 export const ArcaneInputExample: Story = {
   render: () => (
-    <div className="p-6 bg-[#0B0E14] rounded-xl min-w-96">
+    <div className="p-6 bg-skin-primary rounded-xl border border-skin-default min-w-96">
       <ArcaneInput
-        label="Arcane Inscription"
-        placeholder="Channel the mystical energy..."
-        helperText="Focus your intent as you type."
+        label="Decorated Input"
+        placeholder="Type something..."
+        helperText="This input has decorative corners."
       />
     </div>
   ),
 };
 
 // ============================================================================
-// ALCHEMIST'S WORKBENCH
+// REGISTRATION FORM
 // ============================================================================
 
-export const AlchemistForm: Story = {
+export const RegistrationForm: Story = {
   render: () => (
-    <div
-      className="p-8 rounded-xl space-y-6 min-w-[400px] relative"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '2px solid #C17F59',
-        boxShadow: '0 0 50px rgba(193, 127, 89, 0.15), 0 8px 32px rgba(0, 0, 0, 0.5)',
-      }}
-    >
-      {/* Sacred geometry corners */}
-      <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-[#C17F59] opacity-60" />
-      <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-[#C17F59] opacity-60" />
+    <div className="p-8 rounded-xl space-y-6 min-w-[400px] relative bg-skin-secondary border-2 border-skin-accent">
+      {/* Decorative corners */}
+      <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-skin-accent opacity-60" />
+      <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-skin-accent opacity-60" />
 
-      <h2
-        className="text-xl text-center uppercase tracking-[0.15em]"
-        style={{
-          fontFamily: '"Cinzel Decorative", Georgia, serif',
-          color: '#D4A574',
-          textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
-        }}
-      >
-        Register as Alchemist
+      <h2 className="text-xl text-center uppercase tracking-[0.15em] text-skin-accent">
+        Create Account
       </h2>
 
       <div className="space-y-4">
         <Input
           variant="arcane"
-          label="Alchemist Name"
-          placeholder="Your mystical identity..."
-          leftIcon={<span>☿</span>}
+          label="Username"
+          placeholder="Choose a username..."
+          leftIcon={<span>👤</span>}
         />
         <Input
           variant="arcane"
-          label="Realm of Study"
-          placeholder="Transmutation, Potions, etc..."
-          leftIcon={<span>⚗</span>}
+          label="Email"
+          placeholder="your@email.com"
+          leftIcon={<span>✉️</span>}
         />
-        <PasswordInput label="Secret Passphrase" placeholder="Guard it well..." />
+        <PasswordInput label="Password" placeholder="Create a password..." />
         <Input
           variant="arcane"
-          label="Years of Practice"
-          type="number"
-          placeholder="How long have you studied?"
-          helperText="Apprentices welcome."
+          label="Display Name"
+          placeholder="How others will see you"
+          helperText="This can be changed later."
         />
       </div>
 
-      <button
-        className="w-full py-4 rounded-lg text-center uppercase tracking-widest font-semibold"
-        style={{
-          fontFamily: '"Cinzel Decorative", Georgia, serif',
-          background: 'linear-gradient(180deg, #C17F59 0%, rgba(193, 127, 89, 0.8) 100%)',
-          color: '#0B0E14',
-          boxShadow: '0 4px 20px rgba(193, 127, 89, 0.4)',
-        }}
-      >
-        Begin the Great Work
+      <button className="w-full py-4 rounded-lg text-center uppercase tracking-widest font-semibold bg-skin-accent text-skin-on-accent hover:opacity-90 transition-opacity">
+        Register
       </button>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Complete form example with the Midnight Alchemy aesthetic.',
+        story: 'Complete registration form example.',
       },
     },
   },
 };
 
 // ============================================================================
-// DARK LABORATORY
+// SEARCH PANEL
 // ============================================================================
 
-export const DarkLaboratory: Story = {
+export const SearchPanel: Story = {
   render: () => (
-    <div
-      className="p-8 rounded-xl space-y-6 min-w-[450px]"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-lg uppercase tracking-widest text-center mb-6"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#9CA3AF',
-        }}
-      >
-        Ingredient Search
+    <div className="p-8 rounded-xl space-y-6 min-w-[450px] bg-skin-primary border border-skin-default">
+      <h3 className="text-lg uppercase tracking-widest text-center mb-6 text-skin-muted">
+        Search Panel
       </h3>
 
-      <SearchInput placeholder="Search for ingredients..." fullWidth />
+      <SearchInput placeholder="Search..." fullWidth />
 
       <div className="grid grid-cols-2 gap-4">
-        <Input variant="filled" label="Element Type" placeholder="Fire, Water..." size="sm" />
-        <Input variant="filled" label="Potency Level" placeholder="1-10" type="number" size="sm" />
+        <Input variant="filled" label="Category" placeholder="Select..." size="sm" />
+        <Input variant="filled" label="Amount" placeholder="1-10" type="number" size="sm" />
       </div>
 
       <ElegantInput
         label="Notes"
-        placeholder="Additional observations about the ingredient..."
-        helperText="Describe any unusual properties."
+        placeholder="Additional notes..."
+        helperText="Add any relevant details."
       />
     </div>
   ),
@@ -354,24 +310,24 @@ export const DarkLaboratory: Story = {
 
 export const ValidationStates: Story = {
   render: () => (
-    <div className="space-y-6 p-6 bg-[#0B0E14] rounded-xl min-w-96">
+    <div className="space-y-6 p-6 bg-skin-primary rounded-xl border border-skin-default min-w-96">
       <Input
         variant="arcane"
-        label="Valid Formula"
-        value="Aqua Vitae + Sulfur"
-        helperText="✓ Formula verified by the Council"
+        label="Valid Input"
+        value="user@example.com"
+        helperText="✓ Email format is valid"
       />
       <Input
         variant="arcane"
-        label="Invalid Formula"
-        value="Mercury + ??? "
-        error="Unknown ingredient detected. The mixture is unstable."
+        label="Invalid Input"
+        value="not-an-email"
+        error="Please enter a valid email address."
       />
       <Input
         variant="arcane"
         label="Required Field"
-        placeholder="This field cannot be empty..."
-        error="The Great Work cannot proceed without this ingredient."
+        placeholder="This field is required..."
+        error="This field cannot be empty."
       />
     </div>
   ),

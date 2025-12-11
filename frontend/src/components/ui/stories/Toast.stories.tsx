@@ -203,7 +203,7 @@ export const Interactive: Story = {
         {!showToast && (
           <button
             onClick={() => setShowToast(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-500/30 text-blue-300 border border-blue-500/50 rounded-lg hover:bg-blue-500/40"
           >
             Show Toast
           </button>

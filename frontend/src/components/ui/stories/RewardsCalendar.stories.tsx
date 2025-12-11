@@ -395,7 +395,7 @@ export const Interactive: Story = {
     };
 
     return (
-      <div className="min-h-screen bg-gray-900 p-8">
+      <div className="min-h-screen bg-skin-primary p-8">
         <RewardsCalendarDisplay
           calendar={calendar}
           progress={progress}
@@ -406,22 +406,22 @@ export const Interactive: Story = {
           onClose={() => alert('Close clicked')}
         />
 
-        <div className="fixed bottom-8 right-8 space-y-2 bg-gray-800 p-4 rounded-lg border border-gray-600">
-          <h3 className="text-white font-bold mb-2">Calendar Controls</h3>
+        <div className="fixed bottom-8 right-8 space-y-2 bg-skin-secondary p-4 rounded-lg border border-skin-default">
+          <h3 className="text-skin-primary font-bold mb-2">Calendar Controls</h3>
           <button
             onClick={handleAdvanceDay}
             disabled={progress.currentDay >= 30}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="w-full px-4 py-2 bg-blue-500/30 text-blue-300 border border-blue-500/50 rounded hover:bg-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
             Advance Day ({progress.currentDay}/30)
           </button>
           <button
             onClick={handleReset}
-            className="w-full px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
+            className="w-full px-4 py-2 bg-purple-500/30 text-purple-300 border border-purple-500/50 rounded hover:bg-purple-500/40 text-sm"
           >
             Reset Calendar
           </button>
-          <div className="text-gray-300 text-xs mt-2">
+          <div className="text-skin-muted text-xs mt-2">
             Claimed: {progress.rewardsClaimed.length}/30
           </div>
         </div>

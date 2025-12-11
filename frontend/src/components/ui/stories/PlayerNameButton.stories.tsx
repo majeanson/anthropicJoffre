@@ -167,7 +167,7 @@ export const InLeaderboard: Story = {
       <div className="space-y-2">
         {[
           { rank: 1, name: 'ChampionX', wins: 142, color: 'text-yellow-400' },
-          { rank: 2, name: 'ProGamer', wins: 128, color: 'text-gray-300' },
+          { rank: 2, name: 'ProGamer', wins: 128, color: 'text-skin-secondary' },
           { rank: 3, name: 'CardMaster', wins: 115, color: 'text-amber-600' },
           { rank: 4, name: 'LuckyDice', wins: 98, color: 'text-[var(--color-text-secondary)]' },
           { rank: 5, name: 'StarPlayer', wins: 87, color: 'text-[var(--color-text-secondary)]' },
@@ -262,7 +262,7 @@ export const BadgeVariantShowcase: Story = {
               <PlayerNameButton playerName="NewFriend123" onClick={() => {}} variant="badge" />
             </div>
           </div>
-          <button className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm">
+          <button className="px-3 py-1 bg-green-500/30 hover:bg-green-500/40 text-green-300 border border-green-500/50 rounded text-sm">
             Accept
           </button>
         </div>
@@ -276,7 +276,7 @@ export const BadgeVariantShowcase: Story = {
               <p className="text-[var(--color-text-secondary)] text-sm">invited you to play</p>
             </div>
           </div>
-          <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">
+          <button className="px-3 py-1 bg-blue-500/30 hover:bg-blue-500/40 text-blue-300 border border-blue-500/50 rounded text-sm">
             Join
           </button>
         </div>

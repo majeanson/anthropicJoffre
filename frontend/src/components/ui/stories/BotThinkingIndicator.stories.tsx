@@ -1,6 +1,8 @@
 /**
  * BotThinkingIndicator Component Stories
- * Toggle button for bot thinking insights
+ *
+ * Toggle button for bot thinking insights during gameplay.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -33,8 +35,18 @@ const meta: Meta<typeof InteractiveBotThinking> = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'A toggle button that shows what a bot is thinking during gameplay. Click to show/hide the thinking tooltip.',
+        component: `
+# Bot Thinking Indicator
+
+A toggle button that shows what a bot is thinking during gameplay. Adapts to the selected skin theme.
+
+## Features
+- **Tooltip positions**: Top, bottom, left, right
+- **Interactive toggle**: Click to show/hide thoughts
+- **Bot identification**: Shows bot name and current action
+
+Use the skin selector in the toolbar to see how the indicator adapts to different themes.
+        `,
       },
     },
   },
@@ -60,7 +72,7 @@ const meta: Meta<typeof InteractiveBotThinking> = {
   },
   decorators: [
     (Story) => (
-      <div className="p-20 flex items-center justify-center min-h-[300px]">
+      <div className="p-20 flex items-center justify-center min-h-[300px] bg-skin-primary">
         <Story />
       </div>
     ),
@@ -170,9 +182,9 @@ export const PositionRight: Story = {
 // All positions showcase
 export const AllPositions: Story = {
   render: () => (
-    <div className="grid grid-cols-2 gap-20 p-10">
+    <div className="grid grid-cols-2 gap-20 p-10 bg-skin-primary rounded-xl border border-skin-default">
       <div className="flex flex-col items-center gap-2">
-        <span className="text-sm text-gray-500">Top</span>
+        <span className="text-sm text-skin-muted">Top</span>
         <InteractiveBotThinking
           botName="Top Bot"
           action="Tooltip above"
@@ -181,7 +193,7 @@ export const AllPositions: Story = {
         />
       </div>
       <div className="flex flex-col items-center gap-2">
-        <span className="text-sm text-gray-500">Bottom</span>
+        <span className="text-sm text-skin-muted">Bottom</span>
         <InteractiveBotThinking
           botName="Bottom Bot"
           action="Tooltip below"
@@ -190,7 +202,7 @@ export const AllPositions: Story = {
         />
       </div>
       <div className="flex flex-col items-center gap-2">
-        <span className="text-sm text-gray-500">Left</span>
+        <span className="text-sm text-skin-muted">Left</span>
         <InteractiveBotThinking
           botName="Left Bot"
           action="Tooltip left"
@@ -199,7 +211,7 @@ export const AllPositions: Story = {
         />
       </div>
       <div className="flex flex-col items-center gap-2">
-        <span className="text-sm text-gray-500">Right</span>
+        <span className="text-sm text-skin-muted">Right</span>
         <InteractiveBotThinking
           botName="Right Bot"
           action="Tooltip right"
@@ -217,7 +229,7 @@ export const AllPositions: Story = {
 // Multiple bots scenario
 export const MultipleBots: Story = {
   render: () => (
-    <div className="flex gap-8 p-10">
+    <div className="flex gap-8 p-10 bg-skin-primary rounded-xl border border-skin-default">
       <div className="flex flex-col items-center gap-2">
         <InteractiveBotThinking
           botName="Bot Alice"
@@ -225,7 +237,7 @@ export const MultipleBots: Story = {
           initialOpen={false}
           position="top"
         />
-        <span className="text-xs text-gray-400">Alice</span>
+        <span className="text-xs text-skin-muted">Alice</span>
       </div>
       <div className="flex flex-col items-center gap-2">
         <InteractiveBotThinking
@@ -234,7 +246,7 @@ export const MultipleBots: Story = {
           initialOpen={true}
           position="top"
         />
-        <span className="text-xs text-gray-400">Bob (active)</span>
+        <span className="text-xs text-skin-accent">Bob (active)</span>
       </div>
       <div className="flex flex-col items-center gap-2">
         <InteractiveBotThinking
@@ -243,7 +255,7 @@ export const MultipleBots: Story = {
           initialOpen={false}
           position="top"
         />
-        <span className="text-xs text-gray-400">Charlie</span>
+        <span className="text-xs text-skin-muted">Charlie</span>
       </div>
     </div>
   ),

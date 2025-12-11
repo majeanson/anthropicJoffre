@@ -61,7 +61,7 @@ The CatchUpModal (Welcome Back) displays when a player reconnects to a game.
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <div className="min-h-[500px] flex items-center justify-center bg-gray-200 dark:bg-gray-900 p-4">
+      <div className="min-h-[500px] flex items-center justify-center bg-skin-primary p-4">
         <Story />
       </div>
     ),
@@ -167,21 +167,4 @@ export const ScoringPhase: Story = {
   },
 };
 
-/**
- * Dark mode
- */
-export const DarkMode: Story = {
-  args: {
-    isOpen: true,
-    onClose: () => alert('Continue clicked'),
-    currentPlayerId: 'You',
-    gameState: createMockGameState(),
-  },
-  decorators: [
-    (Story) => (
-      <div className="dark min-h-[500px] flex items-center justify-center bg-gray-900 p-4">
-        <Story />
-      </div>
-    ),
-  ],
-};
+// Note: Theme switching is now handled via the skin selector in the toolbar

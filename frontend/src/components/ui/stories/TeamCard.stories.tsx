@@ -101,7 +101,7 @@ export const AllVariants: Story = {
   render: () => (
     <div className="space-y-6">
       <div>
-        <h3 className="text-sm font-bold text-gray-500 mb-2">Team 1 (Orange)</h3>
+        <h3 className="text-sm font-bold text-skin-muted mb-2">Team 1 (Orange)</h3>
         <div className="flex gap-4">
           <TeamCard teamId={1} variant="subtle" className="min-w-[150px]">
             <p className="font-semibold">Subtle</p>
@@ -115,7 +115,7 @@ export const AllVariants: Story = {
         </div>
       </div>
       <div>
-        <h3 className="text-sm font-bold text-gray-500 mb-2">Team 2 (Purple)</h3>
+        <h3 className="text-sm font-bold text-skin-muted mb-2">Team 2 (Purple)</h3>
         <div className="flex gap-4">
           <TeamCard teamId={2} variant="subtle" className="min-w-[150px]">
             <p className="font-semibold">Subtle</p>
@@ -180,7 +180,7 @@ export const PlayerCardExample: Story = {
       <TeamCard teamId={1} variant="subtle">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-200 dark:bg-orange-800 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-orange-500/30 rounded-full flex items-center justify-center">
               🎮
             </div>
             <div>
@@ -194,7 +194,7 @@ export const PlayerCardExample: Story = {
       <TeamCard teamId={2} variant="subtle">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-200 dark:bg-purple-800 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-purple-500/30 rounded-full flex items-center justify-center">
               🤖
             </div>
             <div>
@@ -234,17 +234,17 @@ export const TeamIndicators: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-500 w-12">Small:</span>
+        <span className="text-sm text-skin-muted w-12">Small:</span>
         <TeamIndicator teamId={1} size="sm" />
         <TeamIndicator teamId={2} size="sm" />
       </div>
       <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-500 w-12">Medium:</span>
+        <span className="text-sm text-skin-muted w-12">Medium:</span>
         <TeamIndicator teamId={1} size="md" />
         <TeamIndicator teamId={2} size="md" />
       </div>
       <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-500 w-12">Large:</span>
+        <span className="text-sm text-skin-muted w-12">Large:</span>
         <TeamIndicator teamId={1} size="lg" />
         <TeamIndicator teamId={2} size="lg" />
       </div>

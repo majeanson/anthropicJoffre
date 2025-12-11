@@ -164,7 +164,7 @@ export const WithDisabledItems: Story = {
 export const IconButton: Story = {
   args: {
     trigger: (
-      <button className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+      <button className="p-2 rounded-full hover:bg-skin-tertiary transition-colors">
         <span className="text-xl">⋮</span>
       </button>
     ),

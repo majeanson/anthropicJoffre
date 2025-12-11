@@ -1,5 +1,8 @@
 /**
  * UIToggle Component Stories
+ *
+ * Toggle switches with multiple sizes and colors.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -11,6 +14,22 @@ const meta: Meta<typeof UIToggle> = {
   component: UIToggle,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+# UI Toggle Component
+
+Toggle switch with multiple sizes and colors. Adapts to the selected skin theme.
+
+## Features
+- **3 sizes**: Small, medium, large
+- **4 colors**: Green, blue, amber, purple
+- **Field variant**: With label and description
+
+Use the skin selector in the toolbar to see how toggles adapt to different themes.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
 };
@@ -89,18 +108,18 @@ export const AllSizes: StoryObj = {
     const [lg, setLg] = useState(true);
 
     return (
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-6 p-4 rounded-lg bg-skin-primary">
         <div className="flex flex-col items-center gap-2">
           <UIToggle enabled={sm} onChange={setSm} size="sm" label="Small" />
-          <span className="text-xs text-gray-500">Small</span>
+          <span className="text-xs text-skin-muted">Small</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <UIToggle enabled={md} onChange={setMd} size="md" label="Medium" />
-          <span className="text-xs text-gray-500">Medium</span>
+          <span className="text-xs text-skin-muted">Medium</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <UIToggle enabled={lg} onChange={setLg} size="lg" label="Large" />
-          <span className="text-xs text-gray-500">Large</span>
+          <span className="text-xs text-skin-muted">Large</span>
         </div>
       </div>
     );
@@ -115,22 +134,22 @@ export const AllColors: StoryObj = {
     const [purple, setPurple] = useState(true);
 
     return (
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 p-4 rounded-lg bg-skin-primary">
         <div className="flex flex-col items-center gap-2">
           <UIToggle enabled={green} onChange={setGreen} color="green" label="Green" />
-          <span className="text-xs text-gray-500">Green</span>
+          <span className="text-xs text-skin-muted">Green</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <UIToggle enabled={blue} onChange={setBlue} color="blue" label="Blue" />
-          <span className="text-xs text-gray-500">Blue</span>
+          <span className="text-xs text-skin-muted">Blue</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <UIToggle enabled={amber} onChange={setAmber} color="amber" label="Amber" />
-          <span className="text-xs text-gray-500">Amber</span>
+          <span className="text-xs text-skin-muted">Amber</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <UIToggle enabled={purple} onChange={setPurple} color="purple" label="Purple" />
-          <span className="text-xs text-gray-500">Purple</span>
+          <span className="text-xs text-skin-muted">Purple</span>
         </div>
       </div>
     );
@@ -142,7 +161,7 @@ export const ToggleField: StoryObj = {
     const [enabled, setEnabled] = useState(false);
 
     return (
-      <div className="w-80 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <div className="w-80 p-4 rounded-lg bg-skin-secondary border border-skin-default">
         <UIToggleField
           enabled={enabled}
           onChange={setEnabled}
@@ -159,7 +178,7 @@ export const ToggleFieldWithDescription: StoryObj = {
     const [enabled, setEnabled] = useState(true);
 
     return (
-      <div className="w-80 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <div className="w-80 p-4 rounded-lg bg-skin-secondary border border-skin-default">
         <UIToggleField
           enabled={enabled}
           onChange={setEnabled}
@@ -180,8 +199,8 @@ export const SettingsPanelExample: StoryObj = {
     const [notifications, setNotifications] = useState(true);
 
     return (
-      <div className="w-96 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg space-y-4">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Settings</h3>
+      <div className="w-96 p-6 rounded-lg shadow-lg space-y-4 bg-skin-secondary border border-skin-default">
+        <h3 className="text-lg font-bold text-skin-primary mb-4">Settings</h3>
 
         <UIToggleField
           enabled={sound}
@@ -228,13 +247,13 @@ export const InteractiveDemo: StoryObj = {
     };
 
     return (
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-4 p-4 rounded-lg bg-skin-primary">
         <UIToggle enabled={enabled} onChange={handleChange} size="lg" label="Demo Toggle" />
         <div className="text-center">
-          <p className="text-gray-700 dark:text-gray-300">
+          <p className="text-skin-primary">
             State: <strong>{enabled ? 'ON' : 'OFF'}</strong>
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Toggled {count} times</p>
+          <p className="text-sm text-skin-muted">Toggled {count} times</p>
         </div>
       </div>
     );

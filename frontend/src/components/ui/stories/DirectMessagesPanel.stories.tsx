@@ -134,7 +134,7 @@ export const FullPanel: Story = {
       >
         <div className="flex-1 flex overflow-hidden">
           {/* Conversations List */}
-          <div className="w-80 border-r border-gray-700 overflow-y-auto">
+          <div className="w-80 border-r border-skin-default overflow-y-auto">
             {mockConversations.map((conv, i) => (
               <ConversationItem
                 key={conv.username}
@@ -165,13 +165,13 @@ export const FullPanel: Story = {
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-gray-700 flex gap-2">
+            <div className="p-4 border-t border-skin-default flex gap-2">
               <input
                 type="text"
                 placeholder="Message Alice..."
-                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-4 py-2 bg-skin-tertiary text-skin-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <Button variant="primary" className="bg-blue-600 hover:bg-blue-500 border-blue-700">
+              <Button variant="primary">
                 Send
               </Button>
             </div>
@@ -202,7 +202,7 @@ export const EmptyConversations: Story = {
       >
         <div className="flex-1 flex overflow-hidden">
           {/* Empty Conversations List */}
-          <div className="w-80 border-r border-gray-700 overflow-y-auto">
+          <div className="w-80 border-r border-skin-default overflow-y-auto">
             <EmptyState
               icon="💬"
               title="No conversations yet"
@@ -241,7 +241,7 @@ export const NoMessagesYet: Story = {
       >
         <div className="flex-1 flex overflow-hidden">
           {/* Conversations List */}
-          <div className="w-80 border-r border-gray-700 overflow-y-auto">
+          <div className="w-80 border-r border-skin-default overflow-y-auto">
             <ConversationItem
               username="NewFriend"
               avatar={<Avatar username="NewFriend" size="md" />}
@@ -260,13 +260,13 @@ export const NoMessagesYet: Story = {
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-gray-700 flex gap-2">
+            <div className="p-4 border-t border-skin-default flex gap-2">
               <input
                 type="text"
                 placeholder="Message NewFriend..."
-                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-4 py-2 bg-skin-tertiary text-skin-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <Button variant="primary" className="bg-blue-600 hover:bg-blue-500 border-blue-700">
+              <Button variant="primary">
                 Send
               </Button>
             </div>
@@ -297,7 +297,7 @@ export const LoadingState: Story = {
       >
         <div className="flex-1 flex overflow-hidden">
           {/* Loading Skeleton */}
-          <div className="w-80 border-r border-gray-700 p-4">
+          <div className="w-80 border-r border-skin-default p-4">
             <ListSkeleton count={6} hasAvatar={true} hasSecondaryText={true} />
           </div>
 

@@ -157,7 +157,7 @@ export const OnIcon: Story = {
   args: {
     content: 'Copy game link',
     children: (
-      <button className="p-2 text-xl hover:bg-gray-100 dark:hover:bg-gray-700 rounded">📋</button>
+      <button className="p-2 text-xl hover:bg-skin-tertiary rounded">📋</button>
     ),
   },
 };
@@ -262,23 +262,23 @@ export const ActionBarExample: Story = {
     children: null,
   },
   render: () => (
-    <div className="flex items-center gap-2 p-4 bg-parchment-100 dark:bg-gray-800 rounded-lg">
+    <div className="flex items-center gap-2 p-4 rounded-lg bg-skin-secondary border border-skin-default">
       <Tooltip content="Copy game link">
-        <button className="p-2 hover:bg-parchment-200 dark:hover:bg-gray-700 rounded">📋</button>
+        <button className="p-2 hover:bg-skin-tertiary rounded">📋</button>
       </Tooltip>
 
       <Tooltip content="Invite friends">
-        <button className="p-2 hover:bg-parchment-200 dark:hover:bg-gray-700 rounded">👥</button>
+        <button className="p-2 hover:bg-skin-tertiary rounded">👥</button>
       </Tooltip>
 
       <Tooltip content="Game settings">
-        <button className="p-2 hover:bg-parchment-200 dark:hover:bg-gray-700 rounded">⚙️</button>
+        <button className="p-2 hover:bg-skin-tertiary rounded">⚙️</button>
       </Tooltip>
 
-      <div className="h-6 w-px bg-parchment-300 dark:bg-gray-600 mx-2" />
+      <div className="h-6 w-px bg-skin-subtle mx-2" />
 
       <Tooltip content="Leave game" variant="warning">
-        <button className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded text-red-500">
+        <button className="p-2 hover:bg-red-500/20 rounded text-red-400">
           🚪
         </button>
       </Tooltip>
@@ -293,7 +293,7 @@ export const PlayerInfoExample: Story = {
     children: null,
   },
   render: () => (
-    <div className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+    <div className="flex items-center gap-3 p-4 rounded-lg shadow bg-skin-secondary border border-skin-default">
       <Tooltip
         content={
           <div className="text-left">
@@ -313,8 +313,8 @@ export const PlayerInfoExample: Story = {
       </Tooltip>
 
       <div>
-        <div className="font-semibold text-umber-900 dark:text-gray-100">PlayerOne</div>
-        <div className="text-sm text-umber-500 dark:text-gray-400">Online</div>
+        <div className="font-semibold text-skin-primary">PlayerOne</div>
+        <div className="text-sm text-skin-muted">Online</div>
       </div>
     </div>
   ),
@@ -327,25 +327,25 @@ export const HelpIconsExample: Story = {
     children: null,
   },
   render: () => (
-    <div className="space-y-4 p-4 w-80">
+    <div className="space-y-4 p-4 w-80 rounded-lg bg-skin-primary">
       <div className="flex items-center justify-between">
-        <span className="text-umber-800 dark:text-gray-200">Sound Effects</span>
+        <span className="text-skin-primary">Sound Effects</span>
         <Tooltip content="Enable or disable in-game sound effects">
-          <span className="text-blue-500 cursor-help">ⓘ</span>
+          <span className="text-skin-accent cursor-help">ⓘ</span>
         </Tooltip>
       </div>
 
       <div className="flex items-center justify-between">
-        <span className="text-umber-800 dark:text-gray-200">Auto-play</span>
+        <span className="text-skin-primary">Auto-play</span>
         <Tooltip content="Automatically play cards when there's only one valid option">
-          <span className="text-blue-500 cursor-help">ⓘ</span>
+          <span className="text-skin-accent cursor-help">ⓘ</span>
         </Tooltip>
       </div>
 
       <div className="flex items-center justify-between">
-        <span className="text-umber-800 dark:text-gray-200">Show hints</span>
+        <span className="text-skin-primary">Show hints</span>
         <Tooltip content="Highlight playable cards during your turn">
-          <span className="text-blue-500 cursor-help">ⓘ</span>
+          <span className="text-skin-accent cursor-help">ⓘ</span>
         </Tooltip>
       </div>
     </div>

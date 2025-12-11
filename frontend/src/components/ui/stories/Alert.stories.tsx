@@ -1,45 +1,33 @@
 /**
- * Alert Component Stories - Midnight Alchemy Edition
+ * Alert Component Stories
  *
- * Mystical notification scrolls with alchemical warnings,
- * arcane discoveries, and transmutation results.
+ * Notification alerts with various variants and states.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { Alert } from '../Alert';
 
 const meta = {
-  title: 'Midnight Alchemy/Alert',
+  title: 'UI/Alert',
   component: Alert,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Alerts
+# Alert Component
 
-Mystical notification scrolls for conveying important messages.
-Each alert type represents a different alchemical state.
+Notification alerts for conveying important messages.
+Each alert type represents a different state.
 
 ## Features
 - **5 variants**: info, success, warning, error, neutral
 - **Dismissible**: Optional close button
-- **Custom icons**: Alchemical symbols
-- **Title support**: For formal proclamations
+- **Custom icons**: Custom icon support
+- **Title support**: For formal headings
 
-## Alchemical Meanings
-- **Info**: Arcane knowledge revealed
-- **Success**: Transmutation complete
-- **Warning**: Volatile mixture detected
-- **Error**: Failed experiment
-- **Neutral**: Ancient inscription
+Use the skin selector in the toolbar to see how alerts adapt to different themes.
         `,
       },
     },
@@ -210,57 +198,44 @@ export const AllVariants: Story = {
     children: '',
   },
   render: () => (
-    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
-      <Alert variant="info">☿ Mercury: Knowledge flows like quicksilver.</Alert>
-      <Alert variant="success">☉ Gold: The transmutation is complete!</Alert>
-      <Alert variant="warning">△ Fire: Proceed with extreme caution.</Alert>
-      <Alert variant="error">☠ Void: The mixture has destabilized.</Alert>
-      <Alert variant="neutral">◇ Salt: An observation recorded.</Alert>
+    <div className="space-y-4 p-6 bg-skin-primary rounded-xl border border-skin-default">
+      <Alert variant="info">Information alert message.</Alert>
+      <Alert variant="success">Success! The operation completed.</Alert>
+      <Alert variant="warning">Warning: Please proceed with caution.</Alert>
+      <Alert variant="error">Error: Something went wrong.</Alert>
+      <Alert variant="neutral">Neutral notification message.</Alert>
     </div>
   ),
 };
 
 // ============================================================================
-// ALCHEMIST'S LABORATORY
+// GAME NOTIFICATIONS
 // ============================================================================
 
-export const LaboratoryNotifications: Story = {
+export const GameNotifications: Story = {
   args: {
     children: '',
   },
   render: () => (
-    <div
-      className="space-y-4 p-6 rounded-xl min-w-[400px]"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-lg uppercase tracking-widest text-center mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#D4A574',
-          textShadow: '0 0 10px rgba(212, 165, 116, 0.3)',
-        }}
-      >
-        Laboratory Scrolls
+    <div className="space-y-4 p-6 rounded-xl min-w-[400px] bg-skin-secondary border border-skin-default">
+      <h3 className="text-lg uppercase tracking-widest text-center mb-4 text-skin-accent">
+        Game Notifications
       </h3>
 
-      <Alert variant="info" icon={<span>⚗</span>} title="Your Turn">
-        The Great Work awaits your contribution. Select a catalyst.
+      <Alert variant="info" icon={<span>🎮</span>} title="Your Turn">
+        It's your turn to play a card.
       </Alert>
 
-      <Alert variant="success" icon={<span>☉</span>} title="Reaction Won!">
-        Your formula prevailed. +6 points of pure essence collected!
+      <Alert variant="success" icon={<span>🏆</span>} title="Trick Won!">
+        You won the trick! +6 points collected!
       </Alert>
 
-      <Alert variant="warning" icon={<span>⏳</span>} title="Time Flows">
-        10 seconds remain before the mixture settles.
+      <Alert variant="warning" icon={<span>⏳</span>} title="Timer">
+        10 seconds remaining.
       </Alert>
 
-      <Alert variant="error" icon={<span>✕</span>} title="Invalid Catalyst">
-        You must use the same element if you possess one.
+      <Alert variant="error" icon={<span>✕</span>} title="Invalid Move">
+        You must follow suit if you have it.
       </Alert>
     </div>
   ),
@@ -275,17 +250,17 @@ export const SystemMessages: Story = {
     children: '',
   },
   render: () => (
-    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
-      <Alert variant="warning" icon={<span>🔮</span>} title="Ethereal Link Severed" dismissible>
-        Attempting to restore connection... Please wait.
+    <div className="space-y-4 p-6 bg-skin-primary rounded-xl border border-skin-default">
+      <Alert variant="warning" icon={<span>⚠️</span>} title="Connection Lost" dismissible>
+        Attempting to reconnect... Please wait.
       </Alert>
 
-      <Alert variant="success" icon={<span>✓</span>} title="Bond Restored" dismissible>
-        The ethereal link has been reestablished. Continue your work!
+      <Alert variant="success" icon={<span>✓</span>} title="Connected" dismissible>
+        Connection has been restored. Continue playing!
       </Alert>
 
-      <Alert variant="info" icon={<span>👤</span>} title="Alchemist Arrived" dismissible>
-        Aurelia has entered the laboratory.
+      <Alert variant="info" icon={<span>👤</span>} title="Player Joined" dismissible>
+        Player3 has joined the game.
       </Alert>
     </div>
   ),
@@ -300,60 +275,32 @@ export const FormValidation: Story = {
     children: '',
   },
   render: () => (
-    <div
-      className="space-y-4 p-6 rounded-xl"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-lg font-bold mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#E8E4DC',
-        }}
-      >
-        Register as Alchemist
-      </h3>
+    <div className="space-y-4 p-6 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="text-lg font-bold mb-4 text-skin-primary">Register Account</h3>
 
       <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: '#9CA3AF' }}>
-            Alchemist Name
-          </label>
+          <label className="block text-sm font-medium mb-1 text-skin-muted">Username</label>
           <input
             type="text"
-            className="w-full px-3 py-2 rounded-lg"
-            style={{
-              background: '#131824',
-              border: '1px solid #2D3548',
-              color: '#E8E4DC',
-            }}
+            className="w-full px-3 py-2 rounded-lg bg-skin-secondary border border-skin-default text-skin-primary"
             defaultValue="Al"
           />
         </div>
 
-        <Alert variant="error">Name must contain at least 3 runes.</Alert>
+        <Alert variant="error">Username must be at least 3 characters.</Alert>
 
         <div>
-          <label className="block text-sm font-medium mb-1" style={{ color: '#9CA3AF' }}>
-            Sigil of Contact
-          </label>
+          <label className="block text-sm font-medium mb-1 text-skin-muted">Email</label>
           <input
             type="email"
-            className="w-full px-3 py-2 rounded-lg"
-            style={{
-              background: '#131824',
-              border: '1px solid #2D3548',
-              color: '#E8E4DC',
-            }}
-            defaultValue="alchemist@guild.arcane"
+            className="w-full px-3 py-2 rounded-lg bg-skin-secondary border border-skin-default text-skin-primary"
+            defaultValue="user@example.com"
           />
         </div>
 
         <Alert variant="success" icon={<span>✓</span>}>
-          Sigil format is valid.
+          Email format is valid.
         </Alert>
       </div>
     </div>
@@ -369,44 +316,29 @@ export const BettingPhaseAlerts: Story = {
     children: '',
   },
   render: () => (
-    <div
-      className="p-6 rounded-xl"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-lg font-bold mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#D4A574',
-        }}
-      >
-        Wager Your Essence
-      </h3>
+    <div className="p-6 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="text-lg font-bold mb-4 text-skin-accent">Place Your Bet</h3>
 
       <Alert variant="info" className="mb-4">
-        Declare your wager. Minimum is 7 essence points.
+        Place your bet. Minimum is 7 points.
       </Alert>
 
       <div className="flex gap-2 mb-4">
         {[7, 8, 9, 10, 11, 12].map((n) => (
           <button
             key={n}
-            className="px-4 py-2 rounded transition-colors"
-            style={{
-              background: n === 9 ? '#C17F59' : '#1A1F2E',
-              color: n === 9 ? '#0B0E14' : '#9CA3AF',
-              border: '1px solid #2D3548',
-            }}
+            className={`px-4 py-2 rounded transition-colors border border-skin-default ${
+              n === 9
+                ? 'bg-skin-accent text-skin-on-accent'
+                : 'bg-skin-tertiary text-skin-muted hover:bg-skin-secondary'
+            }`}
           >
             {n}
           </button>
         ))}
       </div>
 
-      <Alert variant="warning">You must raise the wager. Current highest is 8.</Alert>
+      <Alert variant="warning">You must raise the bet. Current highest is 8.</Alert>
     </div>
   ),
 };

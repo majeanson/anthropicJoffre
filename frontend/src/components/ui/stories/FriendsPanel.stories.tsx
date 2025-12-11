@@ -93,7 +93,7 @@ const FriendsPanelMock = ({
         {activeTab === 'requests' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-umber-900 dark:text-gray-100 mb-3">
+              <h3 className="text-lg font-semibold text-skin-primary mb-3">
                 Received Requests
               </h3>
               <div className="space-y-3">
@@ -126,7 +126,7 @@ const FriendsPanelMock = ({
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-umber-900 dark:text-gray-100 mb-3">
+              <h3 className="text-lg font-semibold text-skin-primary mb-3">
                 Sent Requests
               </h3>
               <div className="space-y-3">
@@ -211,18 +211,17 @@ const meta: Meta<typeof FriendsPanelMock> = {
     docs: {
       description: {
         component: `
-The FriendsPanel allows players to manage their friends list.
+# Friends Panel Component
 
-**Features:**
-- View friends list with online status
-- Send/accept/reject friend requests
-- Search for players
-- Remove friends
+Manage friends list with online status, requests, and search. Adapts to the selected skin theme.
 
-**Light/Dark Mode:**
-- Section headings use explicit colors for both modes
-- Uses SocialListItem for consistent list styling
-- Purple theme matches social features
+## Features
+- **Friends tab**: View friends with online/offline/in-game status
+- **Requests tab**: Accept/reject incoming, view sent requests
+- **Search tab**: Find and add new friends
+- **Watch button**: Spectate friends in active games
+
+Use the skin selector in the toolbar to see how the panel adapts to different themes.
         `,
       },
     },
@@ -230,7 +229,7 @@ The FriendsPanel allows players to manage their friends list.
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <div className="min-h-[600px] flex items-center justify-center bg-gray-200 dark:bg-gray-900 p-4">
+      <div className="min-h-[600px] flex items-center justify-center bg-skin-primary p-4">
         <Story />
       </div>
     ),
@@ -299,22 +298,4 @@ export const SearchTab: Story = {
   },
 };
 
-/**
- * Dark mode
- */
-export const DarkMode: Story = {
-  args: {
-    isOpen: true,
-    onClose: () => {},
-    activeTab: 'requests',
-    pendingRequests: [{ id: 1, from_player: 'DarkPlayer', created_at: '2025-01-15' }],
-    sentRequests: [{ id: 2, to_player: 'NightOwl', created_at: '2025-01-14' }],
-  },
-  decorators: [
-    (Story) => (
-      <div className="dark min-h-[600px] flex items-center justify-center bg-gray-900 p-4">
-        <Story />
-      </div>
-    ),
-  ],
-};
+// Note: Theme switching is now handled via the skin selector in the toolbar

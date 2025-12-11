@@ -1,43 +1,33 @@
 /**
- * Select Component Stories - Midnight Alchemy Edition
+ * Select Component Stories
  *
- * Mystical dropdown menus for choosing elements, catalysts,
- * and configurations in the alchemist's laboratory.
+ * Dropdown menus for choosing options and configurations.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { Select } from '../Select';
 
 const meta = {
-  title: 'Midnight Alchemy/Select',
+  title: 'UI/Select',
   component: Select,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Select
+# Select Component
 
-Mystical dropdown menus for choosing elements, catalysts,
-and configurations in the alchemist's laboratory.
+Dropdown menus for choosing options and configurations.
 
 ## Features
 - **3 variants**: default, filled, outlined
 - **3 sizes**: sm, md, lg
-- **Icon support**: Left-positioned alchemical symbols
+- **Icon support**: Left-positioned icons
 - **Helper text**: Guidance for selections
 - **Error states**: Validation feedback
 
-## Alchemical Usage
-Perfect for element selection, difficulty settings,
-and experiment configurations.
+Use the skin selector in the toolbar to see how selects adapt to different themes.
         `,
       },
     },
@@ -290,7 +280,7 @@ export const AllVariants: Story = {
     options: [],
   },
   render: () => (
-    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
+    <div className="space-y-4 p-6 bg-skin-primary rounded-xl border border-skin-default">
       <Select
         variant="default"
         label="Default Variant"
@@ -322,7 +312,7 @@ export const AllSizes: Story = {
     options: [],
   },
   render: () => (
-    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
+    <div className="space-y-4 p-6 bg-skin-primary rounded-xl border border-skin-default">
       <Select size="sm" label="Small" options={difficultyOptions} value="apprentice" />
       <Select size="md" label="Medium" options={difficultyOptions} value="journeyman" />
       <Select size="lg" label="Large" options={difficultyOptions} value="master" />
@@ -331,67 +321,44 @@ export const AllSizes: Story = {
 };
 
 // ============================================================================
-// EXPERIMENT SETTINGS
+// GAME SETTINGS
 // ============================================================================
 
-export const ExperimentSettings: Story = {
+export const GameSettings: Story = {
   args: {
     options: [],
   },
   render: () => (
-    <div
-      className="space-y-4 p-6 rounded-xl w-80"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-lg font-bold mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#D4A574',
-          textShadow: '0 0 10px rgba(212, 165, 116, 0.3)',
-        }}
-      >
-        Experiment Settings
-      </h3>
+    <div className="space-y-4 p-6 rounded-xl w-80 bg-skin-secondary border border-skin-default">
+      <h3 className="text-lg font-bold mb-4 text-skin-accent">Game Settings</h3>
 
       <Select
-        label="Experiment Mode"
+        label="Game Mode"
         options={[
           { value: 'practice', label: 'Practice' },
           { value: 'ranked', label: 'Ranked' },
         ]}
         value="practice"
-        leftIcon={<span>⚗</span>}
+        leftIcon={<span>🎮</span>}
       />
 
       <Select
-        label="Familiar Difficulty"
+        label="Bot Difficulty"
         options={difficultyOptions}
         value="journeyman"
-        helperText="Affects the skill of spirit companions"
-        leftIcon={<span>🔮</span>}
+        helperText="Affects the skill of bot players"
+        leftIcon={<span>🤖</span>}
       />
 
       <Select
-        label="Realm"
+        label="Region"
         options={realmOptions}
-        placeholder="Select realm"
-        leftIcon={<span>🌙</span>}
+        placeholder="Select region"
+        leftIcon={<span>🌍</span>}
       />
 
-      <button
-        className="w-full py-3 rounded-lg font-semibold uppercase tracking-widest mt-2"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          background: 'linear-gradient(180deg, #C17F59 0%, rgba(193, 127, 89, 0.8) 100%)',
-          color: '#0B0E14',
-          boxShadow: '0 4px 20px rgba(193, 127, 89, 0.4)',
-        }}
-      >
-        Begin Experiment
+      <button className="w-full py-3 rounded-lg font-semibold uppercase tracking-widest mt-2 bg-skin-accent text-skin-on-accent hover:opacity-90 transition-opacity">
+        Start Game
       </button>
     </div>
   ),
@@ -406,21 +373,17 @@ export const ComparisonStates: Story = {
     options: [],
   },
   render: () => (
-    <div className="space-y-4 w-80 p-6 bg-[#0B0E14] rounded-xl">
+    <div className="space-y-4 w-80 p-6 bg-skin-primary rounded-xl border border-skin-default">
       <Select label="Normal" options={difficultyOptions} placeholder="Select..." />
       <Select label="With Value" options={difficultyOptions} value="journeyman" />
       <Select
         label="With Helper"
         options={difficultyOptions}
         value="master"
-        helperText="This affects experiment challenge"
+        helperText="This affects game difficulty"
       />
-      <Select
-        label="With Error"
-        options={difficultyOptions}
-        error="Selection is required by the Council"
-      />
-      <Select label="Sealed" options={difficultyOptions} value="apprentice" disabled />
+      <Select label="With Error" options={difficultyOptions} error="Selection is required" />
+      <Select label="Disabled" options={difficultyOptions} value="apprentice" disabled />
     </div>
   ),
 };
@@ -434,46 +397,26 @@ export const ElementSelector: Story = {
     options: [],
   },
   render: () => (
-    <div
-      className="p-6 rounded-xl"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-lg font-bold mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#E8E4DC',
-        }}
-      >
-        Choose Your Element
-      </h3>
+    <div className="p-6 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="text-lg font-bold mb-4 text-skin-primary">Choose Your Element</h3>
 
       <div className="grid grid-cols-2 gap-4">
         <Select
           label="Primary"
           options={elementOptions}
           value="fire"
-          leftIcon={<span style={{ color: '#EF4444' }}>△</span>}
+          leftIcon={<span className="text-red-500">△</span>}
         />
         <Select
           label="Secondary"
           options={elementOptions}
           placeholder="Optional"
-          leftIcon={<span style={{ color: '#3B82F6' }}>▽</span>}
+          leftIcon={<span className="text-blue-500">▽</span>}
         />
       </div>
 
-      <p
-        className="text-sm mt-4 italic"
-        style={{
-          fontFamily: '"Cormorant Garamond", Georgia, serif',
-          color: '#6B7280',
-        }}
-      >
-        Your elemental affinity shapes your transmutation abilities.
+      <p className="text-sm mt-4 italic text-skin-muted">
+        Your selection affects gameplay strategy.
       </p>
     </div>
   ),

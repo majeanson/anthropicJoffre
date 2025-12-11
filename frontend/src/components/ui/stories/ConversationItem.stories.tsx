@@ -1,6 +1,8 @@
 /**
  * ConversationItem Component Stories
- * Sprint 20 - Storybook Integration
+ *
+ * Conversation list items for direct messages.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -11,6 +13,23 @@ const meta = {
   component: ConversationItem,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+# Conversation Item Component
+
+List items for conversation/DM lists. Adapts to the selected skin theme.
+
+## Features
+- **Selection state**: Highlighted when active
+- **Unread count**: Badge for unread messages
+- **Timestamp**: Relative time display
+- **Truncation**: Long messages are truncated
+
+Use the skin selector in the toolbar to see how conversations adapt to different themes.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
@@ -93,9 +112,9 @@ export const ConversationListExample: Story = {
     onClick: () => console.log('Clicked'),
   },
   render: () => (
-    <div className="max-w-md bg-gray-900 rounded-lg overflow-hidden">
-      <div className="p-4 border-b border-gray-700">
-        <h3 className="text-white font-bold">Messages</h3>
+    <div className="max-w-md rounded-lg overflow-hidden bg-skin-secondary border border-skin-default">
+      <div className="p-4 border-b border-skin-subtle">
+        <h3 className="text-skin-primary font-bold">Messages</h3>
       </div>
       <ConversationItem
         username="JohnDoe"

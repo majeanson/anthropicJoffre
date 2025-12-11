@@ -245,8 +245,8 @@ export const AllStreakLevels: Story = {
     },
   },
   render: () => (
-    <div className="flex flex-col gap-4 p-8 bg-gray-900 rounded-lg">
-      <h3 className="text-white text-xl font-bold mb-2">Streak Progression</h3>
+    <div className="flex flex-col gap-4 p-8 bg-skin-primary rounded-lg">
+      <h3 className="text-skin-primary text-xl font-bold mb-2">Streak Progression</h3>
       <div className="grid grid-cols-2 gap-4">
         <LoginStreakBadgeDisplay
           streak={{
@@ -332,7 +332,7 @@ export const Interactive: Story = {
     const [freezeAvailable, setFreezeAvailable] = useState(true);
 
     return (
-      <div className="flex flex-col gap-4 p-8 bg-gray-900 rounded-lg">
+      <div className="flex flex-col gap-4 p-8 bg-skin-primary rounded-lg">
         <LoginStreakBadgeDisplay
           streak={{
             currentStreak,
@@ -347,7 +347,7 @@ export const Interactive: Story = {
 
         <div className="space-y-3 mt-4">
           <div>
-            <label className="text-white text-sm block mb-2">Streak Days: {currentStreak}</label>
+            <label className="text-skin-primary text-sm block mb-2">Streak Days: {currentStreak}</label>
             <input
               type="range"
               min="0"
@@ -364,13 +364,13 @@ export const Interactive: Story = {
                 setShowNotification(true);
                 setTimeout(() => setShowNotification(false), 3000);
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-500/30 text-blue-300 border border-blue-500/50 rounded hover:bg-blue-500/40"
             >
               Show Freeze Notification
             </button>
             <button
               onClick={() => setFreezeAvailable(!freezeAvailable)}
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+              className="px-4 py-2 bg-purple-500/30 text-purple-300 border border-purple-500/50 rounded hover:bg-purple-500/40"
             >
               Toggle Freeze: {freezeAvailable ? 'Available' : 'Used'}
             </button>

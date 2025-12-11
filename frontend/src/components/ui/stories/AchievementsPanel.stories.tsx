@@ -1,6 +1,8 @@
 /**
  * AchievementsPanel Stories
- * Storybook stories for the AchievementsPanel and AchievementCard components
+ *
+ * Achievement cards with tier indicators and progress tracking.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -38,18 +40,17 @@ const meta: Meta<typeof AchievementCard> = {
     docs: {
       description: {
         component: `
-The AchievementCard displays a single achievement with progress.
+# Achievement Card Component
 
-**Features:**
-- Different tier colors (bronze, silver, gold, platinum)
-- Locked/unlocked states
-- Progress bar for incremental achievements
-- Secret achievement masking
+Displays a single achievement with progress. Adapts to the selected skin theme.
 
-**Light/Dark Mode:**
-- Locked achievements use light gray background in light mode
-- Text colors adapt to background for readability
-- Unlocked achievements use vibrant gradient backgrounds
+## Features
+- **4 tiers**: Bronze, Silver, Gold, Platinum
+- **Locked/unlocked states**: Visual differentiation
+- **Progress bar**: For incremental achievements
+- **Secret masking**: Hidden achievements until unlocked
+
+Use the skin selector in the toolbar to see how achievements adapt to different themes.
         `,
       },
     },
@@ -57,7 +58,7 @@ The AchievementCard displays a single achievement with progress.
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <div className="w-80 p-4 bg-gray-200 dark:bg-gray-900">
+      <div className="w-80 p-4 rounded-xl bg-skin-primary border border-skin-default">
         <Story />
       </div>
     ),
@@ -262,156 +263,119 @@ export const LargeSize: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="w-96 p-4 bg-gray-200 dark:bg-gray-900">
+      <div className="w-96 p-4 rounded-xl bg-skin-primary border border-skin-default">
         <Story />
       </div>
     ),
   ],
 };
 
-/**
- * Dark mode - locked
- */
-export const DarkModeLocked: Story = {
-  args: {
-    achievement: createMockAchievement({
-      tier: 'silver',
-      is_unlocked: false,
-    }),
-    size: 'medium',
-  },
-  decorators: [
-    (Story) => (
-      <div className="dark w-80 p-4 bg-gray-900">
-        <Story />
-      </div>
-    ),
-  ],
-};
+// ============================================================================
+// ALL TIERS SHOWCASE
+// ============================================================================
 
-/**
- * Dark mode - unlocked
- */
-export const DarkModeUnlocked: Story = {
-  args: {
-    achievement: createMockAchievement({
-      tier: 'gold',
-      is_unlocked: true,
-      unlocked_at: new Date('2025-01-15'),
-    }),
-    size: 'medium',
-  },
-  decorators: [
-    (Story) => (
-      <div className="dark w-80 p-4 bg-gray-900">
-        <Story />
-      </div>
-    ),
-  ],
-};
-
-/**
- * All tiers comparison - light mode
- */
-export const AllTiersLight: Story = {
+export const AllTiersUnlocked: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
-      <AchievementCard
-        achievement={createMockAchievement({
-          tier: 'bronze',
-          is_unlocked: true,
-          achievement_name: 'Bronze Achievement',
-          icon: '🥉',
-        })}
-        size="medium"
-      />
-      <AchievementCard
-        achievement={createMockAchievement({
-          tier: 'silver',
-          is_unlocked: true,
-          achievement_name: 'Silver Achievement',
-          icon: '🥈',
-        })}
-        size="medium"
-      />
-      <AchievementCard
-        achievement={createMockAchievement({
-          tier: 'gold',
-          is_unlocked: true,
-          achievement_name: 'Gold Achievement',
-          icon: '🥇',
-        })}
-        size="medium"
-      />
-      <AchievementCard
-        achievement={createMockAchievement({
-          tier: 'platinum',
-          is_unlocked: true,
-          achievement_name: 'Platinum Achievement',
-          icon: '💎',
-        })}
-        size="medium"
-      />
+    <div className="p-6 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="text-lg uppercase tracking-wider mb-4 text-skin-accent">All Tiers - Unlocked</h3>
+      <div className="space-y-4 w-80">
+        <AchievementCard
+          achievement={createMockAchievement({
+            tier: 'bronze',
+            is_unlocked: true,
+            achievement_name: 'Bronze Achievement',
+            icon: '🥉',
+          })}
+          size="medium"
+        />
+        <AchievementCard
+          achievement={createMockAchievement({
+            tier: 'silver',
+            is_unlocked: true,
+            achievement_name: 'Silver Achievement',
+            icon: '🥈',
+          })}
+          size="medium"
+        />
+        <AchievementCard
+          achievement={createMockAchievement({
+            tier: 'gold',
+            is_unlocked: true,
+            achievement_name: 'Gold Achievement',
+            icon: '🥇',
+          })}
+          size="medium"
+        />
+        <AchievementCard
+          achievement={createMockAchievement({
+            tier: 'platinum',
+            is_unlocked: true,
+            achievement_name: 'Platinum Achievement',
+            icon: '💎',
+          })}
+          size="medium"
+        />
+      </div>
     </div>
   ),
-  decorators: [
-    (Story) => (
-      <div className="p-4 bg-gray-200">
-        <Story />
-      </div>
-    ),
-  ],
+  parameters: {
+    docs: {
+      description: {
+        story: 'All four achievement tiers in their unlocked state.',
+      },
+    },
+  },
 };
 
-/**
- * All tiers locked - light mode (tests readability)
- */
-export const AllTiersLockedLight: Story = {
+export const AllTiersLocked: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
-      <AchievementCard
-        achievement={createMockAchievement({
-          tier: 'bronze',
-          is_unlocked: false,
-          achievement_name: 'Bronze Achievement',
-          icon: '🥉',
-        })}
-        size="medium"
-      />
-      <AchievementCard
-        achievement={createMockAchievement({
-          tier: 'silver',
-          is_unlocked: false,
-          achievement_name: 'Silver Achievement',
-          icon: '🥈',
-        })}
-        size="medium"
-      />
-      <AchievementCard
-        achievement={createMockAchievement({
-          tier: 'gold',
-          is_unlocked: false,
-          achievement_name: 'Gold Achievement',
-          icon: '🥇',
-        })}
-        size="medium"
-      />
-      <AchievementCard
-        achievement={createMockAchievement({
-          tier: 'platinum',
-          is_unlocked: false,
-          achievement_name: 'Platinum Achievement',
-          icon: '💎',
-        })}
-        size="medium"
-      />
+    <div className="p-6 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="text-lg uppercase tracking-wider mb-4 text-skin-accent">All Tiers - Locked</h3>
+      <div className="space-y-4 w-80">
+        <AchievementCard
+          achievement={createMockAchievement({
+            tier: 'bronze',
+            is_unlocked: false,
+            achievement_name: 'Bronze Achievement',
+            icon: '🥉',
+          })}
+          size="medium"
+        />
+        <AchievementCard
+          achievement={createMockAchievement({
+            tier: 'silver',
+            is_unlocked: false,
+            achievement_name: 'Silver Achievement',
+            icon: '🥈',
+          })}
+          size="medium"
+        />
+        <AchievementCard
+          achievement={createMockAchievement({
+            tier: 'gold',
+            is_unlocked: false,
+            achievement_name: 'Gold Achievement',
+            icon: '🥇',
+          })}
+          size="medium"
+        />
+        <AchievementCard
+          achievement={createMockAchievement({
+            tier: 'platinum',
+            is_unlocked: false,
+            achievement_name: 'Platinum Achievement',
+            icon: '💎',
+          })}
+          size="medium"
+        />
+      </div>
     </div>
   ),
-  decorators: [
-    (Story) => (
-      <div className="p-4 bg-gray-200">
-        <Story />
-      </div>
-    ),
-  ],
+  parameters: {
+    docs: {
+      description: {
+        story: 'All four achievement tiers in their locked state.',
+      },
+    },
+  },
 };

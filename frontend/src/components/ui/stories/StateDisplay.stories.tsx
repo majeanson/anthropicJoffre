@@ -76,7 +76,7 @@ export const WhiteOnDark: LoadingStory = {
   },
   decorators: [
     (Story) => (
-      <div className="bg-gray-800 p-8 rounded-lg">
+      <div className="bg-skin-tertiary p-8 rounded-lg">
         <Story />
       </div>
     ),
@@ -243,9 +243,9 @@ export const DataStateWithData: LoadingStory = {
       }}
     >
       <div className="space-y-2">
-        <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded">Game 1</div>
-        <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded">Game 2</div>
-        <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded">Game 3</div>
+        <div className="p-3 bg-skin-secondary rounded">Game 1</div>
+        <div className="p-3 bg-skin-secondary rounded">Game 2</div>
+        <div className="p-3 bg-skin-secondary rounded">Game 3</div>
       </div>
     </DataState>
   ),
@@ -265,31 +265,31 @@ export const InteractiveDemo: LoadingStory = {
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setState('loading')}
-            className={`px-3 py-1 rounded ${state === 'loading' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-3 py-1 rounded ${state === 'loading' ? 'bg-blue-500/40 text-blue-300 border border-blue-500/50' : 'bg-skin-secondary text-skin-primary'}`}
           >
             Loading
           </button>
           <button
             onClick={() => setState('empty')}
-            className={`px-3 py-1 rounded ${state === 'empty' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-3 py-1 rounded ${state === 'empty' ? 'bg-blue-500/40 text-blue-300 border border-blue-500/50' : 'bg-skin-secondary text-skin-primary'}`}
           >
             Empty
           </button>
           <button
             onClick={() => setState('error')}
-            className={`px-3 py-1 rounded ${state === 'error' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-3 py-1 rounded ${state === 'error' ? 'bg-blue-500/40 text-blue-300 border border-blue-500/50' : 'bg-skin-secondary text-skin-primary'}`}
           >
             Error
           </button>
           <button
             onClick={() => setState('data')}
-            className={`px-3 py-1 rounded ${state === 'data' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-3 py-1 rounded ${state === 'data' ? 'bg-blue-500/40 text-blue-300 border border-blue-500/50' : 'bg-skin-secondary text-skin-primary'}`}
           >
             Data
           </button>
         </div>
 
-        <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 min-h-[200px]">
+        <div className="border-2 border-skin-default rounded-lg p-4 min-h-[200px]">
           <DataState
             data={state === 'data' ? mockData : state === 'empty' ? [] : null}
             isLoading={state === 'loading'}
@@ -306,7 +306,7 @@ export const InteractiveDemo: LoadingStory = {
               {mockData.map((item, i) => (
                 <div
                   key={i}
-                  className="p-3 bg-green-100 dark:bg-green-900/30 rounded border border-green-300 dark:border-green-700"
+                  className="p-3 bg-green-500/20 rounded border border-green-500/30"
                 >
                   ✅ {item}
                 </div>
@@ -327,22 +327,22 @@ export const AllStatesShowcase: LoadingStory = {
   render: () => (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">Loading States</h3>
+        <h3 className="text-lg font-bold text-skin-primary mb-3">Loading States</h3>
         <div className="grid grid-cols-3 gap-4">
-          <div className="border rounded-lg p-4">
+          <div className="border border-skin-default rounded-lg p-4">
             <LoadingState size="sm" message="Small" />
           </div>
-          <div className="border rounded-lg p-4">
+          <div className="border border-skin-default rounded-lg p-4">
             <LoadingState size="md" message="Medium" />
           </div>
-          <div className="border rounded-lg p-4">
+          <div className="border border-skin-default rounded-lg p-4">
             <LoadingState size="lg" message="Large" />
           </div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">Empty States</h3>
+        <h3 className="text-lg font-bold text-skin-primary mb-3">Empty States</h3>
         <div className="grid grid-cols-2 gap-4">
           <EmptyState
             icon="🎮"
@@ -363,7 +363,7 @@ export const AllStatesShowcase: LoadingStory = {
       </div>
 
       <div>
-        <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">Error States</h3>
+        <h3 className="text-lg font-bold text-skin-primary mb-3">Error States</h3>
         <div className="space-y-3">
           <ErrorState message="Simple error message" />
           <ErrorState message="Error with retry option" onRetry={() => {}} />

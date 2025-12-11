@@ -1,5 +1,8 @@
 /**
  * UISlider Component Stories
+ *
+ * Range sliders with multiple sizes and colors.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -11,6 +14,23 @@ const meta: Meta<typeof UISlider> = {
   component: UISlider,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+# UI Slider Component
+
+Range slider with multiple sizes and colors. Adapts to the selected skin theme.
+
+## Features
+- **3 sizes**: Small, medium, large
+- **4 colors**: Amber, blue, green, purple
+- **Custom ranges**: min, max, step support
+- **Field variant**: With label and value display
+
+Use the skin selector in the toolbar to see how sliders adapt to different themes.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
 };
@@ -42,7 +62,7 @@ function SliderWrapper(props: {
         disabled={props.disabled}
         label={props.label}
       />
-      <p className="text-center mt-2 text-sm text-gray-600">{value}</p>
+      <p className="text-center mt-2 text-sm text-skin-muted">{value}</p>
     </div>
   );
 }
@@ -90,17 +110,17 @@ export const AllSizes: StoryObj = {
     const [lg, setLg] = useState(50);
 
     return (
-      <div className="w-64 space-y-6">
+      <div className="w-64 space-y-6 p-4 rounded-lg bg-skin-primary">
         <div>
-          <p className="text-xs text-gray-500 mb-1">Small</p>
+          <p className="text-xs text-skin-muted mb-1">Small</p>
           <UISlider value={sm} onChange={setSm} size="sm" label="Small" />
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Medium</p>
+          <p className="text-xs text-skin-muted mb-1">Medium</p>
           <UISlider value={md} onChange={setMd} size="md" label="Medium" />
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Large</p>
+          <p className="text-xs text-skin-muted mb-1">Large</p>
           <UISlider value={lg} onChange={setLg} size="lg" label="Large" />
         </div>
       </div>
@@ -116,21 +136,21 @@ export const AllColors: StoryObj = {
     const [purple, setPurple] = useState(75);
 
     return (
-      <div className="w-64 space-y-4">
+      <div className="w-64 space-y-4 p-4 rounded-lg bg-skin-primary">
         <div>
-          <p className="text-xs text-gray-500 mb-1">Amber</p>
+          <p className="text-xs text-skin-muted mb-1">Amber</p>
           <UISlider value={amber} onChange={setAmber} color="amber" label="Amber" />
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Blue</p>
+          <p className="text-xs text-skin-muted mb-1">Blue</p>
           <UISlider value={blue} onChange={setBlue} color="blue" label="Blue" />
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Green</p>
+          <p className="text-xs text-skin-muted mb-1">Green</p>
           <UISlider value={green} onChange={setGreen} color="green" label="Green" />
         </div>
         <div>
-          <p className="text-xs text-gray-500 mb-1">Purple</p>
+          <p className="text-xs text-skin-muted mb-1">Purple</p>
           <UISlider value={purple} onChange={setPurple} color="purple" label="Purple" />
         </div>
       </div>
@@ -143,7 +163,7 @@ export const SliderField: StoryObj = {
     const [value, setValue] = useState(50);
 
     return (
-      <div className="w-64 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <div className="w-64 p-4 rounded-lg bg-skin-secondary border border-skin-default">
         <UISliderField
           value={value}
           onChange={setValue}
@@ -160,7 +180,7 @@ export const SliderFieldValueBelow: StoryObj = {
     const [value, setValue] = useState(75);
 
     return (
-      <div className="w-64 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <div className="w-64 p-4 rounded-lg bg-skin-secondary border border-skin-default">
         <UISliderField
           value={value}
           onChange={setValue}
@@ -178,7 +198,7 @@ export const SliderFieldNoLabel: StoryObj = {
     const [value, setValue] = useState(30);
 
     return (
-      <div className="w-64 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <div className="w-64 p-4 rounded-lg bg-skin-secondary border border-skin-default">
         <UISliderField
           value={value}
           onChange={setValue}
@@ -195,7 +215,7 @@ export const CustomRange: StoryObj = {
     const [betAmount, setBetAmount] = useState(7);
 
     return (
-      <div className="w-64 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <div className="w-64 p-4 rounded-lg bg-skin-secondary border border-skin-default">
         <UISliderField
           value={betAmount}
           onChange={setBetAmount}
@@ -216,7 +236,7 @@ export const DecimalStep: StoryObj = {
     const [value, setValue] = useState(1.5);
 
     return (
-      <div className="w-64 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <div className="w-64 p-4 rounded-lg bg-skin-secondary border border-skin-default">
         <UISliderField
           value={value}
           onChange={setValue}
@@ -239,8 +259,8 @@ export const SettingsPanelExample: StoryObj = {
     const [gameSpeed, setGameSpeed] = useState(1.0);
 
     return (
-      <div className="w-80 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg space-y-6">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">Audio & Display</h3>
+      <div className="w-80 p-6 rounded-lg shadow-lg space-y-6 bg-skin-secondary border border-skin-default">
+        <h3 className="text-lg font-bold text-skin-primary">Audio & Display</h3>
 
         <UISliderField
           value={volume}
@@ -279,7 +299,7 @@ export const InteractiveDemo: StoryObj = {
 
     return (
       <div className="flex flex-col items-center gap-6 w-80">
-        <div className="w-full p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+        <div className="w-full p-4 rounded-lg bg-skin-secondary border border-skin-default">
           <UISliderField
             value={value}
             onChange={setValue}
@@ -290,13 +310,13 @@ export const InteractiveDemo: StoryObj = {
         </div>
 
         <div className="text-center">
-          <p className="text-4xl font-bold text-purple-600 dark:text-purple-400 tabular-nums">
+          <p className="text-4xl font-bold text-purple-600 tabular-nums">
             {value}%
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Current Value</p>
+          <p className="text-sm text-skin-muted mt-1">Current Value</p>
         </div>
 
-        <div className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className="w-full h-4 rounded-full overflow-hidden bg-skin-tertiary">
           <div
             className="h-full bg-purple-500 transition-all duration-200"
             style={{ width: `${value}%` }}

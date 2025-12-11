@@ -87,8 +87,8 @@ const mockHand = [
 export const TeamScoresSection: Story = {
   name: 'Team Scores Display',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[700px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold text-center mb-6 text-2xl">
+    <div className="p-6 rounded-lg bg-skin-primary w-[700px]">
+      <h3 className="text-skin-primary font-semibold text-center mb-6 text-2xl">
         Round 3 Complete
       </h3>
 
@@ -99,18 +99,18 @@ export const TeamScoresSection: Story = {
           gradient="team1"
           className="border-4 border-orange-400 shadow-lg"
         >
-          <h3 className="font-bold text-xl text-orange-600 dark:text-orange-400 mb-2">Team 1</h3>
+          <h3 className="font-bold text-xl text-orange-400 mb-2">Team 1</h3>
 
           <div className="mb-3">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
-            <div className="text-6xl font-black text-orange-700 dark:text-orange-300">+9</div>
+            <div className="text-sm text-skin-muted mb-1">This Round</div>
+            <div className="text-6xl font-black text-orange-400">+9</div>
           </div>
 
-          <div className="text-base font-semibold text-green-600 dark:text-green-400 mb-2">
+          <div className="text-base font-semibold text-green-400 mb-2">
             ✓ Made bet!
           </div>
 
-          <div className="text-lg text-gray-700 dark:text-gray-300 pt-3 border-t-2 border-orange-200 dark:border-gray-600">
+          <div className="text-lg text-skin-secondary pt-3 border-t-2 border-orange-500/30">
             Total Score: <span className="font-bold">24</span>
           </div>
         </UICard>
@@ -119,16 +119,16 @@ export const TeamScoresSection: Story = {
         <UICard
           variant="bordered"
           gradient="team2"
-          className="border-4 border-purple-200 dark:border-gray-700"
+          className="border-4 border-purple-500/50"
         >
-          <h3 className="font-bold text-xl text-purple-600 dark:text-purple-400 mb-2">Team 2</h3>
+          <h3 className="font-bold text-xl text-purple-400 mb-2">Team 2</h3>
 
           <div className="mb-3">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
-            <div className="text-6xl font-black text-purple-700 dark:text-purple-300">-7</div>
+            <div className="text-sm text-skin-muted mb-1">This Round</div>
+            <div className="text-6xl font-black text-purple-400">-7</div>
           </div>
 
-          <div className="text-lg text-gray-700 dark:text-gray-300 pt-3 mt-8 border-t-2 border-purple-200 dark:border-gray-600">
+          <div className="text-lg text-skin-secondary pt-3 mt-8 border-t-2 border-purple-500/30">
             Total Score: <span className="font-bold">15</span>
           </div>
         </UICard>
@@ -144,24 +144,24 @@ export const TeamScoresSection: Story = {
 export const BetResults: Story = {
   name: 'Bet Made vs Missed',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[600px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Bet Outcomes</h3>
+    <div className="p-6 rounded-lg bg-skin-primary w-[600px]">
+      <h3 className="text-skin-primary font-semibold mb-4">Bet Outcomes</h3>
 
       <div className="grid grid-cols-2 gap-4">
         {/* Made Bet */}
         <UICard variant="bordered" gradient="team1" className="border-4 border-orange-400">
-          <h4 className="font-bold text-lg text-orange-600 mb-2">Team 1</h4>
-          <div className="text-5xl font-black text-orange-700 mb-3">+10</div>
-          <div className="text-base font-semibold text-green-600">✓ Made bet!</div>
-          <p className="text-sm text-gray-600 mt-2">Bet 8, earned 10 points</p>
+          <h4 className="font-bold text-lg text-orange-400 mb-2">Team 1</h4>
+          <div className="text-5xl font-black text-orange-400 mb-3">+10</div>
+          <div className="text-base font-semibold text-green-400">✓ Made bet!</div>
+          <p className="text-sm text-skin-muted mt-2">Bet 8, earned 10 points</p>
         </UICard>
 
         {/* Missed Bet */}
         <UICard variant="bordered" gradient="team2" className="border-4 border-purple-400">
-          <h4 className="font-bold text-lg text-purple-600 mb-2">Team 2</h4>
-          <div className="text-5xl font-black text-purple-700 mb-3">-8</div>
-          <div className="text-base font-semibold text-red-600">✗ Missed bet</div>
-          <p className="text-sm text-gray-600 mt-2">Bet 9, only earned 6 points</p>
+          <h4 className="font-bold text-lg text-purple-400 mb-2">Team 2</h4>
+          <div className="text-5xl font-black text-purple-400 mb-3">-8</div>
+          <div className="text-base font-semibold text-red-400">✗ Missed bet</div>
+          <p className="text-sm text-skin-muted mt-2">Bet 9, only earned 6 points</p>
         </UICard>
       </div>
     </div>
@@ -182,25 +182,25 @@ export const RoundHighlights: Story = {
     ];
 
     return (
-      <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[700px]">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">⭐ Round Highlights</h3>
+      <div className="p-6 rounded-lg bg-skin-primary w-[700px]">
+        <h3 className="text-skin-primary font-semibold mb-4">⭐ Round Highlights</h3>
 
         <div className="grid grid-cols-3 gap-3">
           {highlights.map((h, i) => (
             <UICard
               key={i}
               variant="bordered"
-              className="flex items-center gap-3 bg-amber-50 dark:bg-gray-700 border-2 border-amber-200 dark:border-gray-600 hover:scale-105 transition-transform"
+              className="flex items-center gap-3 bg-amber-500/10 border-2 border-amber-500/30 hover:scale-105 transition-transform"
             >
               <span className="text-3xl">{h.icon}</span>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">
+                <div className="text-xs font-medium text-amber-400 uppercase tracking-wide">
                   {h.title}
                 </div>
-                <div className="font-bold text-base text-gray-900 dark:text-white truncate">
+                <div className="font-bold text-base text-skin-primary truncate">
                   {h.player}
                 </div>
-                <div className="text-sm text-gray-700 dark:text-gray-300">{h.description}</div>
+                <div className="text-sm text-skin-secondary">{h.description}</div>
               </div>
             </UICard>
           ))}
@@ -237,20 +237,20 @@ export const AllStatTypes: Story = {
     ];
 
     return (
-      <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[700px]">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Performance Stats</h3>
+      <div className="p-6 rounded-lg bg-skin-primary w-[700px]">
+        <h3 className="text-skin-primary font-semibold mb-4">Performance Stats</h3>
         <div className="grid grid-cols-3 gap-2 mb-6">
           {performanceStats.map((s, i) => (
             <div
               key={i}
-              className="p-3 rounded-lg bg-[var(--color-bg-secondary)] flex items-center gap-2"
+              className="p-3 rounded-lg bg-skin-secondary flex items-center gap-2"
             >
               <span className="text-2xl">{s.icon}</span>
               <div>
-                <div className="text-xs font-medium text-[var(--color-text-secondary)]">
+                <div className="text-xs font-medium text-skin-secondary">
                   {s.title}
                 </div>
-                <div className="text-sm font-bold text-[var(--color-text-primary)]">
+                <div className="text-sm font-bold text-skin-primary">
                   {s.description}
                 </div>
               </div>
@@ -258,19 +258,19 @@ export const AllStatTypes: Story = {
           ))}
         </div>
 
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Hand-Based Stats</h3>
+        <h3 className="text-skin-primary font-semibold mb-4">Hand-Based Stats</h3>
         <div className="grid grid-cols-3 gap-2">
           {handStats.map((s, i) => (
             <div
               key={i}
-              className="p-3 rounded-lg bg-[var(--color-bg-secondary)] flex items-center gap-2"
+              className="p-3 rounded-lg bg-skin-secondary flex items-center gap-2"
             >
               <span className="text-2xl">{s.icon}</span>
               <div>
-                <div className="text-xs font-medium text-[var(--color-text-secondary)]">
+                <div className="text-xs font-medium text-skin-secondary">
                   {s.title}
                 </div>
-                <div className="text-sm font-bold text-[var(--color-text-primary)]">
+                <div className="text-sm font-bold text-skin-primary">
                   {s.description}
                 </div>
               </div>
@@ -297,30 +297,30 @@ export const PlayerPerformanceTable: Story = {
     ];
 
     return (
-      <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[600px]">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+      <div className="p-6 rounded-lg bg-skin-primary w-[600px]">
+        <h3 className="text-skin-primary font-semibold mb-4">
           📊 Player Performance
         </h3>
 
         <UICard variant="bordered" className="overflow-hidden">
           <table className="w-full">
-            <thead className="bg-amber-100 dark:bg-gray-700">
+            <thead className="bg-amber-500/20">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-bold text-amber-900 dark:text-amber-300 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-bold text-amber-400 uppercase">
                   Player
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase">
+                <th className="px-4 py-3 text-center text-xs font-bold text-amber-400 uppercase">
                   Tricks
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase">
+                <th className="px-4 py-3 text-center text-xs font-bold text-amber-400 uppercase">
                   Points
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-amber-100 dark:divide-gray-700">
+            <tbody className="divide-y divide-skin-subtle">
               {players.map((p) => (
-                <tr key={p.name} className="hover:bg-amber-50 dark:hover:bg-gray-700/50">
-                  <td className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <tr key={p.name} className="hover:bg-skin-tertiary">
+                  <td className="px-4 py-3 text-sm font-semibold text-skin-primary">
                     <div className="flex items-center gap-2">
                       <TeamIndicator teamId={p.teamId as 1 | 2} size="sm" />
                       <span>{p.name}</span>
@@ -330,7 +330,7 @@ export const PlayerPerformanceTable: Story = {
                           title="Red 0 collected"
                         >
                           <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                          <span className="font-bold text-green-600">×{p.redZeros}</span>
+                          <span className="font-bold text-green-400">×{p.redZeros}</span>
                         </span>
                       )}
                       {p.brownZeros > 0 && (
@@ -338,16 +338,16 @@ export const PlayerPerformanceTable: Story = {
                           className="inline-flex items-center gap-1 text-xs"
                           title="Brown 0 received"
                         >
-                          <span className="w-2 h-2 rounded-full bg-amber-800"></span>
-                          <span className="font-bold text-red-600">×{p.brownZeros}</span>
+                          <span className="w-2 h-2 rounded-full bg-amber-700"></span>
+                          <span className="font-bold text-red-400">×{p.brownZeros}</span>
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-center font-medium text-gray-800 dark:text-gray-200">
+                  <td className="px-4 py-3 text-sm text-center font-medium text-skin-secondary">
                     {p.tricks}
                   </td>
-                  <td className="px-4 py-3 text-sm text-center font-bold text-gray-900 dark:text-gray-100">
+                  <td className="px-4 py-3 text-sm text-center font-bold text-skin-primary">
                     {p.points}
                   </td>
                 </tr>
@@ -375,8 +375,8 @@ export const ReadyStatus: Story = {
     ];
 
     return (
-      <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px]">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4 text-center">
+      <div className="p-6 rounded-lg bg-skin-primary w-[500px]">
+        <h3 className="text-skin-primary font-semibold mb-4 text-center">
           👥 Ready Status
         </h3>
 
@@ -388,17 +388,17 @@ export const ReadyStatus: Story = {
               size="sm"
               className={`transition-all ${
                 p.isReady
-                  ? 'bg-green-50 dark:bg-green-900/20 border-green-400'
-                  : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+                  ? 'bg-green-500/10 border-green-500/50'
+                  : 'bg-skin-secondary border-skin-default'
               }`}
             >
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{p.isReady ? '✓' : '⏳'}</span>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
+                  <div className="font-semibold text-sm text-skin-primary truncate">
                     {p.name}
                   </div>
-                  <div className={`text-xs ${p.isReady ? 'text-green-600' : 'text-gray-500'}`}>
+                  <div className={`text-xs ${p.isReady ? 'text-green-400' : 'text-skin-muted'}`}>
                     {p.isReady ? 'Ready' : 'Waiting...'}
                   </div>
                 </div>
@@ -422,7 +422,7 @@ export const ReadyStatus: Story = {
 export const LoadingState: Story = {
   name: 'Loading State',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[400px]">
+    <div className="p-6 rounded-lg bg-skin-primary w-[400px]">
       <div className="flex flex-col items-center justify-center py-16">
         <div className="flex gap-2 mb-4">
           <div
@@ -442,7 +442,7 @@ export const LoadingState: Story = {
             style={{ animationDelay: '0.3s' }}
           ></div>
         </div>
-        <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
+        <p className="text-center text-lg font-semibold text-skin-secondary animate-pulse">
           Calculating round results...
         </p>
       </div>
@@ -457,29 +457,29 @@ export const LoadingState: Story = {
 export const FullLayout: Story = {
   name: 'Full Round Summary Layout',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[800px] max-h-[600px] overflow-y-auto">
+    <div className="p-6 rounded-lg bg-skin-primary w-[800px] max-h-[600px] overflow-y-auto">
       {/* Header */}
-      <h2 className="text-3xl font-black text-center mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+      <h2 className="text-3xl font-black text-center mb-6 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
         Round 3 Complete
       </h2>
 
       {/* Team Scores */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <UICard variant="bordered" gradient="team1" className="border-4 border-orange-400">
-          <h3 className="font-bold text-xl text-orange-600 mb-2">Team 1</h3>
-          <div className="text-5xl font-black text-orange-700">+9</div>
-          <div className="text-green-600 font-semibold mt-2">✓ Made bet!</div>
-          <div className="text-gray-600 mt-3 pt-3 border-t border-orange-200">Total: 24</div>
+          <h3 className="font-bold text-xl text-orange-400 mb-2">Team 1</h3>
+          <div className="text-5xl font-black text-orange-400">+9</div>
+          <div className="text-green-400 font-semibold mt-2">✓ Made bet!</div>
+          <div className="text-skin-muted mt-3 pt-3 border-t border-orange-500/30">Total: 24</div>
         </UICard>
-        <UICard variant="bordered" gradient="team2" className="border-4 border-purple-200">
-          <h3 className="font-bold text-xl text-purple-600 mb-2">Team 2</h3>
-          <div className="text-5xl font-black text-purple-700">-7</div>
-          <div className="text-gray-600 mt-9 pt-3 border-t border-purple-200">Total: 15</div>
+        <UICard variant="bordered" gradient="team2" className="border-4 border-purple-500/50">
+          <h3 className="font-bold text-xl text-purple-400 mb-2">Team 2</h3>
+          <div className="text-5xl font-black text-purple-400">-7</div>
+          <div className="text-skin-muted mt-9 pt-3 border-t border-purple-500/30">Total: 15</div>
         </UICard>
       </div>
 
       {/* Highlights */}
-      <h3 className="font-bold text-lg mb-3">⭐ Round Highlights</h3>
+      <h3 className="font-bold text-lg mb-3 text-skin-primary">⭐ Round Highlights</h3>
       <div className="grid grid-cols-3 gap-3 mb-6">
         {[
           { icon: '🎯', title: 'Perfect Bet', player: 'Alice', desc: 'Exact 9' },
@@ -489,13 +489,13 @@ export const FullLayout: Story = {
           <UICard
             key={i}
             variant="bordered"
-            className="flex items-center gap-3 bg-amber-50 dark:bg-gray-700 border-amber-200"
+            className="flex items-center gap-3 bg-amber-500/10 border-amber-500/30"
           >
             <span className="text-3xl">{h.icon}</span>
             <div>
-              <div className="text-xs font-medium text-amber-700">{h.title}</div>
-              <div className="font-bold">{h.player}</div>
-              <div className="text-sm text-gray-600">{h.desc}</div>
+              <div className="text-xs font-medium text-amber-400">{h.title}</div>
+              <div className="font-bold text-skin-primary">{h.player}</div>
+              <div className="text-sm text-skin-muted">{h.desc}</div>
             </div>
           </UICard>
         ))}

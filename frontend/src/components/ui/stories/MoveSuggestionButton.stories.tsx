@@ -174,7 +174,7 @@ export const AllPositions: Story = {
   render: () => (
     <div className="grid grid-cols-2 gap-20 p-10">
       <div className="flex flex-col items-center gap-2">
-        <span className="text-sm text-gray-500">Top</span>
+        <span className="text-sm text-skin-muted">Top</span>
         <InteractiveMoveSuggestion
           suggestion="Position: Top"
           details="Tooltip appears above the button"
@@ -183,7 +183,7 @@ export const AllPositions: Story = {
         />
       </div>
       <div className="flex flex-col items-center gap-2">
-        <span className="text-sm text-gray-500">Bottom</span>
+        <span className="text-sm text-skin-muted">Bottom</span>
         <InteractiveMoveSuggestion
           suggestion="Position: Bottom"
           details="Tooltip appears below the button"
@@ -192,7 +192,7 @@ export const AllPositions: Story = {
         />
       </div>
       <div className="flex flex-col items-center gap-2">
-        <span className="text-sm text-gray-500">Left</span>
+        <span className="text-sm text-skin-muted">Left</span>
         <InteractiveMoveSuggestion
           suggestion="Position: Left"
           details="Tooltip appears to the left"
@@ -201,7 +201,7 @@ export const AllPositions: Story = {
         />
       </div>
       <div className="flex flex-col items-center gap-2">
-        <span className="text-sm text-gray-500">Right</span>
+        <span className="text-sm text-skin-muted">Right</span>
         <InteractiveMoveSuggestion
           suggestion="Position: Right"
           details="Tooltip appears to the right"

@@ -1,3 +1,10 @@
+/**
+ * AchievementUnlocked Component Stories
+ *
+ * Achievement unlock celebration overlay with animations.
+ * Adapts to the currently selected skin theme.
+ */
+
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { AchievementUnlocked } from '../../AchievementUnlocked';
@@ -34,7 +41,7 @@ function InteractiveAchievement(props: { achievement: Achievement | null; autoSh
     <>
       <button
         onClick={() => setShowAchievement(true)}
-        className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+        className="px-4 py-2 rounded-lg font-medium transition-colors bg-skin-accent text-skin-on-accent hover:opacity-90"
       >
         Unlock Achievement
       </button>
@@ -51,19 +58,28 @@ const meta: Meta<typeof InteractiveAchievement> = {
   component: InteractiveAchievement,
   parameters: {
     layout: 'fullscreen',
-    backgrounds: {
-      default: 'game',
-      values: [
-        { name: 'game', value: '#2d4a2d' },
-        { name: 'light', value: '#f5f5f5' },
-        { name: 'dark', value: '#1a1a1a' },
-      ],
+    docs: {
+      description: {
+        component: `
+# Achievement Unlocked Component
+
+Celebration overlay when achievements are unlocked. Adapts to the selected skin theme.
+
+## Features
+- **Animated entrance**: Slide-in with particle effects
+- **Rarity styling**: Different colors for common, rare, epic, legendary
+- **Auto-dismiss**: Closes after a few seconds
+- **Interactive**: Click to dismiss early
+
+Use the skin selector in the toolbar to see how the overlay adapts to different themes.
+        `,
+      },
     },
   },
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <div className="min-h-[300px] relative p-8">
+      <div className="min-h-[300px] relative p-8 bg-skin-primary">
         <Story />
       </div>
     ),

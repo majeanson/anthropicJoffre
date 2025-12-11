@@ -1,8 +1,8 @@
 /**
- * Button Component Stories - Midnight Alchemy Edition
+ * Button Component Stories
  *
- * Showcases the mystical button system with ethereal glows,
- * mechanical press effects, and alchemical aesthetics.
+ * Showcases the button system with various variants, sizes, and effects.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -18,33 +18,25 @@ import {
 } from '../Button';
 
 const meta = {
-  title: 'Midnight Alchemy/Button',
+  title: 'UI/Button',
   component: Button,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Buttons
+# Button Component
 
-Mystical buttons with alchemical aesthetics - copper accents, ethereal glows, and brass mechanical textures.
+Versatile button system with multiple variants and effects. Automatically adapts to the selected skin theme.
 
 ## Features
 - **9 variants**: primary, secondary, success, warning, danger, ghost, link, elegant, arcane
 - **5 sizes**: xs, sm, md, lg, xl
-- **Mechanical press**: Steampunk-inspired depth effect
-- **Ethereal glow**: Pulsing copper/rose gold animation
-- **Alchemical shimmer**: Subtle light sweep on hover
+- **Mechanical press**: Arcade-style depth effect
+- **Ethereal glow**: Pulsing accent color animation
+- **Shimmer effect**: Subtle light sweep on hover
 
-## Typography
-Uses **Cinzel Decorative** for that mystical manuscript feel with wide letter-spacing.
+Use the skin selector in the toolbar to see how buttons adapt to different themes.
         `,
       },
     },
@@ -171,7 +163,7 @@ export const Arcane: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4 items-center p-6 bg-[#0B0E14] rounded-xl">
+    <div className="flex flex-wrap gap-4 items-center p-6 bg-skin-primary rounded-xl border border-skin-default">
       <Button variant="primary">Primary</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="success">Success</Button>
@@ -200,7 +192,7 @@ export const AllVariants: Story = {
 
 export const AllSizes: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4 items-end p-6 bg-[#0B0E14] rounded-xl">
+    <div className="flex flex-wrap gap-4 items-end p-6 bg-skin-primary rounded-xl border border-skin-default">
       <Button size="xs">Extra Small</Button>
       <Button size="sm">Small</Button>
       <Button size="md">Medium</Button>
@@ -251,9 +243,9 @@ export const EtherealGlow: Story = {
 // WITH ICONS (Alchemical Symbols)
 // ============================================================================
 
-export const WithAlchemicalSymbols: Story = {
+export const WithIcons: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4 items-center p-6 bg-[#0B0E14] rounded-xl">
+    <div className="flex flex-wrap gap-4 items-center p-6 bg-skin-primary rounded-xl border border-skin-default">
       <Button variant="primary" leftIcon={<span>△</span>}>
         Fire
       </Button>
@@ -302,7 +294,7 @@ export const Disabled: Story = {
 
 export const DisabledVariants: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4 items-center p-6 bg-[#0B0E14] rounded-xl">
+    <div className="flex flex-wrap gap-4 items-center p-6 bg-skin-primary rounded-xl border border-skin-default">
       <Button variant="primary" disabled>
         Primary
       </Button>
@@ -338,7 +330,7 @@ export const FullWidth: Story = {
 
 export const PresetButtons: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4 items-center p-6 bg-[#0B0E14] rounded-xl">
+    <div className="flex flex-wrap gap-4 items-center p-6 bg-skin-primary rounded-xl border border-skin-default">
       <PrimaryButton>Primary</PrimaryButton>
       <SecondaryButton>Secondary</SecondaryButton>
       <SuccessButton>Success</SuccessButton>
@@ -358,84 +350,60 @@ export const PresetButtons: Story = {
 };
 
 // ============================================================================
-// ALCHEMIST'S LABORATORY
+// GAME MENU EXAMPLE
 // ============================================================================
 
-export const AlchemistLaboratory: Story = {
+export const GameMenuExample: Story = {
   render: () => (
-    <div
-      className="p-8 rounded-xl space-y-6 min-w-96"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '2px solid #C17F59',
-        boxShadow: '0 0 50px rgba(193, 127, 89, 0.15), 0 8px 32px rgba(0, 0, 0, 0.5)',
-      }}
-    >
-      {/* Sacred geometry corners */}
+    <div className="p-8 rounded-xl space-y-6 min-w-96 bg-skin-secondary border-2 border-skin-accent shadow-lg">
+      {/* Decorative corners */}
       <div className="relative">
-        <div className="absolute -top-6 -left-6 w-4 h-4 border-l-2 border-t-2 border-[#C17F59] opacity-60" />
-        <div className="absolute -top-6 -right-6 w-4 h-4 border-r-2 border-t-2 border-[#C17F59] opacity-60" />
+        <div className="absolute -top-6 -left-6 w-4 h-4 border-l-2 border-t-2 border-skin-accent opacity-60" />
+        <div className="absolute -top-6 -right-6 w-4 h-4 border-r-2 border-t-2 border-skin-accent opacity-60" />
 
-        <h2
-          className="text-2xl text-center uppercase tracking-[0.2em] mb-2"
-          style={{
-            fontFamily: '"Cinzel Decorative", Georgia, serif',
-            color: '#D4A574',
-            textShadow: '0 0 20px rgba(212, 165, 116, 0.5)',
-          }}
-        >
-          The Alchemist's Study
+        <h2 className="text-2xl text-center uppercase tracking-[0.2em] mb-2 text-skin-accent">
+          Game Menu
         </h2>
-        <p
-          className="text-center text-sm italic opacity-70 mb-6"
-          style={{
-            fontFamily: '"Cormorant Garamond", Georgia, serif',
-            color: '#9CA3AF',
-          }}
-        >
-          Choose your path of transmutation
+        <p className="text-center text-sm italic opacity-70 mb-6 text-skin-secondary">
+          Choose your action
         </p>
       </div>
 
       <div className="space-y-3">
         <Button variant="primary" fullWidth arcade size="lg">
-          Quick Transmutation
+          Quick Play
         </Button>
         <Button variant="secondary" fullWidth size="lg">
-          Create Experiment
+          Create Game
         </Button>
         <Button variant="arcane" fullWidth size="lg" glow>
-          Join the Great Work
+          Join Ranked
         </Button>
       </div>
 
-      <div
-        className="flex gap-3 justify-center pt-6 mt-6"
-        style={{ borderTop: '1px solid #2D3548' }}
-      >
+      <div className="flex gap-3 justify-center pt-6 mt-6 border-t border-skin-subtle">
         <Button variant="ghost" size="sm">
-          Ancient Texts
+          Rules
         </Button>
         <Button variant="ghost" size="sm">
-          Ingredients
+          Settings
         </Button>
         <Button variant="link" size="sm">
-          Philosopher's Notes
+          Help
         </Button>
       </div>
 
       {/* Bottom corners */}
       <div className="relative h-2">
-        <div className="absolute -bottom-6 -left-6 w-4 h-4 border-l-2 border-b-2 border-[#C17F59] opacity-60" />
-        <div className="absolute -bottom-6 -right-6 w-4 h-4 border-r-2 border-b-2 border-[#C17F59] opacity-60" />
+        <div className="absolute -bottom-6 -left-6 w-4 h-4 border-l-2 border-b-2 border-skin-accent opacity-60" />
+        <div className="absolute -bottom-6 -right-6 w-4 h-4 border-r-2 border-b-2 border-skin-accent opacity-60" />
       </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story:
-          'Example of buttons used in a game menu context with the Midnight Alchemy aesthetic.',
+        story: 'Example of buttons used in a game menu context. Adapts to the selected skin theme.',
       },
     },
   },
@@ -447,13 +415,7 @@ export const AlchemistLaboratory: Story = {
 
 export const CardGameActions: Story = {
   render: () => (
-    <div
-      className="p-6 rounded-lg space-y-4"
-      style={{
-        background: 'linear-gradient(180deg, #1A1F2E 0%, #131824 100%)',
-        boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.5)',
-      }}
-    >
+    <div className="p-6 rounded-lg space-y-4 bg-skin-tertiary border border-skin-default shadow-inner">
       <div className="flex gap-3 justify-center">
         <Button variant="primary" size="lg" arcade leftIcon={<span>♠</span>}>
           Place Bet
@@ -485,34 +447,22 @@ export const CardGameActions: Story = {
 };
 
 // ============================================================================
-// ELEMENTAL QUARTET
+// ELEMENTAL BUTTONS
 // ============================================================================
 
-export const ElementalQuartet: Story = {
+export const ElementalButtons: Story = {
   render: () => (
-    <div className="grid grid-cols-2 gap-4 p-6 bg-[#0B0E14] rounded-xl max-w-md">
+    <div className="grid grid-cols-2 gap-4 p-6 bg-skin-primary rounded-xl border border-skin-default max-w-md">
       <Button variant="danger" size="lg" fullWidth leftIcon={<span className="text-xl">🔥</span>}>
         Fire
       </Button>
-      <Button
-        variant="secondary"
-        size="lg"
-        fullWidth
-        leftIcon={<span className="text-xl">💧</span>}
-        style={{ borderColor: '#3B82F6' }}
-      >
+      <Button variant="secondary" size="lg" fullWidth leftIcon={<span className="text-xl">💧</span>}>
         Water
       </Button>
       <Button variant="success" size="lg" fullWidth leftIcon={<span className="text-xl">🌿</span>}>
         Earth
       </Button>
-      <Button
-        variant="ghost"
-        size="lg"
-        fullWidth
-        leftIcon={<span className="text-xl">💨</span>}
-        style={{ color: '#E8E4DC' }}
-      >
+      <Button variant="ghost" size="lg" fullWidth leftIcon={<span className="text-xl">💨</span>}>
         Air
       </Button>
     </div>

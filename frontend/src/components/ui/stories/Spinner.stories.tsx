@@ -1,41 +1,31 @@
 /**
- * Spinner Component Stories - Midnight Alchemy Edition
+ * Spinner Component Stories
  *
- * Mystical loading indicators showing alchemical processes,
- * ethereal channeling, and transmutation in progress.
+ * Loading indicators with various sizes and variants.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { Spinner } from '../Spinner';
 
 const meta = {
-  title: 'Midnight Alchemy/Spinner',
+  title: 'UI/Spinner',
   component: Spinner,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Spinners
+# Spinner Component
 
-Mystical loading indicators showing alchemical processes,
-ethereal channeling, and transmutation in progress.
+Loading indicators with various sizes and variants.
 
 ## Features
 - **4 sizes**: xs, sm, md, lg
 - **3 variants**: default (ring), dots, pulse
 - **6 colors**: primary, white, gray, success, warning, error
 
-## Alchemical Usage
-Indicates active transmutation, essence channeling,
-or connection to the ethereal realm.
+Use the skin selector in the toolbar to see how spinners adapt to different themes.
         `,
       },
     },
@@ -147,7 +137,7 @@ export const WhiteColor: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="p-8 rounded-lg" style={{ background: '#131824' }}>
+      <div className="p-8 rounded-lg bg-skin-secondary">
         <Story />
       </div>
     ),
@@ -161,30 +151,22 @@ export const WhiteColor: Story = {
 export const AllSizes: Story = {
   args: {},
   render: () => (
-    <div className="flex items-center gap-6 p-6 bg-[#0B0E14] rounded-xl">
+    <div className="flex items-center gap-6 p-6 bg-skin-primary rounded-xl border border-skin-default">
       <div className="text-center">
         <Spinner size="xs" />
-        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
-          xs
-        </p>
+        <p className="text-xs mt-2 text-skin-muted">xs</p>
       </div>
       <div className="text-center">
         <Spinner size="sm" />
-        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
-          sm
-        </p>
+        <p className="text-xs mt-2 text-skin-muted">sm</p>
       </div>
       <div className="text-center">
         <Spinner size="md" />
-        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
-          md
-        </p>
+        <p className="text-xs mt-2 text-skin-muted">md</p>
       </div>
       <div className="text-center">
         <Spinner size="lg" />
-        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
-          lg
-        </p>
+        <p className="text-xs mt-2 text-skin-muted">lg</p>
       </div>
     </div>
   ),
@@ -197,24 +179,18 @@ export const AllSizes: Story = {
 export const AllVariants: Story = {
   args: {},
   render: () => (
-    <div className="flex items-center gap-8 p-6 bg-[#0B0E14] rounded-xl">
+    <div className="flex items-center gap-8 p-6 bg-skin-primary rounded-xl border border-skin-default">
       <div className="text-center">
         <Spinner variant="default" size="lg" />
-        <p className="text-xs mt-3" style={{ color: '#6B7280' }}>
-          Ring
-        </p>
+        <p className="text-xs mt-3 text-skin-muted">Ring</p>
       </div>
       <div className="text-center">
         <Spinner variant="dots" size="lg" />
-        <p className="text-xs mt-3" style={{ color: '#6B7280' }}>
-          Essence
-        </p>
+        <p className="text-xs mt-3 text-skin-muted">Dots</p>
       </div>
       <div className="text-center">
         <Spinner variant="pulse" size="lg" />
-        <p className="text-xs mt-3" style={{ color: '#6B7280' }}>
-          Pulse
-        </p>
+        <p className="text-xs mt-3 text-skin-muted">Pulse</p>
       </div>
     </div>
   ),
@@ -227,42 +203,30 @@ export const AllVariants: Story = {
 export const AllColors: Story = {
   args: {},
   render: () => (
-    <div className="flex flex-wrap items-center gap-6 p-6 bg-[#0B0E14] rounded-xl">
+    <div className="flex flex-wrap items-center gap-6 p-6 bg-skin-primary rounded-xl border border-skin-default">
       <div className="text-center">
         <Spinner color="primary" size="md" />
-        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
-          Copper
-        </p>
+        <p className="text-xs mt-2 text-skin-muted">Primary</p>
       </div>
       <div className="text-center">
         <Spinner color="success" size="md" />
-        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
-          Emerald
-        </p>
+        <p className="text-xs mt-2 text-skin-muted">Success</p>
       </div>
       <div className="text-center">
         <Spinner color="warning" size="md" />
-        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
-          Amber
-        </p>
+        <p className="text-xs mt-2 text-skin-muted">Warning</p>
       </div>
       <div className="text-center">
         <Spinner color="error" size="md" />
-        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
-          Ruby
-        </p>
+        <p className="text-xs mt-2 text-skin-muted">Error</p>
       </div>
       <div className="text-center">
         <Spinner color="gray" size="md" />
-        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
-          Mercury
-        </p>
+        <p className="text-xs mt-2 text-skin-muted">Gray</p>
       </div>
-      <div className="text-center p-3 rounded-lg" style={{ background: '#131824' }}>
+      <div className="text-center p-3 rounded-lg bg-skin-secondary">
         <Spinner color="white" size="md" />
-        <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
-          Moonlight
-        </p>
+        <p className="text-xs mt-2 text-skin-secondary">White</p>
       </div>
     </div>
   ),
@@ -275,28 +239,14 @@ export const AllColors: Story = {
 export const InButton: Story = {
   args: {},
   render: () => (
-    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
-      <button
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold"
-        style={{
-          background: 'linear-gradient(180deg, #C17F59 0%, rgba(193, 127, 89, 0.8) 100%)',
-          color: '#0B0E14',
-          fontFamily: '"Cinzel", Georgia, serif',
-        }}
-      >
+    <div className="space-y-4 p-6 bg-skin-primary rounded-xl border border-skin-default">
+      <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold bg-skin-accent text-skin-on-accent">
         <Spinner size="xs" color="gray" />
-        <span>Transmuting...</span>
+        <span>Loading...</span>
       </button>
-      <button
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg"
-        style={{
-          background: '#1A1F2E',
-          border: '1px solid #2D3548',
-          color: '#E8E4DC',
-        }}
-      >
+      <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-skin-tertiary border border-skin-default text-skin-primary">
         <Spinner size="xs" color="white" variant="dots" />
-        <span>Channeling...</span>
+        <span>Processing...</span>
       </button>
     </div>
   ),
@@ -309,25 +259,9 @@ export const InButton: Story = {
 export const LoadingCard: Story = {
   args: {},
   render: () => (
-    <div
-      className="p-8 rounded-xl text-center"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '2px solid #C17F59',
-        boxShadow: '0 0 30px rgba(193, 127, 89, 0.15)',
-      }}
-    >
+    <div className="p-8 rounded-xl text-center bg-skin-secondary border-2 border-skin-accent">
       <Spinner size="lg" color="primary" />
-      <p
-        className="mt-4"
-        style={{
-          fontFamily: '"Cormorant Garamond", Georgia, serif',
-          color: '#D4A574',
-          fontStyle: 'italic',
-        }}
-      >
-        Consulting the ancient tomes...
-      </p>
+      <p className="mt-4 italic text-skin-accent">Loading...</p>
     </div>
   ),
 };
@@ -339,17 +273,9 @@ export const LoadingCard: Story = {
 export const ReconnectingState: Story = {
   args: {},
   render: () => (
-    <div
-      className="p-4 rounded-lg flex items-center gap-3"
-      style={{
-        background: 'rgba(217, 119, 6, 0.1)',
-        border: '1px solid #D97706',
-      }}
-    >
+    <div className="p-4 rounded-lg flex items-center gap-3 bg-yellow-500/10 border border-yellow-500">
       <Spinner size="sm" color="warning" />
-      <span className="font-medium" style={{ color: '#FBBF24' }}>
-        Restoring ethereal connection...
-      </span>
+      <span className="font-medium text-yellow-500">Reconnecting...</span>
     </div>
   ),
 };
@@ -361,17 +287,9 @@ export const ReconnectingState: Story = {
 export const FullPageLoading: Story = {
   args: {},
   render: () => (
-    <div
-      className="w-80 h-48 rounded-xl flex flex-col items-center justify-center"
-      style={{
-        background: 'linear-gradient(180deg, #0B0E14 0%, #131824 100%)',
-        border: '1px solid #2D3548',
-      }}
-    >
+    <div className="w-80 h-48 rounded-xl flex flex-col items-center justify-center bg-skin-secondary border border-skin-default">
       <Spinner size="lg" color="primary" />
-      <p className="mt-4 text-sm" style={{ color: '#6B7280' }}>
-        Loading experiment data...
-      </p>
+      <p className="mt-4 text-sm text-skin-muted">Loading data...</p>
     </div>
   ),
 };
@@ -383,59 +301,37 @@ export const FullPageLoading: Story = {
 export const InlineWithText: Story = {
   args: {},
   render: () => (
-    <div className="space-y-3 p-6 bg-[#0B0E14] rounded-xl">
-      <p style={{ color: '#E8E4DC' }}>
+    <div className="space-y-3 p-6 bg-skin-primary rounded-xl border border-skin-default">
+      <p className="text-skin-primary">
         <Spinner size="xs" className="mr-2" />
-        Fetching alchemist profiles...
+        Fetching profiles...
       </p>
-      <p style={{ color: '#E8E4DC' }}>
+      <p className="text-skin-primary">
         <Spinner size="xs" variant="dots" className="mr-2" />
-        Searching the archives...
+        Searching...
       </p>
-      <p style={{ color: '#E8E4DC' }}>
+      <p className="text-skin-primary">
         <Spinner size="xs" variant="pulse" className="mr-2" />
-        Analyzing formula stability...
+        Analyzing...
       </p>
     </div>
   ),
 };
 
 // ============================================================================
-// TRANSMUTATION PROGRESS
+// PROCESSING STATE
 // ============================================================================
 
-export const TransmutationProgress: Story = {
+export const ProcessingState: Story = {
   args: {},
   render: () => (
-    <div
-      className="p-6 rounded-xl text-center"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <div className="relative inline-block" style={{ width: '80px', height: '80px' }}>
+    <div className="p-6 rounded-xl text-center bg-skin-primary border border-skin-default">
+      <div className="relative inline-block w-20 h-20">
         <Spinner size="lg" color="primary" />
-        <div className="absolute inset-0 flex items-center justify-center text-2xl">⚗</div>
+        <div className="absolute inset-0 flex items-center justify-center text-2xl">⏳</div>
       </div>
-      <h3
-        className="text-lg font-bold mt-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#D4A574',
-        }}
-      >
-        Transmutation in Progress
-      </h3>
-      <p
-        className="text-sm mt-2 italic"
-        style={{
-          fontFamily: '"Cormorant Garamond", Georgia, serif',
-          color: '#6B7280',
-        }}
-      >
-        The elements are aligning...
-      </p>
+      <h3 className="text-lg font-bold mt-4 text-skin-accent">Processing</h3>
+      <p className="text-sm mt-2 italic text-skin-muted">Please wait...</p>
     </div>
   ),
 };

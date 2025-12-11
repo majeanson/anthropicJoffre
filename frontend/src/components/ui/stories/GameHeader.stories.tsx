@@ -1,6 +1,8 @@
 /**
- * GameHeader Stories
- * Storybook stories for the GameHeader component
+ * GameHeader Component Stories
+ *
+ * Game information header with scores, bet info, and action buttons.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -16,24 +18,18 @@ const meta: Meta<typeof GameHeader> = {
     docs: {
       description: {
         component: `
-The GameHeader displays game information and action buttons.
+# Game Header Component
 
-**Features:**
-- Game ID with copy-to-clipboard
-- Round number
-- Team scores with animated changes
-- Bet and trump indicators
-- Action buttons (chat, leaderboard, achievements, friends, settings)
+Displays game information and action buttons. Adapts to the selected skin theme.
 
-**Mobile Behavior:**
-- Two-row layout with scores on top and action buttons below
-- Smaller touch targets
-- Action buttons should stay within header bounds
+## Features
+- **Game ID**: Copy-to-clipboard functionality
+- **Round indicator**: Current round number
+- **Team scores**: Animated score changes
+- **Bet/Trump info**: Current bet amount and trump suit
+- **Action buttons**: Chat, leaderboard, achievements, friends, settings
 
-**Z-Index Considerations:**
-- Header: z-40
-- Floating score change indicators: z-[9999]
-- Modals triggered from header: z-[10000]+
+Use the skin selector in the toolbar to see how the header adapts to different themes.
         `,
       },
     },
@@ -42,10 +38,10 @@ The GameHeader displays game information and action buttons.
   decorators: [
     (Story) => (
       <SettingsProvider>
-        <div className="min-h-[200px] bg-gray-200 dark:bg-gray-900">
+        <div className="min-h-[200px] bg-skin-primary">
           <Story />
-          <div className="p-4 mt-4 bg-parchment-100 dark:bg-gray-800 rounded m-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="p-4 mt-4 rounded m-4 bg-skin-secondary border border-skin-default">
+            <p className="text-sm text-skin-muted">
               Content below header - score animations should appear above this
             </p>
           </div>
@@ -123,24 +119,24 @@ export const WithScoreAnimation: Story = {
           <div className="p-4 flex gap-4 justify-center">
             <button
               onClick={() => setTeam1Score((s) => s + 5)}
-              className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+              className="px-4 py-2 bg-orange-500/30 text-orange-300 border border-orange-500/50 rounded hover:bg-orange-500/40"
             >
               +5 Team 1
             </button>
             <button
               onClick={() => setTeam2Score((s) => s + 3)}
-              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+              className="px-4 py-2 bg-purple-500/30 text-purple-300 border border-purple-500/50 rounded hover:bg-purple-500/40"
             >
               +3 Team 2
             </button>
             <button
               onClick={() => setTeam1Score((s) => s - 2)}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              className="px-4 py-2 bg-red-500/30 text-red-300 border border-red-500/50 rounded hover:bg-red-500/40"
             >
               -2 Team 1
             </button>
           </div>
-          <p className="text-center text-sm text-gray-500 mt-2">
+          <p className="text-center text-sm text-skin-muted mt-2">
             Click buttons above to see score change animations (should appear above everything)
           </p>
         </div>
@@ -203,23 +199,4 @@ export const SpectatorMode: Story = {
   },
 };
 
-/**
- * Dark mode
- */
-export const DarkMode: Story = {
-  args: {
-    ...Default.args,
-  },
-  decorators: [
-    (Story) => (
-      <SettingsProvider>
-        <div className="dark min-h-[200px] bg-gray-900">
-          <Story />
-          <div className="p-4 mt-4 bg-gray-800 rounded m-4">
-            <p className="text-sm text-gray-400">Dark mode content below header</p>
-          </div>
-        </div>
-      </SettingsProvider>
-    ),
-  ],
-};
+// Note: Theme switching is now handled via the skin selector in the toolbar

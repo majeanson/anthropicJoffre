@@ -1,6 +1,8 @@
 /**
  * UnreadBadge Component Stories
- * Sprint 20 - Storybook Integration
+ *
+ * Notification count badges with multiple variants.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -11,6 +13,23 @@ const meta = {
   component: UnreadBadge,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `
+# Unread Badge Component
+
+Notification count badges with multiple variants and sizes.
+
+## Features
+- **4 colors**: Blue, red, green, purple
+- **3 sizes**: Small, medium, large
+- **Max count**: Shows "99+" when over limit
+- **Positioning**: Inline or absolute
+
+Use the skin selector in the toolbar to see how badges adapt to different themes.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
@@ -105,8 +124,8 @@ export const AbsolutePosition: Story = {
     position: 'absolute',
   },
   render: () => (
-    <div className="relative inline-block p-4 bg-gray-700 rounded">
-      <span className="text-white">Notifications</span>
+    <div className="relative inline-block p-4 rounded bg-skin-secondary border border-skin-default">
+      <span className="text-skin-primary">Notifications</span>
       <UnreadBadge count={5} position="absolute" />
     </div>
   ),
@@ -117,21 +136,21 @@ export const AllVariants: Story = {
     count: 3,
   },
   render: () => (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 p-4 rounded-lg bg-skin-primary">
       <div className="flex items-center gap-2">
-        <span className="text-white w-24">Blue:</span>
+        <span className="text-skin-primary w-24">Blue:</span>
         <UnreadBadge count={3} variant="blue" />
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-white w-24">Red:</span>
+        <span className="text-skin-primary w-24">Red:</span>
         <UnreadBadge count={5} variant="red" />
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-white w-24">Green:</span>
+        <span className="text-skin-primary w-24">Green:</span>
         <UnreadBadge count={2} variant="green" />
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-white w-24">Purple:</span>
+        <span className="text-skin-primary w-24">Purple:</span>
         <UnreadBadge count={7} variant="purple" />
       </div>
     </div>
@@ -143,17 +162,17 @@ export const AllSizes: Story = {
     count: 5,
   },
   render: () => (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 p-4 rounded-lg bg-skin-primary">
       <div className="flex items-center gap-2">
-        <span className="text-white w-24">Small:</span>
+        <span className="text-skin-primary w-24">Small:</span>
         <UnreadBadge count={5} size="sm" />
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-white w-24">Medium:</span>
+        <span className="text-skin-primary w-24">Medium:</span>
         <UnreadBadge count={5} size="md" />
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-white w-24">Large:</span>
+        <span className="text-skin-primary w-24">Large:</span>
         <UnreadBadge count={5} size="lg" />
       </div>
     </div>

@@ -1,32 +1,24 @@
 /**
- * Checkbox Component Stories - Midnight Alchemy Edition
+ * Checkbox Component Stories
  *
- * Mystical toggles and rune-inscribed checkboxes for
- * controlling the arcane mechanisms of the laboratory.
+ * Toggles and checkboxes for controlling various settings.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { Checkbox } from '../Checkbox';
 
 const meta = {
-  title: 'Midnight Alchemy/Checkbox',
+  title: 'UI/Checkbox',
   component: Checkbox,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Checkboxes
+# Checkbox Component
 
-Mystical toggles and rune-inscribed checkboxes for controlling
-the arcane mechanisms of the laboratory.
+Toggles and checkboxes for controlling various settings.
 
 ## Features
 - **2 variants**: checkbox, toggle
@@ -34,9 +26,7 @@ the arcane mechanisms of the laboratory.
 - **Indeterminate state**: Partial selection
 - **Descriptions**: Helper text support
 
-## Alchemical Usage
-Use toggles for binary states (on/off, active/inactive)
-and checkboxes for selections and agreements.
+Use the skin selector in the toolbar to see how checkboxes adapt to different themes.
         `,
       },
     },
@@ -255,10 +245,10 @@ export const ToggleWithoutLabel: Story = {
 
 export const AllCheckboxSizes: Story = {
   render: () => (
-    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
-      <Checkbox size="sm" label="Small inscribed rune" checked />
-      <Checkbox size="md" label="Medium inscribed rune" checked />
-      <Checkbox size="lg" label="Large inscribed rune" checked />
+    <div className="space-y-4 p-6 bg-skin-primary rounded-xl border border-skin-default">
+      <Checkbox size="sm" label="Small checkbox" checked />
+      <Checkbox size="md" label="Medium checkbox" checked />
+      <Checkbox size="lg" label="Large checkbox" checked />
     </div>
   ),
 };
@@ -269,73 +259,45 @@ export const AllCheckboxSizes: Story = {
 
 export const AllToggleSizes: Story = {
   render: () => (
-    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
-      <Checkbox variant="toggle" size="sm" label="Small brass lever" checked />
-      <Checkbox variant="toggle" size="md" label="Medium brass lever" checked />
-      <Checkbox variant="toggle" size="lg" label="Large brass lever" checked />
+    <div className="space-y-4 p-6 bg-skin-primary rounded-xl border border-skin-default">
+      <Checkbox variant="toggle" size="sm" label="Small toggle" checked />
+      <Checkbox variant="toggle" size="md" label="Medium toggle" checked />
+      <Checkbox variant="toggle" size="lg" label="Large toggle" checked />
     </div>
   ),
 };
 
 // ============================================================================
-// LABORATORY SETTINGS
+// SETTINGS PANEL
 // ============================================================================
 
-export const LaboratorySettings: Story = {
+export const SettingsPanel: Story = {
   render: () => (
-    <div
-      className="space-y-4 p-6 rounded-xl w-80"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-lg font-bold mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#D4A574',
-          textShadow: '0 0 10px rgba(212, 165, 116, 0.3)',
-        }}
-      >
-        Laboratory Settings
-      </h3>
+    <div className="space-y-4 p-6 rounded-xl w-80 bg-skin-secondary border border-skin-default">
+      <h3 className="text-lg font-bold mb-4 text-skin-accent">Game Settings</h3>
 
       <Checkbox
         variant="toggle"
-        label="Resonance Effects"
-        description="Audible feedback during reactions"
+        label="Sound Effects"
+        description="Play sounds during game"
         checked
       />
 
       <Checkbox
         variant="toggle"
-        label="Auto-catalyze"
-        description="Automatically proceed when only one option"
+        label="Auto-play"
+        description="Automatically play when only one option"
       />
 
-      <Checkbox
-        variant="toggle"
-        label="Midnight Mode"
-        description="Dim the ethereal lamps"
-        checked
-      />
+      <Checkbox variant="toggle" label="Dark Mode" description="Use dark theme" checked />
 
-      <div className="pt-4 mt-4" style={{ borderTop: '1px solid #2D3548' }}>
-        <h4
-          className="text-sm font-semibold mb-3"
-          style={{
-            fontFamily: '"Cinzel", Georgia, serif',
-            color: '#9CA3AF',
-          }}
-        >
-          Notifications
-        </h4>
+      <div className="pt-4 mt-4 border-t border-skin-subtle">
+        <h4 className="text-sm font-semibold mb-3 text-skin-muted">Notifications</h4>
 
         <div className="space-y-2">
-          <Checkbox label="Experiment invitations" checked />
-          <Checkbox label="Guild requests" checked />
-          <Checkbox label="Scroll messages" />
+          <Checkbox label="Game invitations" checked />
+          <Checkbox label="Friend requests" checked />
+          <Checkbox label="Messages" />
         </div>
       </div>
     </div>
@@ -343,118 +305,66 @@ export const LaboratorySettings: Story = {
 };
 
 // ============================================================================
-// ALCHEMIST REGISTRATION
+// REGISTRATION FORM
 // ============================================================================
 
-export const AlchemistRegistration: Story = {
+export const RegistrationForm: Story = {
   render: () => (
-    <div
-      className="space-y-4 p-6 w-80 rounded-xl"
-      style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-lg font-bold"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#E8E4DC',
-        }}
-      >
-        Join the Guild
-      </h3>
+    <div className="space-y-4 p-6 w-80 rounded-xl bg-skin-primary border border-skin-default">
+      <h3 className="text-lg font-bold text-skin-primary">Create Account</h3>
 
       <div className="space-y-3">
-        <Checkbox
-          label="I accept the Alchemist's Code"
-          description="Required for guild membership"
-        />
+        <Checkbox label="I accept the Terms of Service" description="Required for registration" />
 
-        <Checkbox label="Subscribe to the Chronicle" description="Receive wisdom and discoveries" />
+        <Checkbox label="Subscribe to newsletter" description="Receive updates and news" />
 
         <Checkbox
           label={
-            <span style={{ color: '#E8E4DC' }}>
-              I have practiced for at least <strong style={{ color: '#D4A574' }}>13 moons</strong>
+            <span className="text-skin-primary">
+              I am at least <strong className="text-skin-accent">13 years old</strong>
             </span>
           }
         />
       </div>
 
-      <button
-        className="w-full py-3 rounded-lg font-semibold uppercase tracking-widest mt-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          background: 'linear-gradient(180deg, #C17F59 0%, rgba(193, 127, 89, 0.8) 100%)',
-          color: '#0B0E14',
-          boxShadow: '0 4px 20px rgba(193, 127, 89, 0.4)',
-        }}
-      >
-        Begin Initiation
+      <button className="w-full py-3 rounded-lg font-semibold uppercase tracking-widest mt-4 bg-skin-accent text-skin-on-accent hover:opacity-90 transition-opacity">
+        Register
       </button>
     </div>
   ),
 };
 
 // ============================================================================
-// EXPERIMENT OPTIONS
+// GAME OPTIONS
 // ============================================================================
 
-export const ExperimentOptions: Story = {
+export const GameOptions: Story = {
   render: () => (
-    <div
-      className="p-6 rounded-xl"
-      style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '1px solid #2D3548',
-      }}
-    >
-      <h3
-        className="text-lg font-bold mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#D4A574',
-        }}
-      >
-        Experiment Configuration
-      </h3>
+    <div className="p-6 rounded-xl bg-skin-secondary border border-skin-default">
+      <h3 className="text-lg font-bold mb-4 text-skin-accent">Game Configuration</h3>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold" style={{ color: '#9CA3AF' }}>
-            Elements
-          </h4>
-          <Checkbox label="△ Fire" checked />
-          <Checkbox label="▽ Water" checked />
-          <Checkbox label="◇ Earth" />
-          <Checkbox label="○ Air" />
+          <h4 className="text-sm font-semibold text-skin-muted">Game Modes</h4>
+          <Checkbox label="Quick Play" checked />
+          <Checkbox label="Ranked" checked />
+          <Checkbox label="Custom" />
+          <Checkbox label="Practice" />
         </div>
 
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold" style={{ color: '#9CA3AF' }}>
-            Catalysts
-          </h4>
-          <Checkbox label="☿ Mercury" checked />
-          <Checkbox label="♄ Lead" />
-          <Checkbox label="☉ Gold" checked />
-          <Checkbox label="☽ Silver" />
+          <h4 className="text-sm font-semibold text-skin-muted">Features</h4>
+          <Checkbox label="Timer" checked />
+          <Checkbox label="Chat" />
+          <Checkbox label="Spectators" checked />
+          <Checkbox label="Replays" />
         </div>
       </div>
 
-      <div
-        className="mt-4 pt-4 flex items-center justify-between"
-        style={{ borderTop: '1px solid #2D3548' }}
-      >
-        <Checkbox variant="toggle" label="Lock configuration" size="sm" />
-        <button
-          className="px-4 py-2 rounded-lg text-sm font-semibold"
-          style={{
-            background: '#C17F59',
-            color: '#0B0E14',
-          }}
-        >
-          Begin
+      <div className="mt-4 pt-4 flex items-center justify-between border-t border-skin-subtle">
+        <Checkbox variant="toggle" label="Save settings" size="sm" />
+        <button className="px-4 py-2 rounded-lg text-sm font-semibold bg-skin-accent text-skin-on-accent">
+          Start Game
         </button>
       </div>
     </div>

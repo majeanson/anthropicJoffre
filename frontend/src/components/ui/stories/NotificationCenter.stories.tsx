@@ -149,8 +149,8 @@ const getNotificationIcon = (type: string) => {
 export const BellWithBadge: Story = {
   name: 'Bell Icon with Badge',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-6 w-[300px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Badge Variants</h3>
+    <div className="p-6 rounded-lg bg-skin-primary space-y-6 w-[300px]">
+      <h3 className="text-skin-primary font-semibold mb-4">Badge Variants</h3>
 
       <div className="flex items-center gap-8 justify-center">
         {/* Low count */}
@@ -163,7 +163,7 @@ export const BellWithBadge: Story = {
               </span>
             </Button>
           </div>
-          <p className="text-[var(--color-text-tertiary)] text-xs mt-2">3 unread</p>
+          <p className="text-skin-muted text-xs mt-2">3 unread</p>
         </div>
 
         {/* High count (9+) */}
@@ -176,7 +176,7 @@ export const BellWithBadge: Story = {
               </span>
             </Button>
           </div>
-          <p className="text-[var(--color-text-tertiary)] text-xs mt-2">Many unread</p>
+          <p className="text-skin-muted text-xs mt-2">Many unread</p>
         </div>
       </div>
     </div>
@@ -190,13 +190,13 @@ export const BellWithBadge: Story = {
 export const DropdownOpen: Story = {
   name: 'Dropdown Panel Open',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[450px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Notification Panel</h3>
+    <div className="p-6 rounded-lg bg-skin-primary w-[450px]">
+      <h3 className="text-skin-primary font-semibold mb-4">Notification Panel</h3>
 
       <UICard variant="elevated" size="md" className="w-full max-h-[500px] flex flex-col border-2">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b-2 border-gray-200 dark:border-gray-600">
-          <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">Notifications</h3>
+        <div className="flex items-center justify-between pb-4 border-b-2 border-skin-default">
+          <h3 className="font-bold text-lg text-skin-primary">Notifications</h3>
           <div className="flex gap-2">
             <Button variant="primary" size="sm">
               Mark all read
@@ -212,8 +212,8 @@ export const DropdownOpen: Story = {
           {mockNotifications.map((notification) => (
             <div
               key={notification.id}
-              className={`p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors cursor-pointer ${
-                !notification.isRead ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+              className={`p-4 border-b border-skin-subtle hover:bg-skin-tertiary transition-colors cursor-pointer ${
+                !notification.isRead ? 'bg-blue-500/10' : ''
               }`}
             >
               <div className="flex items-start gap-3">
@@ -222,17 +222,17 @@ export const DropdownOpen: Story = {
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                    <p className="font-semibold text-skin-primary text-sm">
                       {notification.title}
                     </p>
                     {!notification.isRead && (
-                      <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-1"></span>
+                      <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-skin-secondary mt-1">
                     {notification.message}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                  <p className="text-xs text-skin-muted mt-2">
                     {notification.timestamp}
                   </p>
                 </div>
@@ -270,19 +270,19 @@ export const NotificationTypes: Story = {
     ];
 
     return (
-      <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[400px]">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Notification Icons</h3>
+      <div className="p-6 rounded-lg bg-skin-primary w-[400px]">
+        <h3 className="text-skin-primary font-semibold mb-4">Notification Icons</h3>
 
         <div className="space-y-2">
           {notificationTypes.map((n) => (
             <div
               key={n.type}
-              className="p-3 rounded-lg bg-[var(--color-bg-secondary)] flex items-center gap-3"
+              className="p-3 rounded-lg bg-skin-secondary flex items-center gap-3"
             >
               <span className="text-2xl">{getNotificationIcon(n.type)}</span>
               <div>
-                <p className="text-[var(--color-text-primary)] font-medium text-sm">{n.title}</p>
-                <p className="text-[var(--color-text-secondary)] text-xs">{n.message}</p>
+                <p className="text-skin-primary font-medium text-sm">{n.title}</p>
+                <p className="text-skin-secondary text-xs">{n.message}</p>
               </div>
             </div>
           ))}
@@ -299,47 +299,47 @@ export const NotificationTypes: Story = {
 export const ReadVsUnread: Story = {
   name: 'Read vs Unread States',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[400px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Read Status</h3>
+    <div className="p-6 rounded-lg bg-skin-primary w-[400px]">
+      <h3 className="text-skin-primary font-semibold mb-4">Read Status</h3>
 
       <div className="space-y-2">
         {/* Unread */}
-        <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+        <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
           <div className="flex items-start gap-3">
             <span className="text-2xl">🏆</span>
             <div className="flex-1">
               <div className="flex items-start justify-between">
-                <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                <p className="font-semibold text-skin-primary text-sm">
                   New Achievement!
                 </p>
-                <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-sm text-skin-secondary mt-1">
                 This notification is unread
               </p>
-              <p className="text-xs text-gray-500 mt-2">Just now</p>
+              <p className="text-xs text-skin-muted mt-2">Just now</p>
             </div>
           </div>
         </div>
 
         {/* Read */}
-        <div className="p-4 rounded-lg bg-[var(--color-bg-secondary)]">
+        <div className="p-4 rounded-lg bg-skin-secondary">
           <div className="flex items-start gap-3">
             <span className="text-2xl">👥</span>
             <div className="flex-1">
-              <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+              <p className="font-semibold text-skin-primary text-sm">
                 Friend Request Accepted
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-sm text-skin-secondary mt-1">
                 This notification has been read
               </p>
-              <p className="text-xs text-gray-500 mt-2">Yesterday</p>
+              <p className="text-xs text-skin-muted mt-2">Yesterday</p>
             </div>
           </div>
         </div>
       </div>
 
-      <p className="text-[var(--color-text-tertiary)] text-xs mt-4 text-center">
+      <p className="text-skin-muted text-xs mt-4 text-center">
         Blue background + dot indicator = unread
       </p>
     </div>
@@ -353,12 +353,12 @@ export const ReadVsUnread: Story = {
 export const EmptyNotifications: Story = {
   name: 'No Notifications',
   render: () => (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[400px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Empty State</h3>
+    <div className="p-6 rounded-lg bg-skin-primary w-[400px]">
+      <h3 className="text-skin-primary font-semibold mb-4">Empty State</h3>
 
       <UICard variant="elevated" size="md" className="w-full">
-        <div className="flex items-center justify-between pb-4 border-b-2 border-gray-200 dark:border-gray-600">
-          <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">Notifications</h3>
+        <div className="flex items-center justify-between pb-4 border-b-2 border-skin-default">
+          <h3 className="font-bold text-lg text-skin-primary">Notifications</h3>
         </div>
 
         <div className="py-8">
@@ -386,17 +386,17 @@ export const TimeFormats: Story = {
     ];
 
     return (
-      <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[350px]">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Timestamp Formats</h3>
+      <div className="p-6 rounded-lg bg-skin-primary w-[350px]">
+        <h3 className="text-skin-primary font-semibold mb-4">Timestamp Formats</h3>
 
         <div className="space-y-2">
           {timeExamples.map((t, i) => (
             <div
               key={i}
-              className="p-3 rounded-lg bg-[var(--color-bg-secondary)] flex items-center justify-between"
+              className="p-3 rounded-lg bg-skin-secondary flex items-center justify-between"
             >
-              <span className="text-[var(--color-text-secondary)] text-sm">{t.description}</span>
-              <span className="text-[var(--color-text-tertiary)] text-xs">{t.time}</span>
+              <span className="text-skin-secondary text-sm">{t.description}</span>
+              <span className="text-skin-muted text-xs">{t.time}</span>
             </div>
           ))}
         </div>
@@ -428,9 +428,9 @@ function InteractiveDemo() {
   };
 
   return (
-    <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[450px] h-[600px] relative">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Interactive Demo</h3>
-      <p className="text-[var(--color-text-secondary)] text-sm mb-4">
+    <div className="p-6 rounded-lg bg-skin-primary w-[450px] h-[600px] relative">
+      <h3 className="text-skin-primary font-semibold mb-4">Interactive Demo</h3>
+      <p className="text-skin-secondary text-sm mb-4">
         Click the bell to open/close, click notifications to mark as read
       </p>
 
@@ -457,8 +457,8 @@ function InteractiveDemo() {
             size="md"
             className="absolute right-0 bottom-full mb-2 w-96 max-h-[400px] flex flex-col border-2"
           >
-            <div className="flex items-center justify-between pb-4 border-b border-gray-600">
-              <h3 className="font-bold text-gray-100">Notifications</h3>
+            <div className="flex items-center justify-between pb-4 border-b border-skin-default">
+              <h3 className="font-bold text-skin-primary">Notifications</h3>
               <div className="flex gap-2">
                 {unreadCount > 0 && (
                   <Button variant="primary" size="sm" onClick={handleMarkAllRead}>
@@ -481,19 +481,19 @@ function InteractiveDemo() {
                   <div
                     key={n.id}
                     onClick={() => handleMarkAsRead(n.id)}
-                    className={`p-4 border-b border-gray-700 hover:bg-gray-750 cursor-pointer ${
-                      !n.isRead ? 'bg-blue-900/20' : ''
+                    className={`p-4 border-b border-skin-subtle hover:bg-skin-tertiary cursor-pointer ${
+                      !n.isRead ? 'bg-blue-500/10' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <span className="text-2xl">{getNotificationIcon(n.type)}</span>
                       <div className="flex-1">
                         <div className="flex items-start justify-between">
-                          <p className="font-semibold text-gray-100 text-sm">{n.title}</p>
-                          {!n.isRead && <span className="w-2 h-2 bg-blue-600 rounded-full"></span>}
+                          <p className="font-semibold text-skin-primary text-sm">{n.title}</p>
+                          {!n.isRead && <span className="w-2 h-2 bg-blue-500 rounded-full"></span>}
                         </div>
-                        <p className="text-sm text-gray-400 mt-1">{n.message}</p>
-                        <p className="text-xs text-gray-500 mt-2">{n.timestamp}</p>
+                        <p className="text-sm text-skin-secondary mt-1">{n.message}</p>
+                        <p className="text-xs text-skin-muted mt-2">{n.timestamp}</p>
                       </div>
                     </div>
                   </div>

@@ -62,10 +62,10 @@ type Story = StoryObj<typeof meta>;
 export const AllVariants: Story = {
   name: 'All Variants',
   render: () => (
-    <div className="p-6 rounded-lg bg-gray-900 space-y-8">
+    <div className="p-6 rounded-lg bg-skin-primary space-y-8">
       {/* Full Variant */}
       <div>
-        <h3 className="text-white font-semibold mb-4">Full Variant</h3>
+        <h3 className="text-skin-primary font-semibold mb-4">Full Variant</h3>
         <div className="flex flex-wrap gap-6">
           <PlayerAvatar playerName="Alice" avatarUrl="fox" teamId={1} variant="full" />
           <PlayerAvatar playerName="Bob" avatarUrl="ninja" teamId={2} variant="full" />
@@ -81,7 +81,7 @@ export const AllVariants: Story = {
 
       {/* Compact Variant */}
       <div>
-        <h3 className="text-white font-semibold mb-4">Compact Variant</h3>
+        <h3 className="text-skin-primary font-semibold mb-4">Compact Variant</h3>
         <div className="flex flex-wrap gap-4">
           <PlayerAvatar playerName="Alice" avatarUrl="fox" teamId={1} variant="compact" />
           <PlayerAvatar playerName="Bob" avatarUrl="ninja" teamId={2} variant="compact" />
@@ -105,13 +105,13 @@ export const AllVariants: Story = {
 export const StatusIndicators: Story = {
   name: 'Status Indicators',
   render: () => (
-    <div className="p-6 rounded-lg bg-gray-900 space-y-6">
-      <h3 className="text-white font-semibold mb-4">Player Status Indicators</h3>
+    <div className="p-6 rounded-lg bg-skin-primary space-y-6">
+      <h3 className="text-skin-primary font-semibold mb-4">Player Status Indicators</h3>
 
       <div className="grid grid-cols-2 gap-6">
         {/* Online Status */}
-        <div className="p-4 rounded-lg bg-gray-800">
-          <h4 className="text-gray-400 text-sm mb-3">Online Status</h4>
+        <div className="p-4 rounded-lg bg-skin-secondary">
+          <h4 className="text-skin-muted text-sm mb-3">Online Status</h4>
           <div className="flex gap-4">
             <PlayerAvatar
               playerName="Online"
@@ -133,8 +133,8 @@ export const StatusIndicators: Story = {
         </div>
 
         {/* Bot Indicator */}
-        <div className="p-4 rounded-lg bg-gray-800">
-          <h4 className="text-gray-400 text-sm mb-3">Bot Indicator</h4>
+        <div className="p-4 rounded-lg bg-skin-secondary">
+          <h4 className="text-skin-muted text-sm mb-3">Bot Indicator</h4>
           <div className="flex gap-4">
             <PlayerAvatar
               playerName="Human"
@@ -156,8 +156,8 @@ export const StatusIndicators: Story = {
         </div>
 
         {/* Current Turn */}
-        <div className="p-4 rounded-lg bg-gray-800">
-          <h4 className="text-gray-400 text-sm mb-3">Current Turn Highlight</h4>
+        <div className="p-4 rounded-lg bg-skin-secondary">
+          <h4 className="text-skin-muted text-sm mb-3">Current Turn Highlight</h4>
           <div className="flex gap-4">
             <PlayerAvatar
               playerName="Waiting"
@@ -179,8 +179,8 @@ export const StatusIndicators: Story = {
         </div>
 
         {/* Dealer Indicator */}
-        <div className="p-4 rounded-lg bg-gray-800">
-          <h4 className="text-gray-400 text-sm mb-3">Dealer Indicator</h4>
+        <div className="p-4 rounded-lg bg-skin-secondary">
+          <h4 className="text-skin-muted text-sm mb-3">Dealer Indicator</h4>
           <div className="flex gap-4">
             <PlayerAvatar
               playerName="Regular"
@@ -212,12 +212,12 @@ export const StatusIndicators: Story = {
 export const TeamColors: Story = {
   name: 'Team Colors',
   render: () => (
-    <div className="p-6 rounded-lg bg-gray-900 space-y-6">
-      <h3 className="text-white font-semibold mb-4">Team Color Indicators</h3>
+    <div className="p-6 rounded-lg bg-skin-primary space-y-6">
+      <h3 className="text-skin-primary font-semibold mb-4">Team Color Indicators</h3>
 
       <div className="grid grid-cols-3 gap-6">
         {/* Team 1 */}
-        <div className="p-4 rounded-lg bg-orange-900/20 border border-orange-500/30">
+        <div className="p-4 rounded-lg bg-orange-500/20 border border-orange-500/30">
           <h4 className="text-orange-400 text-sm mb-3">Team 1 (Orange)</h4>
           <div className="space-y-3">
             <PlayerAvatar playerName="Alice" avatarUrl="fox" teamId={1} variant="full" />
@@ -226,7 +226,7 @@ export const TeamColors: Story = {
         </div>
 
         {/* Team 2 */}
-        <div className="p-4 rounded-lg bg-purple-900/20 border border-purple-500/30">
+        <div className="p-4 rounded-lg bg-purple-500/20 border border-purple-500/30">
           <h4 className="text-purple-400 text-sm mb-3">Team 2 (Purple)</h4>
           <div className="space-y-3">
             <PlayerAvatar playerName="Bob" avatarUrl="ninja" teamId={2} variant="full" />
@@ -235,8 +235,8 @@ export const TeamColors: Story = {
         </div>
 
         {/* No Team */}
-        <div className="p-4 rounded-lg bg-gray-800 border border-gray-700">
-          <h4 className="text-gray-400 text-sm mb-3">No Team</h4>
+        <div className="p-4 rounded-lg bg-skin-secondary border border-skin-default">
+          <h4 className="text-skin-muted text-sm mb-3">No Team</h4>
           <div className="space-y-3">
             <PlayerAvatar playerName="Spectator" avatarUrl="ghost" variant="full" />
             <PlayerAvatar playerName="Waiting" avatarUrl="alien" variant="full" />
@@ -254,13 +254,13 @@ export const TeamColors: Story = {
 export const AllSizes: Story = {
   name: 'All Sizes',
   render: () => (
-    <div className="p-6 rounded-lg bg-gray-900 space-y-6">
-      <h3 className="text-white font-semibold mb-4">Size Variants</h3>
+    <div className="p-6 rounded-lg bg-skin-primary space-y-6">
+      <h3 className="text-skin-primary font-semibold mb-4">Size Variants</h3>
 
       <div className="flex items-end gap-8">
         <div className="flex flex-col items-center gap-2">
           <PlayerAvatar playerName="Small" avatarUrl="fox" teamId={1} size="sm" variant="compact" />
-          <span className="text-xs text-gray-400">Small</span>
+          <span className="text-xs text-skin-muted">Small</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <PlayerAvatar
@@ -270,7 +270,7 @@ export const AllSizes: Story = {
             size="md"
             variant="compact"
           />
-          <span className="text-xs text-gray-400">Medium</span>
+          <span className="text-xs text-skin-muted">Medium</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <PlayerAvatar
@@ -280,7 +280,7 @@ export const AllSizes: Story = {
             size="lg"
             variant="compact"
           />
-          <span className="text-xs text-gray-400">Large</span>
+          <span className="text-xs text-skin-muted">Large</span>
         </div>
       </div>
     </div>
@@ -294,8 +294,8 @@ export const AllSizes: Story = {
 export const GameBoardLayout: Story = {
   name: 'Game Board Layout',
   render: () => (
-    <div className="p-6 rounded-lg bg-gray-900 w-[600px]">
-      <h3 className="text-white font-semibold mb-6 text-center">Game Board - 4 Players</h3>
+    <div className="p-6 rounded-lg bg-skin-primary w-[600px]">
+      <h3 className="text-skin-primary font-semibold mb-6 text-center">Game Board - 4 Players</h3>
 
       {/* Circular arrangement */}
       <div className="relative h-[400px]">
@@ -338,7 +338,7 @@ export const GameBoardLayout: Story = {
         </div>
 
         {/* Center indicator */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-500 text-sm">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-skin-muted text-sm">
           Game Board
         </div>
       </div>
@@ -349,8 +349,8 @@ export const GameBoardLayout: Story = {
 export const LobbyPlayerList: Story = {
   name: 'Lobby Player List',
   render: () => (
-    <div className="p-6 rounded-lg bg-gray-900 w-[350px]">
-      <h3 className="text-white font-semibold mb-4">Players in Lobby</h3>
+    <div className="p-6 rounded-lg bg-skin-primary w-[350px]">
+      <h3 className="text-skin-primary font-semibold mb-4">Players in Lobby</h3>
 
       <div className="space-y-2">
         {[
@@ -361,7 +361,7 @@ export const LobbyPlayerList: Story = {
         ].map((player, i) => (
           <div
             key={player.name}
-            className="flex items-center justify-between p-2 rounded-lg bg-gray-800"
+            className="flex items-center justify-between p-2 rounded-lg bg-skin-secondary"
           >
             <PlayerAvatar
               playerName={player.name}
@@ -372,7 +372,7 @@ export const LobbyPlayerList: Story = {
               variant="full"
               size="sm"
             />
-            <span className="text-xs text-gray-500">#{i + 1}</span>
+            <span className="text-xs text-skin-muted">#{i + 1}</span>
           </div>
         ))}
       </div>
@@ -383,12 +383,12 @@ export const LobbyPlayerList: Story = {
 export const MixedStates: Story = {
   name: 'Mixed States (All Features)',
   render: () => (
-    <div className="p-6 rounded-lg bg-gray-900">
-      <h3 className="text-white font-semibold mb-4">Player with All Indicators</h3>
+    <div className="p-6 rounded-lg bg-skin-primary">
+      <h3 className="text-skin-primary font-semibold mb-4">Player with All Indicators</h3>
 
       <div className="flex gap-8">
-        <div className="p-4 rounded-lg bg-gray-800">
-          <p className="text-gray-400 text-xs mb-2">Current Turn + Dealer + Team 1</p>
+        <div className="p-4 rounded-lg bg-skin-secondary">
+          <p className="text-skin-muted text-xs mb-2">Current Turn + Dealer + Team 1</p>
           <PlayerAvatar
             playerName="Alice"
             avatarUrl="crown"
@@ -401,8 +401,8 @@ export const MixedStates: Story = {
           />
         </div>
 
-        <div className="p-4 rounded-lg bg-gray-800">
-          <p className="text-gray-400 text-xs mb-2">Bot + Team 2 + Offline</p>
+        <div className="p-4 rounded-lg bg-skin-secondary">
+          <p className="text-skin-muted text-xs mb-2">Bot + Team 2 + Offline</p>
           <PlayerAvatar
             playerName="Bot_Medium"
             avatarUrl="robot"
@@ -437,7 +437,7 @@ export const Default: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="p-6 rounded-lg bg-gray-900">
+      <div className="p-6 rounded-lg bg-skin-primary">
         <Story />
       </div>
     ),

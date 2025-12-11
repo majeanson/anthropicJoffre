@@ -16,7 +16,7 @@ function InteractiveSwapModal(props: {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        className="px-4 py-2 bg-blue-500/30 text-blue-300 border border-blue-500/50 rounded-lg hover:bg-blue-500/40"
       >
         Open Swap Request
       </button>

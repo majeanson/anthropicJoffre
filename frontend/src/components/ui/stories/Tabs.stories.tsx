@@ -1,8 +1,8 @@
 /**
- * Tabs Component Stories - Midnight Alchemy Edition
+ * Tabs Component Stories
  *
- * Mystical navigation tabs for exploring different sections
- * of the alchemist's laboratory and archives.
+ * Navigation tabs for exploring different sections.
+ * Adapts to the currently selected skin theme.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -10,35 +10,25 @@ import { useState } from 'react';
 import { Tabs, TabPanel } from '../Tabs';
 
 const meta = {
-  title: 'Midnight Alchemy/Tabs',
+  title: 'UI/Tabs',
   component: Tabs,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Tabs
+# Tabs Component
 
-Mystical navigation tabs for exploring different sections
-of the alchemist's laboratory and archives.
+Navigation tabs for exploring different sections.
 
 ## Features
 - **3 variants**: underline, pills, boxed
 - **3 sizes**: sm, md, lg
-- **Icons**: Alchemical symbols
+- **Icons**: Icon support
 - **Badges**: Notification counts
 - **Full width**: Stretch to fill container
 
-## Alchemical Usage
-Navigate between guild members, experiment logs,
-and archived formulas.
+Use the skin selector in the toolbar to see how tabs adapt to different themes.
         `,
       },
     },
@@ -269,29 +259,23 @@ export const AllVariants: Story = {
   },
   render: () => {
     const tabs = [
-      { id: 'tab1', label: 'Mercury' },
-      { id: 'tab2', label: 'Sulfur' },
-      { id: 'tab3', label: 'Salt' },
+      { id: 'tab1', label: 'First' },
+      { id: 'tab2', label: 'Second' },
+      { id: 'tab3', label: 'Third' },
     ];
 
     return (
-      <div className="space-y-8 p-6 bg-[#0B0E14] rounded-xl">
+      <div className="space-y-8 p-6 bg-skin-primary rounded-xl border border-skin-default">
         <div>
-          <h4 className="text-sm font-medium mb-2" style={{ color: '#6B7280' }}>
-            Underline
-          </h4>
+          <h4 className="text-sm font-medium mb-2 text-skin-muted">Underline</h4>
           <Tabs variant="underline" tabs={tabs} activeTab="tab1" onChange={() => {}} />
         </div>
         <div>
-          <h4 className="text-sm font-medium mb-2" style={{ color: '#6B7280' }}>
-            Pills
-          </h4>
+          <h4 className="text-sm font-medium mb-2 text-skin-muted">Pills</h4>
           <Tabs variant="pills" tabs={tabs} activeTab="tab1" onChange={() => {}} />
         </div>
         <div>
-          <h4 className="text-sm font-medium mb-2" style={{ color: '#6B7280' }}>
-            Boxed
-          </h4>
+          <h4 className="text-sm font-medium mb-2 text-skin-muted">Boxed</h4>
           <Tabs variant="boxed" tabs={tabs} activeTab="tab1" onChange={() => {}} />
         </div>
       </div>
@@ -310,37 +294,31 @@ export const Interactive: Story = {
     onChange: () => {},
   },
   render: () => {
-    const [activeTab, setActiveTab] = useState('guild');
+    const [activeTab, setActiveTab] = useState('friends');
 
     return (
-      <div
-        className="p-4 rounded-xl"
-        style={{
-          background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-          border: '1px solid #2D3548',
-        }}
-      >
+      <div className="p-4 rounded-xl bg-skin-secondary border border-skin-default">
         <Tabs
           tabs={[
-            { id: 'guild', label: 'Guild', icon: '⚗', badge: 5 },
-            { id: 'scrolls', label: 'Scrolls', icon: '📜', badge: 2 },
-            { id: 'archives', label: 'Archives', icon: '📚' },
+            { id: 'friends', label: 'Friends', icon: '👥', badge: 5 },
+            { id: 'messages', label: 'Messages', icon: '💬', badge: 2 },
+            { id: 'settings', label: 'Settings', icon: '⚙️' },
           ]}
           activeTab={activeTab}
           onChange={setActiveTab}
         />
 
-        <div className="mt-4 p-4 rounded-lg min-h-[100px]" style={{ background: '#0B0E14' }}>
-          <TabPanel tabId="guild" activeTab={activeTab}>
-            <p style={{ color: '#E8E4DC' }}>Your fellow alchemists await in the guild hall.</p>
+        <div className="mt-4 p-4 rounded-lg min-h-[100px] bg-skin-primary">
+          <TabPanel tabId="friends" activeTab={activeTab}>
+            <p className="text-skin-primary">Your friends list appears here.</p>
           </TabPanel>
 
-          <TabPanel tabId="scrolls" activeTab={activeTab}>
-            <p style={{ color: '#E8E4DC' }}>Unread scrolls containing new discoveries.</p>
+          <TabPanel tabId="messages" activeTab={activeTab}>
+            <p className="text-skin-primary">Your messages appear here.</p>
           </TabPanel>
 
-          <TabPanel tabId="archives" activeTab={activeTab}>
-            <p style={{ color: '#E8E4DC' }}>Ancient formulas preserved for eternity.</p>
+          <TabPanel tabId="settings" activeTab={activeTab}>
+            <p className="text-skin-primary">Your settings appear here.</p>
           </TabPanel>
         </div>
       </div>
@@ -349,10 +327,10 @@ export const Interactive: Story = {
 };
 
 // ============================================================================
-// GUILD PANEL
+// FRIENDS PANEL
 // ============================================================================
 
-export const GuildPanel: Story = {
+export const FriendsPanel: Story = {
   args: {
     tabs: [],
     activeTab: '',
@@ -362,31 +340,16 @@ export const GuildPanel: Story = {
     const [activeTab, setActiveTab] = useState('online');
 
     return (
-      <div
-        className="p-4 rounded-xl w-80"
-        style={{
-          background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-          border: '1px solid #2D3548',
-        }}
-      >
-        <h3
-          className="text-lg font-bold mb-4"
-          style={{
-            fontFamily: '"Cinzel", Georgia, serif',
-            color: '#D4A574',
-            textShadow: '0 0 10px rgba(212, 165, 116, 0.3)',
-          }}
-        >
-          Guild Members
-        </h3>
+      <div className="p-4 rounded-xl w-80 bg-skin-secondary border border-skin-default">
+        <h3 className="text-lg font-bold mb-4 text-skin-accent">Friends</h3>
 
         <Tabs
           variant="pills"
           fullWidth
           tabs={[
-            { id: 'online', label: 'Active', badge: 8 },
-            { id: 'all', label: 'All Members' },
-            { id: 'blocked', label: 'Exiled' },
+            { id: 'online', label: 'Online', badge: 8 },
+            { id: 'all', label: 'All Friends' },
+            { id: 'blocked', label: 'Blocked' },
           ]}
           activeTab={activeTab}
           onChange={setActiveTab}
@@ -394,28 +357,20 @@ export const GuildPanel: Story = {
 
         <div className="mt-4 space-y-2">
           <TabPanel tabId="online" activeTab={activeTab}>
-            {['Aurelia', 'Magnus', 'Isolde'].map((name) => (
-              <div
-                key={name}
-                className="p-2 rounded flex items-center gap-2"
-                style={{ background: '#0B0E14' }}
-              >
-                <span className="w-2 h-2 rounded-full" style={{ background: '#10B981' }} />
-                <span style={{ color: '#E8E4DC' }}>{name}</span>
+            {['Player1', 'Player2', 'Player3'].map((name) => (
+              <div key={name} className="p-2 rounded flex items-center gap-2 bg-skin-primary">
+                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-skin-primary">{name}</span>
               </div>
             ))}
           </TabPanel>
 
           <TabPanel tabId="all" activeTab={activeTab}>
-            <p className="text-center py-4" style={{ color: '#6B7280' }}>
-              Showing all guild members...
-            </p>
+            <p className="text-center py-4 text-skin-muted">Showing all friends...</p>
           </TabPanel>
 
           <TabPanel tabId="blocked" activeTab={activeTab}>
-            <p className="text-center py-4" style={{ color: '#6B7280' }}>
-              No exiled members
-            </p>
+            <p className="text-center py-4 text-skin-muted">No blocked users</p>
           </TabPanel>
         </div>
       </div>
@@ -424,10 +379,10 @@ export const GuildPanel: Story = {
 };
 
 // ============================================================================
-// EXPERIMENT MODE SELECTOR
+// GAME MODE SELECTOR
 // ============================================================================
 
-export const ExperimentModeSelector: Story = {
+export const GameModeSelector: Story = {
   args: {
     tabs: [],
     activeTab: '',
@@ -443,29 +398,23 @@ export const ExperimentModeSelector: Story = {
           fullWidth
           size="lg"
           tabs={[
-            { id: 'practice', label: 'Practice', icon: '⚗' },
+            { id: 'practice', label: 'Practice', icon: '🎮' },
             { id: 'ranked', label: 'Ranked', icon: '🏆' },
-            { id: 'custom', label: 'Custom', icon: '☿' },
+            { id: 'custom', label: 'Custom', icon: '⚙️' },
           ]}
           activeTab={activeTab}
           onChange={setActiveTab}
         />
 
-        <div
-          className="mt-4 p-4 rounded-lg text-center"
-          style={{
-            background: '#0B0E14',
-            border: '1px solid #2D3548',
-          }}
-        >
+        <div className="mt-4 p-4 rounded-lg text-center bg-skin-primary border border-skin-default">
           {activeTab === 'practice' && (
-            <p style={{ color: '#E8E4DC' }}>Experiment freely with no guild standing impact</p>
+            <p className="text-skin-primary">Play casually without affecting your rank</p>
           )}
           {activeTab === 'ranked' && (
-            <p style={{ color: '#E8E4DC' }}>Compete to climb the Grand Alchemist rankings</p>
+            <p className="text-skin-primary">Compete to climb the leaderboard</p>
           )}
           {activeTab === 'custom' && (
-            <p style={{ color: '#E8E4DC' }}>Configure custom experiment parameters</p>
+            <p className="text-skin-primary">Configure custom game settings</p>
           )}
         </div>
       </div>
@@ -474,80 +423,56 @@ export const ExperimentModeSelector: Story = {
 };
 
 // ============================================================================
-// ELEMENTAL TABS
+// SUIT SELECTOR TABS
 // ============================================================================
 
-export const ElementalTabs: Story = {
+export const SuitSelectorTabs: Story = {
   args: {
     tabs: [],
     activeTab: '',
     onChange: () => {},
   },
   render: () => {
-    const [activeTab, setActiveTab] = useState('fire');
+    const [activeTab, setActiveTab] = useState('red');
 
-    const elementColors: Record<string, string> = {
-      fire: '#EF4444',
-      water: '#3B82F6',
-      earth: '#84CC16',
-      air: '#E8E4DC',
+    const suitColors: Record<string, string> = {
+      red: 'border-red-500',
+      blue: 'border-blue-500',
+      green: 'border-green-500',
+      brown: 'border-yellow-700',
     };
 
     return (
-      <div
-        className="p-6 rounded-xl"
-        style={{
-          background: '#0B0E14',
-          border: '1px solid #2D3548',
-        }}
-      >
-        <h3
-          className="text-lg font-bold mb-4 text-center"
-          style={{
-            fontFamily: '"Cinzel", Georgia, serif',
-            color: '#D4A574',
-          }}
-        >
-          Choose Your Element
-        </h3>
+      <div className="p-6 rounded-xl bg-skin-primary border border-skin-default">
+        <h3 className="text-lg font-bold mb-4 text-center text-skin-accent">Choose Your Suit</h3>
 
         <Tabs
           variant="pills"
           fullWidth
           tabs={[
-            { id: 'fire', label: '△ Fire' },
-            { id: 'water', label: '▽ Water' },
-            { id: 'earth', label: '◇ Earth' },
-            { id: 'air', label: '○ Air' },
+            { id: 'red', label: '♥ Red' },
+            { id: 'blue', label: '♠ Blue' },
+            { id: 'green', label: '♣ Green' },
+            { id: 'brown', label: '♦ Brown' },
           ]}
           activeTab={activeTab}
           onChange={setActiveTab}
         />
 
         <div
-          className="mt-4 p-4 rounded-lg text-center transition-colors"
-          style={{
-            background: '#131824',
-            borderLeft: `3px solid ${elementColors[activeTab]}`,
-          }}
+          className={`mt-4 p-4 rounded-lg text-center bg-skin-secondary border-l-4 ${suitColors[activeTab]}`}
         >
           <span className="text-3xl block mb-2">
-            {activeTab === 'fire' && '🔥'}
-            {activeTab === 'water' && '💧'}
-            {activeTab === 'earth' && '🌿'}
-            {activeTab === 'air' && '💨'}
+            {activeTab === 'red' && '♥️'}
+            {activeTab === 'blue' && '♠️'}
+            {activeTab === 'green' && '♣️'}
+            {activeTab === 'brown' && '♦️'}
           </span>
-          <p
-            className="italic"
-            style={{
-              fontFamily: '"Cormorant Garamond", Georgia, serif',
-              color: '#9CA3AF',
-            }}
-          >
-            {activeTab === 'fire' && 'The flame of transformation'}
-            {activeTab === 'water' && 'The flow of purification'}
-            {activeTab === 'earth' && 'The foundation of stability'}
-            {activeTab === 'air' && 'The breath of inspiration'}
+          <p className="italic text-skin-muted">
+            {activeTab === 'red' && 'The red suit'}
+            {activeTab === 'blue' && 'The blue suit'}
+            {activeTab === 'green' && 'The green suit'}
+            {activeTab === 'brown' && 'The brown suit (trump)'}
           </p>
         </div>
       </div>
