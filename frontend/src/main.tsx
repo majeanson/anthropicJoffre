@@ -9,6 +9,7 @@ import { SettingsProvider } from './contexts/SettingsContext';
 import { AuthProvider } from './contexts/AuthContext'; // Sprint 3 Phase 1
 import { SkinProvider } from './contexts/SkinContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ThemedBackground } from './components/ThemedBackground';
 import logger from './utils/logger';
 import { initWebVitals } from './utils/webVitals';
 
@@ -60,6 +61,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <SocketProvider>
             <GameProvider>
               <SettingsProvider>
+                <ThemedBackground />
                 <App />
               </SettingsProvider>
             </GameProvider>

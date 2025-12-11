@@ -81,7 +81,7 @@ function ToggleSwitch({
 }
 
 export function SettingsContent({ onShowRules, onShowDebug, socket }: SettingsContentProps) {
-  const { animationsEnabled, setAnimationsEnabled } = useSettings();
+  const { animationsEnabled, setAnimationsEnabled, environmentEnabled, setEnvironmentEnabled } = useSettings();
   useSkin();
   useCardSkin(); // Initialize card skin context
   useSpecialCardSkins(); // Initialize special card skin context
@@ -230,6 +230,16 @@ export function SettingsContent({ onShowRules, onShowDebug, socket }: SettingsCo
                   onChange={setAnimationsEnabled}
                   label="Animations"
                   description="Card animations, glows, transitions"
+                />
+              </div>
+
+              {/* Environment Effects Toggle */}
+              <div className="border-t border-[var(--color-border-subtle)] pt-4">
+                <ToggleSwitch
+                  enabled={environmentEnabled}
+                  onChange={setEnvironmentEnabled}
+                  label="Ambient Effects"
+                  description="Floating particles, candles, sparkles per theme"
                 />
               </div>
             </div>

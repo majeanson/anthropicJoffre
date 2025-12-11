@@ -8,6 +8,8 @@ interface SettingsContextType {
   setAutoplayEnabled: (enabled: boolean) => void;
   animationsEnabled: boolean;
   setAnimationsEnabled: (enabled: boolean) => void;
+  environmentEnabled: boolean;
+  setEnvironmentEnabled: (enabled: boolean) => void;
   debugMode: boolean;
   setDebugMode: (enabled: boolean) => void;
   debugPanelOpen: boolean;
@@ -32,6 +34,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     return saved !== null ? JSON.parse(saved) : true;
   });
 
+  const [environmentEnabled, setEnvironmentEnabledState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('environmentEnabled');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
   const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
   const [debugMode, setDebugMode] = useState<boolean>(false);
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
@@ -53,6 +60,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('animationsEnabled', JSON.stringify(animationsEnabled));
   }, [animationsEnabled]);
 
+  // Sync environment effects settings
+  useEffect(() => {
+    localStorage.setItem('environmentEnabled', JSON.stringify(environmentEnabled));
+  }, [environmentEnabled]);
+
   // Sync beginner mode settings
   useEffect(() => {
     localStorage.setItem('beginnerMode', JSON.stringify(beginnerMode));
@@ -70,6 +82,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setAnimationsEnabledState(enabled);
   };
 
+  const setEnvironmentEnabled = (enabled: boolean) => {
+    setEnvironmentEnabledState(enabled);
+  };
+
   const setBeginnerMode = (enabled: boolean) => {
     setBeginnerModeState(enabled);
   };
@@ -83,6 +99,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         setAutoplayEnabled,
         animationsEnabled,
         setAnimationsEnabled,
+        environmentEnabled,
+        setEnvironmentEnabled,
         debugMode,
         setDebugMode,
         debugPanelOpen,

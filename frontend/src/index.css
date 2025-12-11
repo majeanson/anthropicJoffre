@@ -1464,3 +1464,201 @@ img.clickable {
     background-color: inherit !important;
   }
 }
+
+/* ============================================================================
+   THEMED BACKGROUND ANIMATIONS
+   Ambient particle effects for each skin theme
+   ============================================================================ */
+
+/* Candle flicker for Tavern Noir */
+@keyframes candle-flicker {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    opacity: 0.8;
+    transform: translateY(-2px) scale(1.1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-1px) scale(0.95);
+  }
+  75% {
+    opacity: 0.9;
+    transform: translateY(-3px) scale(1.05);
+  }
+}
+
+.animate-candle-flicker {
+  animation: candle-flicker var(--duration, 8s) ease-in-out infinite;
+}
+
+/* Float up for Midnight Alchemy particles */
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100vh) translateX(var(--wobble, 20px));
+  }
+}
+
+.animate-float-up {
+  animation: float-up var(--duration, 15s) ease-out infinite;
+}
+
+/* Sparkle for Luxury Casino */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+.animate-sparkle {
+  animation: sparkle var(--duration, 3s) ease-in-out infinite;
+}
+
+/* Digital rain for Cyberpunk */
+@keyframes digital-rain {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh);
+  }
+}
+
+.animate-digital-rain {
+  animation: digital-rain var(--duration, 2s) linear infinite;
+}
+
+/* Bubble rise for Ocean Depths */
+@keyframes bubble-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0) scale(0.5);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100vh) translateX(var(--wobble, 20px)) scale(1.2);
+  }
+}
+
+.animate-bubble-rise {
+  animation: bubble-rise var(--duration, 10s) ease-in-out infinite;
+}
+
+/* Firefly for Forest Enchanted */
+@keyframes firefly {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translate(0, 0);
+  }
+  25% {
+    opacity: 0.8;
+    transform: translate(10px, -15px);
+  }
+  50% {
+    opacity: 0.4;
+    transform: translate(-5px, -30px);
+  }
+  75% {
+    opacity: 0.9;
+    transform: translate(15px, -20px);
+  }
+}
+
+.animate-firefly {
+  animation: firefly var(--duration, 4s) ease-in-out infinite;
+}
+
+/* Petal fall for Sakura Spring */
+@keyframes petal-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-10%) translateX(0) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(110vh) translateX(var(--wobble, 50px)) rotate(720deg);
+  }
+}
+
+.animate-petal-fall {
+  animation: petal-fall var(--duration, 12s) ease-in-out infinite;
+}
+
+/* Dust float for Classic Parchment */
+@keyframes dust-float {
+  0%, 100% {
+    opacity: 0.2;
+    transform: translate(0, 0);
+  }
+  25% {
+    opacity: 0.35;
+    transform: translate(5px, -10px);
+  }
+  50% {
+    opacity: 0.2;
+    transform: translate(-3px, -5px);
+  }
+  75% {
+    opacity: 0.3;
+    transform: translate(8px, -15px);
+  }
+}
+
+.animate-dust-float {
+  animation: dust-float var(--duration, 20s) ease-in-out infinite;
+}
+
+/* Geometric drift for Modern Minimal */
+@keyframes geometric-drift {
+  0%, 100% {
+    opacity: 0.03;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    opacity: 0.05;
+    transform: translate(20px, 20px) rotate(90deg);
+  }
+}
+
+.animate-geometric-drift {
+  animation: geometric-drift var(--duration, 30s) ease-in-out infinite;
+}
