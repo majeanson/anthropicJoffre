@@ -31,6 +31,7 @@ export const PlayerHand = memo(function PlayerHand({
   onSetPlayEffect,
   queuedCard,
   onQueueCard,
+  trump,
 }: PlayerHandProps) {
   const [showDealingAnimation, setShowDealingAnimation] = useState(false);
   const [dealingCardIndex, setDealingCardIndex] = useState(0);
@@ -80,6 +81,14 @@ export const PlayerHand = memo(function PlayerHand({
       return queuedCard?.color === card.color && queuedCard?.value === card.value;
     },
     [queuedCard]
+  );
+
+  // Check if a card is trump suit
+  const isCardTrump = useCallback(
+    (card: CardType) => {
+      return trump && card.color === trump;
+    },
+    [trump]
   );
 
   // Handle card click with debouncing and validation
@@ -454,6 +463,10 @@ export const PlayerHand = memo(function PlayerHand({
                             </div>
                           </>
                         )}
+                        {/* Trump card indicator */}
+                        {isCardTrump(card) && !isQueued && !isSelected && (
+                          <div className="absolute -inset-1 rounded-xl animate-trump-indicator pointer-events-none z-0" />
+                        )}
                         <CardComponent
                           card={card}
                           size="large"
@@ -556,6 +569,10 @@ export const PlayerHand = memo(function PlayerHand({
                             </div>
                           </>
                         )}
+                        {/* Trump card indicator */}
+                        {isCardTrump(card) && !isQueued && !isSelected && !isPreview && (
+                          <div className="absolute -inset-2 rounded-2xl animate-trump-indicator pointer-events-none z-0" />
+                        )}
                         <CardComponent
                           card={card}
                           size="large"
@@ -626,6 +643,10 @@ export const PlayerHand = memo(function PlayerHand({
                         QUEUED
                       </div>
                     </>
+                  )}
+                  {/* Trump card indicator */}
+                  {isCardTrump(card) && !isQueued && !isSelected && (
+                    <div className="absolute -inset-1 rounded-lg animate-trump-indicator pointer-events-none z-0" />
                   )}
                   <CardComponent
                     card={card}

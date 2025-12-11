@@ -232,6 +232,12 @@ function CardComponent({
     return classes.join(' ');
   }, [isPlayable, disabled]);
 
+  // Special card effect classes (Red 0 = golden glow, Brown 0 = dark aura)
+  const specialEffectClass = useMemo(() => {
+    if (!isSpecial) return '';
+    return card.color === 'red' ? 'card-red-zero-effect' : 'card-brown-zero-effect';
+  }, [isSpecial, card.color]);
+
   // Brown cards get thicker border
   const borderThicknessClass = card.color === 'brown' ? 'border-4' : '';
 
@@ -249,6 +255,7 @@ function CardComponent({
         ${suitClass.border}
         ${suitClass.borderStyle}
         ${stateClasses}
+        ${specialEffectClass}
         rounded-[var(--radius-lg)]
         font-display
         flex flex-col items-center justify-center gap-1
@@ -267,6 +274,14 @@ function CardComponent({
     >
       {/* Parchment texture overlay */}
       <div className="absolute inset-0 rounded-[var(--radius-lg)] pointer-events-none opacity-40 card-parchment-overlay" />
+
+      {/* Special card particle effects */}
+      {isSpecial && card.color === 'red' && (
+        <div className="card-red-zero-sparkles" aria-hidden="true" />
+      )}
+      {isSpecial && card.color === 'brown' && (
+        <div className="card-brown-zero-wisps" aria-hidden="true" />
+      )}
 
       {/* Ethereal glow for playable cards */}
       {isPlayable && !disabled && (

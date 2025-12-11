@@ -549,6 +549,7 @@ function PlayingPhaseComponent({
           onSetPlayEffect={setPlayEffect}
           queuedCard={queuedCard}
           onQueueCard={handleQueueCard}
+          trump={gameState.trump}
         />
       </div>
 

@@ -14,9 +14,10 @@ interface MatchCardProps {
   game: GameHistoryEntry;
   onViewReplay?: (gameId: string) => void;
   onViewDetails?: (gameId: string) => void;
+  onResumeGame?: (gameId: string) => void;
 }
 
-export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps) {
+export function MatchCard({ game, onViewReplay, onViewDetails, onResumeGame }: MatchCardProps) {
   const isFinished = game.is_finished;
   const isWin = game.won_game;
 
@@ -135,18 +136,18 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
         )
       ) : (
         // Resume button for unfinished games
-        <Button
-          variant="warning"
-          fullWidth
-          onClick={(e) => {
-            e.stopPropagation();
-            // TODO: Implement resume game functionality
-          }}
-          disabled
-          title="Resume functionality coming soon"
-        >
-          <span aria-hidden="true">▶️</span> Resume Game (Coming Soon)
-        </Button>
+        onResumeGame && (
+          <Button
+            variant="warning"
+            fullWidth
+            onClick={(e) => {
+              e.stopPropagation();
+              onResumeGame(game.game_id);
+            }}
+          >
+            <span aria-hidden="true">▶️</span> Resume Game
+          </Button>
+        )
       )}
     </UICard>
   );

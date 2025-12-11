@@ -480,6 +480,10 @@ export function Lobby({
                 socket={socket}
                 isOpen={showPlayerStats}
                 onClose={() => setShowPlayerStats(false)}
+                onResumeGame={(gameId) => {
+                  setShowPlayerStats(false);
+                  onJoinGame(gameId, playerName);
+                }}
               />
               <GlobalLeaderboard
                 socket={socket}

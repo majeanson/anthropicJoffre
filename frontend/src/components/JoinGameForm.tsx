@@ -426,6 +426,10 @@ export function JoinGameForm({
             socket={socket}
             isOpen={showPlayerStats}
             onClose={() => setShowPlayerStats(false)}
+            onResumeGame={(gameIdToResume) => {
+              setShowPlayerStats(false);
+              onJoinGame(gameIdToResume, playerName);
+            }}
           />
           <GlobalLeaderboard
             socket={socket}

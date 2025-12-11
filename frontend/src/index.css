@@ -914,6 +914,221 @@ button:not(:disabled):active {
   box-shadow: 0 2px 10px var(--color-error);
 }
 
+/* ============================================================================
+   SPECIAL CARD VISUAL EFFECTS
+   Red 0 (+5 points): Golden glow with sparkle particles
+   Brown 0 (-2 points): Dark aura with subtle shake
+   ============================================================================ */
+
+/* Red 0 - Golden Glow Pulse Animation */
+@keyframes red-zero-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(255, 215, 0, 0.4),
+      0 0 30px rgba(255, 165, 0, 0.3),
+      0 0 45px rgba(255, 140, 0, 0.2),
+      inset 0 0 15px rgba(255, 215, 0, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 25px rgba(255, 215, 0, 0.6),
+      0 0 50px rgba(255, 165, 0, 0.4),
+      0 0 75px rgba(255, 140, 0, 0.3),
+      inset 0 0 25px rgba(255, 215, 0, 0.2);
+  }
+}
+
+/* Red 0 Sparkle Particles */
+@keyframes sparkle-float {
+  0% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-20px) scale(0.8);
+  }
+  100% {
+    transform: translateY(-40px) scale(0);
+    opacity: 0;
+  }
+}
+
+.card-red-zero-effect {
+  animation: red-zero-glow 2s ease-in-out infinite;
+  border-color: #fbbf24 !important;
+}
+
+.card-red-zero-effect::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.15), rgba(255, 140, 0, 0.1));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Sparkle particles container for Red 0 */
+.card-red-zero-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+
+.card-red-zero-sparkles::before,
+.card-red-zero-sparkles::after {
+  content: '✨';
+  position: absolute;
+  font-size: 12px;
+  animation: sparkle-float 2s ease-out infinite;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.8));
+}
+
+.card-red-zero-sparkles::before {
+  left: 20%;
+  top: 50%;
+  animation-delay: 0s;
+}
+
+.card-red-zero-sparkles::after {
+  right: 20%;
+  top: 40%;
+  animation-delay: 0.7s;
+}
+
+/* Brown 0 - Dark Aura Effect */
+@keyframes brown-zero-aura {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(92, 64, 51, 0.5),
+      0 0 30px rgba(59, 36, 27, 0.4),
+      0 0 45px rgba(30, 20, 15, 0.3),
+      inset 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(92, 64, 51, 0.6),
+      0 0 40px rgba(59, 36, 27, 0.5),
+      0 0 60px rgba(30, 20, 15, 0.4),
+      inset 0 0 15px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Subtle Shake Animation for Brown 0 */
+@keyframes brown-zero-shake {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-1px, 0); }
+  20% { transform: translate(1px, -1px); }
+  30% { transform: translate(-1px, 1px); }
+  40% { transform: translate(1px, 0); }
+  50% { transform: translate(-1px, -1px); }
+  60% { transform: translate(1px, 1px); }
+  70% { transform: translate(0, -1px); }
+  80% { transform: translate(-1px, 0); }
+  90% { transform: translate(1px, 0); }
+}
+
+.card-brown-zero-effect {
+  animation: brown-zero-aura 3s ease-in-out infinite, brown-zero-shake 4s ease-in-out infinite;
+  border-color: #5c4033 !important;
+}
+
+.card-brown-zero-effect::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: var(--radius-lg);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Dark wisps for Brown 0 */
+.card-brown-zero-wisps {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 5;
+}
+
+@keyframes wisp-float {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.4;
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-30px) rotate(180deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+.card-brown-zero-wisps::before,
+.card-brown-zero-wisps::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(59, 36, 27, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: wisp-float 3s ease-out infinite;
+}
+
+.card-brown-zero-wisps::before {
+  left: 25%;
+  bottom: 20%;
+  animation-delay: 0s;
+}
+
+.card-brown-zero-wisps::after {
+  right: 25%;
+  bottom: 30%;
+  animation-delay: 1s;
+}
+
+/* Trump Card Pulse Effect */
+@keyframes trump-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px transparent;
+  }
+  50% {
+    box-shadow: 0 0 0 3px var(--color-text-accent), 0 0 15px var(--color-glow);
+  }
+}
+
+.card-trump-effect {
+  animation: trump-pulse 1.5s ease-in-out infinite;
+}
+
+/* Reduced motion: Disable animations for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .card-red-zero-effect,
+  .card-brown-zero-effect,
+  .card-trump-effect {
+    animation: none;
+  }
+
+  .card-red-zero-sparkles::before,
+  .card-red-zero-sparkles::after,
+  .card-brown-zero-wisps::before,
+  .card-brown-zero-wisps::after {
+    display: none;
+  }
+}
+
 /* Card disabled overlay */
 .card-disabled-overlay {
   background-color: color-mix(in srgb, var(--color-bg-primary) 60%, transparent);
@@ -1661,4 +1876,215 @@ img.clickable {
 
 .animate-geometric-drift {
   animation: geometric-drift var(--duration, 30s) ease-in-out infinite;
+}
+
+/* ============================================================================
+   CARD PLAY AND TRICK ANIMATIONS
+   Card flight from player hand to trick area
+   Trick collection towards winner
+   ============================================================================ */
+
+/* Card slide-in from each direction (card played to trick area) */
+@keyframes slide-from-bottom {
+  0% {
+    transform: translateY(80px) scale(0.7);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-from-top {
+  0% {
+    transform: translateY(-80px) scale(0.7);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-from-left {
+  0% {
+    transform: translateX(-80px) scale(0.7);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-from-right {
+  0% {
+    transform: translateX(80px) scale(0.7);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-slide-from-bottom {
+  animation: slide-from-bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-from-top {
+  animation: slide-from-top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-from-left {
+  animation: slide-from-left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-from-right {
+  animation: slide-from-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Trick collection - cards slide toward winner position */
+@keyframes collect-to-bottom {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(0, 100px) scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(0, 120px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes collect-to-top {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(0, -100px) scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(0, -120px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes collect-to-left {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-100px, 0) scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-120px, 0) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes collect-to-right {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(100px, 0) scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(120px, 0) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-collect-to-bottom {
+  animation: collect-to-bottom 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-collect-to-top {
+  animation: collect-to-top 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-collect-to-left {
+  animation: collect-to-left 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-collect-to-right {
+  animation: collect-to-right 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+/* Card entrance with slight bounce */
+@keyframes card-entrance {
+  0% {
+    transform: scale(0.5) rotateY(90deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05) rotateY(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-card-entrance {
+  animation: card-entrance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Trump card indicator pulse - highlight trump cards in hand */
+@keyframes trump-indicator-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px var(--color-text-accent),
+      0 0 10px var(--color-glow);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px var(--color-text-accent),
+      0 0 20px var(--color-glow),
+      0 0 30px var(--color-glow);
+  }
+}
+
+.animate-trump-indicator {
+  animation: trump-indicator-pulse 2s ease-in-out infinite;
+}
+
+/* Reduced motion: Disable card animations for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-from-bottom,
+  .animate-slide-from-top,
+  .animate-slide-from-left,
+  .animate-slide-from-right,
+  .animate-collect-to-bottom,
+  .animate-collect-to-top,
+  .animate-collect-to-left,
+  .animate-collect-to-right,
+  .animate-card-entrance,
+  .animate-trump-indicator {
+    animation: none;
+  }
 }

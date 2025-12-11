@@ -14,6 +14,7 @@ interface HistoryTabProps {
   onRetry: () => void;
   onViewReplay?: (gameId: string) => void;
   onViewDetails: (gameId: string) => void;
+  onResumeGame?: (gameId: string) => void;
   onClose: () => void;
 }
 
@@ -24,6 +25,7 @@ export function HistoryTab({
   onRetry,
   onViewReplay,
   onViewDetails,
+  onResumeGame,
   onClose,
 }: HistoryTabProps) {
   const [historyTab, setHistoryTab] = useState<HistoryTabType>('finished');
@@ -221,6 +223,14 @@ export function HistoryTab({
                         : undefined
                     }
                     onViewDetails={onViewDetails}
+                    onResumeGame={
+                      onResumeGame
+                        ? (gameId) => {
+                            onResumeGame(gameId);
+                            onClose();
+                          }
+                        : undefined
+                    }
                   />
                 ))}
               </div>

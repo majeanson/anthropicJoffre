@@ -100,6 +100,8 @@ export interface PlayerHandProps {
   onSetPlayEffect?: (effect: { card: CardType; position: { x: number; y: number } } | null) => void;
   queuedCard?: CardType | null;
   onQueueCard?: (card: CardType | null) => void;
+  /** Current trump color - cards of this color will have a pulse effect */
+  trump?: string | null;
 }
 
 // ============================================================================

@@ -39,6 +39,7 @@ interface PlayerStatsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onViewReplay?: (gameId: string) => void;
+  onResumeGame?: (gameId: string) => void;
 }
 
 export function PlayerStatsModal({
@@ -47,6 +48,7 @@ export function PlayerStatsModal({
   isOpen,
   onClose,
   onViewReplay,
+  onResumeGame,
 }: PlayerStatsModalProps) {
   // CRITICAL: Check isOpen BEFORE any hooks
   if (!isOpen) return null;
@@ -210,6 +212,7 @@ export function PlayerStatsModal({
                   setSelectedMatchId(gameId);
                   setShowMatchStatsModal(true);
                 }}
+                onResumeGame={onResumeGame}
                 onClose={onClose}
               />
             )}
