@@ -245,6 +245,12 @@ export const rateLimiters = {
     { windowMs: 60000, maxRequests: 20 }, // 20 changes per minute
     'TeamChanges'
   ),
+
+  // Lounge invites (wave, invite to table, friend requests from lounge)
+  loungeInvites: new SlidingWindowRateLimiter(
+    { windowMs: 60000, maxRequests: 10 }, // 10 invites/waves per minute
+    'LoungeInvites'
+  ),
 };
 
 /**

@@ -11,6 +11,8 @@
 
 import { Server, Socket } from 'socket.io';
 import logger from '../utils/logger.js';
+import { getFriendsWithStatus } from '../db/friends.js';
+import { rateLimiters, getSocketIP } from '../utils/rateLimiter.js';
 
 // Generate unique ID (same pattern as elsewhere in codebase)
 function generateId(): string {
@@ -29,6 +31,31 @@ import {
   ChatMessage,
 } from '../types/game.js';
 import { getAllTables, getTable } from './tableHandler.js';
+
+/**
+ * Enrich lounge players with friend status relative to the requesting player.
+ * Each player sees their own friends marked with isFriend=true.
+ */
+async function enrichPlayersWithFriendStatus(
+  players: LoungePlayer[],
+  requestingPlayerName: string
+): Promise<LoungePlayer[]> {
+  try {
+    // Get requesting player's friends list
+    const friends = await getFriendsWithStatus(requestingPlayerName);
+    const friendNames = new Set(friends.map(f => f.player_name));
+
+    // Enrich each player with isFriend status
+    return players.map(player => ({
+      ...player,
+      isFriend: friendNames.has(player.playerName),
+    }));
+  } catch (error) {
+    logger.error('Error enriching players with friend status:', error);
+    // Return players without friend info rather than failing
+    return players;
+  }
+}
 
 // In-memory storage for lounge state
 const loungePlayers = new Map<string, LoungePlayer>(); // socketId -> LoungePlayer
@@ -66,7 +93,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   const getPlayerName = (): string => socket.data.playerName || 'Anonymous';
 
   // Join the lounge
-  socket.on('join_lounge', () => {
+  socket.on('join_lounge', async () => {
     try {
       const playerName = getPlayerName();
 
@@ -97,20 +124,38 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
 
       socket.join('lounge');
 
-      // Send current lounge state
+      // Enrich online players with friend status (relative to joining player)
+      const allPlayers = Array.from(loungePlayers.values());
+      const enrichedPlayers = await enrichPlayersWithFriendStatus(allPlayers, playerName);
+
+      // Send current lounge state with enriched friend info
       socket.emit('lounge_state', {
         tables: getAllTables().filter(t => !t.settings.isPrivate),
         activities: recentActivities,
         voiceParticipants: Array.from(loungeVoice.values()),
-        onlinePlayers: Array.from(loungePlayers.values()),
+        onlinePlayers: enrichedPlayers,
         liveGames: Array.from(liveGames.values()),
         chatMessages: loungeChatMessages,
       });
 
-      // Broadcast join to others
+      // Broadcast join to others - each existing player needs their own view
       const activity = addActivity('player_joined_lounge', playerName, {});
       io.to('lounge').emit('lounge_activity', activity);
-      io.to('lounge').emit('lounge_player_joined', { player });
+
+      // Send player_joined to each other lounge member with their specific isFriend status
+      for (const [socketId, loungePlayer] of loungePlayers.entries()) {
+        if (socketId !== socket.id) {
+          // Check if the new player is a friend of this existing player
+          const existingSocket = io.sockets.sockets.get(socketId);
+          if (existingSocket) {
+            const friends = await getFriendsWithStatus(loungePlayer.playerName);
+            const isFriend = friends.some(f => f.player_name === playerName);
+            existingSocket.emit('lounge_player_joined', {
+              player: { ...player, isFriend },
+            });
+          }
+        }
+      }
 
       logger.info(`${playerName} joined the lounge`);
     } catch (error) {
@@ -183,6 +228,15 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
       const playerName = getPlayerName();
       const { targetPlayerName } = payload;
 
+      // Rate limiting for waves
+      const ip = getSocketIP(socket);
+      const rateLimit = rateLimiters.loungeInvites.checkLimit(playerName, ip);
+      if (!rateLimit.allowed) {
+        socket.emit('error', { message: 'Too many waves. Please slow down.', context: 'wave_at_player' });
+        return;
+      }
+      rateLimiters.loungeInvites.recordRequest(playerName, ip);
+
       if (targetPlayerName === playerName) {
         socket.emit('error', { message: "You can't wave at yourself", context: 'wave_at_player' });
         return;
@@ -221,6 +275,21 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
       const playerName = getPlayerName();
       const { tableId, targetPlayerName } = payload;
 
+      // Rate limiting for invites
+      const ip = getSocketIP(socket);
+      const rateLimit = rateLimiters.loungeInvites.checkLimit(playerName, ip);
+      if (!rateLimit.allowed) {
+        socket.emit('error', { message: 'Too many invites. Please slow down.', context: 'invite_to_table' });
+        return;
+      }
+      rateLimiters.loungeInvites.recordRequest(playerName, ip);
+
+      // Prevent self-invite
+      if (targetPlayerName === playerName) {
+        socket.emit('error', { message: 'You cannot invite yourself', context: 'invite_to_table' });
+        return;
+      }
+
       const table = getTable(tableId);
       if (!table) {
         socket.emit('error', { message: 'Table not found', context: 'invite_to_table' });
@@ -231,6 +300,13 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
       const senderAtTable = table.seats.some(s => s.playerName === playerName);
       if (!senderAtTable) {
         socket.emit('error', { message: 'You must be at the table to invite', context: 'invite_to_table' });
+        return;
+      }
+
+      // Check if target is already at the table
+      const targetAtTable = table.seats.some(s => s.playerName === targetPlayerName);
+      if (targetAtTable) {
+        socket.emit('error', { message: 'Player is already at this table', context: 'invite_to_table' });
         return;
       }
 
@@ -344,10 +420,13 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   });
 
   // Get online players
-  socket.on('get_lounge_players', () => {
+  socket.on('get_lounge_players', async () => {
     try {
+      const playerName = getPlayerName();
+      const allPlayers = Array.from(loungePlayers.values());
+      const enrichedPlayers = await enrichPlayersWithFriendStatus(allPlayers, playerName);
       socket.emit('lounge_players', {
-        players: Array.from(loungePlayers.values()),
+        players: enrichedPlayers,
       });
     } catch (error) {
       logger.error('Error getting players:', error);

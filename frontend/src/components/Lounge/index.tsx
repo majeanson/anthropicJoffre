@@ -331,6 +331,24 @@ export function Lounge({
     });
   });
 
+  // Friend request success - show toast on actual success from server
+  useSocketEvent(socket, 'friend_request_sent', (data: { request: { to_player: string } }) => {
+    setToastMessage({
+      message: `Friend request sent to ${data.request.to_player}`,
+      variant: 'success',
+      title: 'Request Sent',
+    });
+  });
+
+  // Table invite success - show toast on actual success from server
+  useSocketEvent(socket, 'invite_sent', (data: { targetPlayerName: string }) => {
+    setToastMessage({
+      message: `Invited ${data.targetPlayerName} to join your table`,
+      variant: 'success',
+      title: 'Invite Sent',
+    });
+  });
+
   // Actions
   const handleJoinVoice = useCallback(async () => {
     sounds.buttonClick();
@@ -403,11 +421,7 @@ export function Lounge({
     if (socket) {
       socket.emit('send_friend_request', { toPlayer: targetName });
       sounds.buttonClick();
-      setToastMessage({
-        message: `Friend request sent to ${targetName}`,
-        variant: 'success',
-        title: 'Request Sent',
-      });
+      // Toast will be shown on friend_request_sent or error event from server
     }
   }, [socket]);
 
@@ -415,11 +429,7 @@ export function Lounge({
     if (socket && selectedTableId) {
       socket.emit('invite_to_table', { tableId: selectedTableId, targetPlayerName: targetName });
       sounds.buttonClick();
-      setToastMessage({
-        message: `Invited ${targetName} to join your table`,
-        variant: 'success',
-        title: 'Invite Sent',
-      });
+      // Toast will be shown on invite_sent or error event from server
     }
   }, [socket, selectedTableId]);
 

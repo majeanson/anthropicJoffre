@@ -33,7 +33,10 @@ export function TableRoom({
   onGameStart,
 }: TableRoomProps) {
   const [table, setTable] = useState<LoungeTable>(initialTable);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  // Initialize chat messages from table's chat history (if any)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(
+    initialTable.chatMessages || []
+  );
   const [chatInput, setChatInput] = useState('');
   const [isReady, setIsReady] = useState(false);
   const [isStartingGame, setIsStartingGame] = useState(false);

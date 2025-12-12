@@ -29,7 +29,7 @@ import {
   Player,
   PlayerSession,
 } from '../types/game.js';
-import { getLoungePlayerSocketId, removePlayerFromLoungeVoice } from './loungeHandler.js';
+import { getLoungePlayerSocketId, removePlayerFromLoungeVoice, updatePlayerStatus } from './loungeHandler.js';
 
 // Generate unique ID (same pattern as elsewhere in codebase)
 function generateId(): string {
@@ -316,6 +316,9 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       // Remove from lounge voice if they were in it
       removePlayerFromLoungeVoice(io, playerName);
 
+      // Update player status in lounge to 'at_table'
+      updatePlayerStatus(io, playerName, 'at_table', undefined, tableId);
+
       // Clear any disconnect timeout for this player
       const timeout = tableDisconnectTimeouts.get(playerName);
       if (timeout) {
@@ -490,6 +493,9 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       playerTables.delete(playerName);
 
       socket.leave(`table:${tableId}`);
+
+      // Update player status in lounge back to 'in_lounge'
+      updatePlayerStatus(io, playerName, 'in_lounge', undefined, undefined);
 
       // Add system message
       table.chatMessages.push({
@@ -697,6 +703,9 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       // If it's a human player, notify them
       if (!wasBot && removedName) {
         playerTables.delete(removedName);
+
+        // Update player status in lounge back to 'in_lounge'
+        updatePlayerStatus(io, removedName, 'in_lounge', undefined, undefined);
 
         // Broadcast to table room
         io.to(`table:${tableId}`).emit('player_removed_from_table', {
