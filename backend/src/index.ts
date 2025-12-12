@@ -213,7 +213,7 @@ import { registerQuestHandlers } from './socketHandlers/quests'; // Sprint 19: D
 import { registerVoiceHandlers } from './socketHandlers/voice'; // Voice chat WebRTC signaling
 import { registerSideBetsHandlers, autoResolveBets, expireGameBets } from './socketHandlers/sideBets'; // Side betting system
 import { setupTableHandler } from './socketHandlers/tableHandler'; // Social lounge tables
-import { setupLoungeHandler } from './socketHandlers/loungeHandler'; // Social lounge system
+import { setupLoungeHandler, updateLiveGame, removeLiveGame } from './socketHandlers/loungeHandler'; // Social lounge system
 import { updatePlayerBalance } from './db/sideBets'; // For coin rewards
 import {
   generateSessionToken as generateSessionTokenUtil,
@@ -555,6 +555,9 @@ function emitGameUpdate(gameId: string, gameState: GameState, forceFull: boolean
     gameSaveTimeouts,
     logger,
     saveGame,
+    // Wire up live games in lounge
+    onLiveGameUpdate: (game) => updateLiveGame(io, game),
+    onLiveGameRemove: (gId) => removeLiveGame(io, gId),
   };
   emitGameUpdateUtil(gameId, gameState, forceFull, deps);
 }

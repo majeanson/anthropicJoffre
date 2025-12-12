@@ -70,10 +70,19 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
     try {
       const playerName = getPlayerName();
 
-      // Leave any previous lounge connection for this player
+      // Leave any previous lounge connection for this player (handles reconnection)
       const existingSocketId = playerNameToSocket.get(playerName);
       if (existingSocketId && existingSocketId !== socket.id) {
+        // Clean up old socket's entries
         loungePlayers.delete(existingSocketId);
+        loungeVoice.delete(existingSocketId);
+
+        // Try to remove old socket from lounge room (may already be disconnected)
+        const oldSocket = io.sockets.sockets.get(existingSocketId);
+        if (oldSocket) {
+          oldSocket.leave('lounge');
+          oldSocket.leave('lounge_voice');
+        }
       }
 
       const player: LoungePlayer = {

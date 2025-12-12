@@ -29,6 +29,7 @@ import {
   Player,
   PlayerSession,
 } from '../types/game.js';
+import { getLoungePlayerSocketId } from './loungeHandler.js';
 
 // Generate unique ID (same pattern as elsewhere in codebase)
 function generateId(): string {
@@ -352,9 +353,15 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       seat.isReady = false;
       // Note: Keep playerTables entry - they're still "at" the table, just not seated
 
-      // Reset table status if was ready
+      // Reset table status if was ready, and reset ALL players' ready state
       if (table.status === 'ready') {
         table.status = 'gathering';
+        // Reset all human players' ready state when table goes back to gathering
+        table.seats.forEach(s => {
+          if (s.playerName && !s.isBot) {
+            s.isReady = false;
+          }
+        });
       }
 
       logger.info(`${playerName} stood up at table ${tableId}`);
@@ -588,12 +595,23 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       const wasBot = targetSeat.isBot;
 
       // If it's a human player, notify them
-      if (!wasBot) {
+      if (!wasBot && removedName) {
         playerTables.delete(removedName);
+
+        // Broadcast to table room
         io.to(`table:${tableId}`).emit('player_removed_from_table', {
           tableId,
           playerName: removedName,
         });
+
+        // Also send directly to the removed player's socket (they may have left the room)
+        const removedSocketId = getLoungePlayerSocketId(removedName);
+        if (removedSocketId) {
+          io.to(removedSocketId).emit('player_removed_from_table', {
+            tableId,
+            playerName: removedName,
+          });
+        }
       }
 
       targetSeat.playerName = null;
@@ -601,9 +619,15 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       targetSeat.botDifficulty = undefined;
       targetSeat.isReady = false;
 
-      // Reset status if was ready
+      // Reset status if was ready, and reset ALL players' ready state
       if (table.status === 'ready') {
         table.status = 'gathering';
+        // Reset all human players' ready state when table goes back to gathering
+        table.seats.forEach(s => {
+          if (s.playerName && !s.isBot) {
+            s.isReady = false;
+          }
+        });
       }
 
       // Add system message
@@ -695,6 +719,13 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       const allReady = table.seats.every(s => s.isReady);
       if (!allReady) {
         socket.emit('error', { message: 'All players must be ready', context: 'start_table_game' });
+        return;
+      }
+
+      // Check minimum human players (at least 1 human required, 2 recommended for proper gameplay)
+      const humanCount = table.seats.filter(s => s.playerName && !s.isBot).length;
+      if (humanCount < 1) {
+        socket.emit('error', { message: 'At least one human player is required', context: 'start_table_game' });
         return;
       }
 

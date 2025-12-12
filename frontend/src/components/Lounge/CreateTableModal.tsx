@@ -4,11 +4,12 @@
  * Simple modal for creating a table with a name and optional settings.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { sounds } from '../../utils/sounds';
+import { LoungeTable } from '../../types/game';
 
 interface CreateTableModalProps {
   isOpen: boolean;
@@ -26,11 +27,58 @@ export function CreateTableModal({
   const [tableName, setTableName] = useState(`${playerName}'s Table`);
   const [isPrivate, setIsPrivate] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Listen for table creation success/failure
+  useEffect(() => {
+    if (!socket || !isCreating) return;
+
+    const handleTableCreated = (data: { table: LoungeTable }) => {
+      // Only close if this is our table (we're the host)
+      if (data.table.hostName === playerName) {
+        setIsCreating(false);
+        setError(null);
+        onClose();
+      }
+    };
+
+    const handleError = (data: { message: string; context?: string }) => {
+      if (data.context === 'create_table') {
+        setIsCreating(false);
+        setError(data.message);
+      }
+    };
+
+    socket.on('table_created', handleTableCreated);
+    socket.on('error', handleError);
+
+    // Timeout fallback in case event never arrives
+    const timeout = setTimeout(() => {
+      if (isCreating) {
+        setIsCreating(false);
+        setError('Table creation timed out. Please try again.');
+      }
+    }, 10000);
+
+    return () => {
+      socket.off('table_created', handleTableCreated);
+      socket.off('error', handleError);
+      clearTimeout(timeout);
+    };
+  }, [socket, isCreating, playerName, onClose]);
+
+  // Reset error when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setError(null);
+    }
+  }, [isOpen]);
 
   const handleCreate = useCallback(() => {
-    if (!socket || !tableName.trim()) return;
+    if (!socket || !tableName.trim() || isCreating) return;
 
     setIsCreating(true);
+    setError(null);
     socket.emit('create_table', {
       name: tableName.trim(),
       settings: {
@@ -41,13 +89,7 @@ export function CreateTableModal({
     });
 
     sounds.buttonClick();
-
-    // Close modal after a short delay (the table_created event will update the UI)
-    setTimeout(() => {
-      setIsCreating(false);
-      onClose();
-    }, 500);
-  }, [socket, tableName, isPrivate, onClose]);
+  }, [socket, tableName, isPrivate, isCreating]);
 
   const handleClose = useCallback(() => {
     if (!isCreating) {
@@ -118,6 +160,13 @@ export function CreateTableModal({
             You can add bots to fill empty seats, or wait for others to join.
           </p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
+            <p className="text-xs text-red-400">{error}</p>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">

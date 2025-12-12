@@ -35,6 +35,7 @@ import { useSocketEvent } from '../../hooks/useSocketEvent';
 import { useLoungeVoice } from '../../hooks/useLoungeVoice';
 import { sounds } from '../../utils/sounds';
 import { Button } from '../ui/Button';
+import { Toast, ToastContainer } from '../ui/Toast';
 
 interface LoungeProps {
   socket: Socket | null;
@@ -89,6 +90,14 @@ export function Lounge({
   const [mobileTab, setMobileTab] = useState<MobileTab>('tables');
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [joiningTableId, setJoiningTableId] = useState<string | null>(null); // Track pending join
+
+  // Toast notifications
+  const [toastMessage, setToastMessage] = useState<{
+    message: string;
+    variant: 'success' | 'warning' | 'error' | 'info';
+    title?: string;
+  } | null>(null);
 
   // Get the selected table object
   const selectedTable = tables.find(t => t.id === selectedTableId);
@@ -205,6 +214,29 @@ export function Lounge({
     setVoiceParticipants(data.participants);
   });
 
+  // Voice participant status updates (mute/speaking)
+  useSocketEvent(socket, 'lounge_voice_participant_updated', (data: {
+    playerName: string;
+    isMuted: boolean;
+  }) => {
+    setVoiceParticipants(prev => prev.map(p =>
+      p.playerName === data.playerName
+        ? { ...p, isMuted: data.isMuted }
+        : p
+    ));
+  });
+
+  useSocketEvent(socket, 'lounge_voice_participant_speaking', (data: {
+    playerName: string;
+    isSpeaking: boolean;
+  }) => {
+    setVoiceParticipants(prev => prev.map(p =>
+      p.playerName === data.playerName
+        ? { ...p, isSpeaking: data.isSpeaking }
+        : p
+    ));
+  });
+
   // Live games updates
   useSocketEvent(socket, 'live_game_updated', (data: { game: LiveGame }) => {
     setLiveGames(prev => {
@@ -222,10 +254,73 @@ export function Lounge({
     setLiveGames(prev => prev.filter(g => g.gameId !== data.gameId));
   });
 
-  // Wave received
-  useSocketEvent(socket, 'player_waved_at_you', () => {
+  // Wave received - show toast notification
+  useSocketEvent(socket, 'player_waved_at_you', (data: { playerName: string }) => {
     sounds.chatNotification();
-    // Could show a toast here
+    setToastMessage({
+      message: `${data.playerName} waved at you!`,
+      variant: 'info',
+      title: '👋 Wave',
+    });
+  });
+
+  // Table join confirmation - only update UI on success
+  useSocketEvent(socket, 'table_joined', (data: { table: LoungeTable }) => {
+    setSelectedTableId(data.table.id);
+    setJoiningTableId(null);
+    // Update table in list with latest data (including chat history)
+    setTables(prev => {
+      const index = prev.findIndex(t => t.id === data.table.id);
+      if (index >= 0) {
+        const updated = [...prev];
+        updated[index] = data.table;
+        return updated;
+      }
+      return [...prev, data.table];
+    });
+  });
+
+  // Table invite received
+  useSocketEvent(socket, 'table_invite_received', (data: {
+    tableId: string;
+    tableName: string;
+    hostName: string;
+    inviterName: string;
+  }) => {
+    sounds.chatNotification();
+    setToastMessage({
+      message: `${data.inviterName} invited you to join "${data.tableName}"`,
+      variant: 'info',
+      title: '📨 Table Invite',
+    });
+  });
+
+  // Player removed from table notification
+  useSocketEvent(socket, 'player_removed_from_table', (data: {
+    tableId: string;
+    playerName: string;
+  }) => {
+    if (data.playerName === playerName) {
+      setSelectedTableId(null);
+      setToastMessage({
+        message: 'You were removed from the table',
+        variant: 'warning',
+        title: 'Removed',
+      });
+    }
+  });
+
+  // Error handling for socket events
+  useSocketEvent(socket, 'error', (data: { message: string; context?: string }) => {
+    // Clear pending join state on error
+    if (data.context === 'join_table' || data.context === 'sit_at_table') {
+      setJoiningTableId(null);
+    }
+    setToastMessage({
+      message: data.message,
+      variant: 'error',
+      title: 'Error',
+    });
   });
 
   // Actions
@@ -245,12 +340,13 @@ export function Lounge({
   }, []);
 
   const handleJoinTable = useCallback((tableId: string) => {
-    if (socket) {
+    if (socket && !joiningTableId) {
+      setJoiningTableId(tableId); // Track pending join
       socket.emit('join_table', { tableId });
-      setSelectedTableId(tableId);
+      // Don't set selectedTableId here - wait for table_joined confirmation
       sounds.buttonClick();
     }
-  }, [socket]);
+  }, [socket, joiningTableId]);
 
   const handleViewTable = useCallback((tableId: string) => {
     setSelectedTableId(tableId);
@@ -353,6 +449,19 @@ export function Lounge({
 
   return (
     <div className="min-h-screen bg-skin-primary">
+      {/* Toast notifications */}
+      {toastMessage && (
+        <ToastContainer position="top-right">
+          <Toast
+            variant={toastMessage.variant}
+            message={toastMessage.message}
+            title={toastMessage.title}
+            autoDismiss={5000}
+            onClose={() => setToastMessage(null)}
+          />
+        </ToastContainer>
+      )}
+
       {/* Header */}
       <LoungeHeader
         user={user}

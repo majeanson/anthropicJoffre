@@ -156,10 +156,12 @@ export function TableRoom({
                 ${table.status === 'gathering' ? 'bg-green-500/20 text-green-400' : ''}
                 ${table.status === 'ready' ? 'bg-yellow-500/20 text-yellow-400' : ''}
                 ${table.status === 'in_game' ? 'bg-blue-500/20 text-blue-400' : ''}
+                ${table.status === 'post_game' ? 'bg-purple-500/20 text-purple-400' : ''}
               `}>
                 {table.status === 'gathering' && 'Gathering Players'}
                 {table.status === 'ready' && 'Ready to Start'}
                 {table.status === 'in_game' && 'In Game'}
+                {table.status === 'post_game' && 'Game Finished'}
               </span>
               <Button variant="ghost" size="sm" onClick={handleLeave}>
                 Leave Table

@@ -9,7 +9,7 @@
  */
 
 import { Server } from 'socket.io';
-import { GameState, Player } from '../types/game';
+import { GameState, Player, LiveGame } from '../types/game';
 import {
   generateStateDelta,
   calculateDeltaSize,
@@ -27,6 +27,34 @@ export interface BroadcastManagerDeps {
   gameSaveTimeouts: Map<string, NodeJS.Timeout>;
   logger: Logger;
   saveGame: (gameState: GameState) => Promise<void>;
+  /** Optional callback to update live games in lounge */
+  onLiveGameUpdate?: (game: LiveGame) => void;
+  /** Optional callback to remove live game from lounge when game ends */
+  onLiveGameRemove?: (gameId: string) => void;
+}
+
+/**
+ * Convert GameState to LiveGame for lounge display
+ */
+function gameStateToLiveGame(gameState: GameState, spectatorCount: number = 0): LiveGame {
+  const team1Players = gameState.players
+    .filter(p => p.teamId === 1)
+    .map(p => p.name);
+  const team2Players = gameState.players
+    .filter(p => p.teamId === 2)
+    .map(p => p.name);
+
+  return {
+    gameId: gameState.id,
+    team1Players,
+    team2Players,
+    team1Score: gameState.teamScores.team1,
+    team2Score: gameState.teamScores.team2,
+    phase: gameState.phase,
+    currentTrick: gameState.currentTrick.length,
+    totalTricks: 8, // Jaffre has 8 tricks per round
+    spectatorCount,
+  };
 }
 
 /**
@@ -130,6 +158,22 @@ export function emitGameUpdate(
         phase: gameState.phase,
         reason: forceFull ? 'forced' : 'phase_change',
       });
+    }
+  }
+
+  // Update live games in lounge (for spectator list)
+  // Only update on phase changes or score changes to avoid spam
+  if (shouldSendFull && deps.onLiveGameUpdate && deps.onLiveGameRemove) {
+    if (gameState.phase === 'game_over') {
+      // Game ended - remove from live games
+      deps.onLiveGameRemove(gameId);
+    } else if (gameState.phase !== 'team_selection') {
+      // Game is in progress - update live games list
+      // Count spectators in the spectator room
+      const spectatorRoom = io.sockets.adapter.rooms.get(`${gameId}-spectators`);
+      const spectatorCount = spectatorRoom?.size || 0;
+      const liveGame = gameStateToLiveGame(gameState, spectatorCount);
+      deps.onLiveGameUpdate(liveGame);
     }
   }
 }
