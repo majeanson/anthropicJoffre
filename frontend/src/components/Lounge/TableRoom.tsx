@@ -36,6 +36,7 @@ export function TableRoom({
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isReady, setIsReady] = useState(false);
+  const [isStartingGame, setIsStartingGame] = useState(false);
 
   const isHost = table.hostName === playerName;
   const mySeat = table.seats.find(s => s.playerName === playerName);
@@ -60,8 +61,16 @@ export function TableRoom({
   // Listen for game start
   useSocketEvent(socket, 'table_game_started', (data: { gameId: string; tableId: string; gameState?: GameState }) => {
     if (data.tableId === table.id) {
+      setIsStartingGame(false);
       sounds.gameStart();
       onGameStart(data.gameId, data.gameState);
+    }
+  });
+
+  // Listen for errors (to clear loading state on game start failure)
+  useSocketEvent(socket, 'error', (data: { message: string; context?: string }) => {
+    if (data.context === 'start_table_game') {
+      setIsStartingGame(false);
     }
   });
 
@@ -108,11 +117,12 @@ export function TableRoom({
   }, [socket, table.id, isHost]);
 
   const handleStartGame = useCallback(() => {
-    if (socket && canStart) {
+    if (socket && canStart && !isStartingGame) {
+      setIsStartingGame(true);
       socket.emit('start_table_game', { tableId: table.id });
       sounds.buttonClick();
     }
-  }, [socket, table.id, canStart]);
+  }, [socket, table.id, canStart, isStartingGame]);
 
   const handleSendChat = useCallback(() => {
     if (socket && chatInput.trim()) {
@@ -233,9 +243,11 @@ export function TableRoom({
                 variant="warning"
                 size="lg"
                 onClick={handleStartGame}
-                leftIcon={<span>🎮</span>}
+                disabled={isStartingGame}
+                loading={isStartingGame}
+                leftIcon={!isStartingGame ? <span>🎮</span> : undefined}
               >
-                Start Game!
+                {isStartingGame ? 'Starting...' : 'Start Game!'}
               </Button>
             )}
           </div>

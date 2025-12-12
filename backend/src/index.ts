@@ -212,7 +212,7 @@ import { registerSocialHandlers } from './socketHandlers/social'; // Sprint 16 D
 import { registerQuestHandlers } from './socketHandlers/quests'; // Sprint 19: Daily Engagement System
 import { registerVoiceHandlers } from './socketHandlers/voice'; // Voice chat WebRTC signaling
 import { registerSideBetsHandlers, autoResolveBets, expireGameBets } from './socketHandlers/sideBets'; // Side betting system
-import { setupTableHandler } from './socketHandlers/tableHandler'; // Social lounge tables
+import { setupTableHandler, returnTableToPostGame } from './socketHandlers/tableHandler'; // Social lounge tables
 import { setupLoungeHandler, updateLiveGame, removeLiveGame } from './socketHandlers/loungeHandler'; // Social lounge system
 import { updatePlayerBalance } from './db/sideBets'; // For coin rewards
 import {
@@ -2044,6 +2044,11 @@ async function endRound(gameId: string) {
 
     // Broadcast game_over event BEFORE removing from memory
     broadcastGameUpdate(gameId, 'game_over', { winningTeam, gameState: game });
+
+    // If this game was created from a lounge table, return the table to post_game status
+    if (game.tableId) {
+      returnTableToPostGame(io, game.tableId);
+    }
 
     // ============================================================================
     // MEMORY OPTIMIZATION: Remove finished games from memory immediately

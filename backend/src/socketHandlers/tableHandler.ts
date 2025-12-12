@@ -693,9 +693,10 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
   // start_table_game - Start the game (host only) - CREATES ACTUAL GAME
   // ============================================================================
   socket.on('start_table_game', async (payload: StartTableGamePayload) => {
+    const { tableId } = payload;
+
     try {
       const playerName = getPlayerName();
-      const { tableId } = payload;
 
       const table = tables.get(tableId);
       if (!table) {
@@ -830,6 +831,15 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
 
     } catch (error) {
       logger.error('Error starting table game:', error);
+
+      // Rollback table status if it was changed
+      const table = tables.get(tableId);
+      if (table && table.status === 'in_game') {
+        table.status = 'ready';
+        table.gameId = undefined;
+        broadcastTableUpdate(io, table);
+      }
+
       socket.emit('error', { message: 'Failed to start game', context: 'start_table_game' });
     }
   });
@@ -1027,19 +1037,30 @@ export function setTableGameId(tableId: string, gameId: string): void {
 export function returnTableToPostGame(io: Server, tableId: string): void {
   const table = tables.get(tableId);
   if (table) {
+    const previousGameId = table.gameId;
     table.status = 'post_game';
     table.gameId = undefined;
+
     // Reset ready states for human players
     table.seats.forEach(s => {
       if (!s.isBot) {
         s.isReady = false;
       }
     });
+
+    // Emit table_game_finished to table room so frontend knows to transition back
+    io.to(`table:${tableId}`).emit('table_game_finished', {
+      tableId,
+      previousGameId,
+    });
+
     broadcastTableUpdate(io, table);
     broadcastActivity(io, 'game_finished', table.hostName, {
       tableName: table.name,
       tableId: table.id,
     });
+
+    logger.info(`Table ${tableId} (${table.name}) returned to post_game state`);
   }
 }
 

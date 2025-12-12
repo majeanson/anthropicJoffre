@@ -1835,16 +1835,31 @@ function AppContent() {
               >
                 📺 View Game Replay
               </button>
-              <button
-                data-testid="back-to-lobby-button"
-                onClick={() => {
-                  setGameState(null);
-                  setGameId('');
-                }}
-                className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-8 py-4 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
-              >
-                🏠 Back to Lobby
-              </button>
+              {gameState.tableId ? (
+                <button
+                  data-testid="back-to-table-button"
+                  onClick={() => {
+                    // Return to lounge with the table selected
+                    setGameState(null);
+                    setGameId('');
+                    setShowLounge(true);
+                  }}
+                  className="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-8 py-4 rounded-xl font-bold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 border-2 border-purple-700 shadow-lg transform hover:scale-105"
+                >
+                  🎴 Back to Table
+                </button>
+              ) : (
+                <button
+                  data-testid="back-to-lobby-button"
+                  onClick={() => {
+                    setGameState(null);
+                    setGameId('');
+                  }}
+                  className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-8 py-4 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
+                >
+                  🏠 Back to Lobby
+                </button>
+              )}
             </div>
           </div>
         </div>
