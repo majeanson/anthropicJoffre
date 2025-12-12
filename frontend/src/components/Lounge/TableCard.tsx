@@ -55,9 +55,16 @@ export function TableCard({
       {/* Header */}
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <h4 className="font-display text-skin-primary text-sm truncate">
-            {table.name}
-          </h4>
+          <div className="flex items-center gap-1.5">
+            <h4 className="font-display text-skin-primary text-sm truncate">
+              {table.name}
+            </h4>
+            {table.settings.isPrivate && (
+              <span className="text-xs" title="Private table - Invite only">
+                🔒
+              </span>
+            )}
+          </div>
           <p className="text-xs text-skin-muted truncate">
             Host: {table.hostName}
           </p>

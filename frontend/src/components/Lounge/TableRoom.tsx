@@ -77,6 +77,19 @@ export function TableRoom({
     }
   });
 
+  // Listen for game finished (return to table after game ends)
+  useSocketEvent(socket, 'table_game_finished', (data: { tableId: string; previousGameId: string }) => {
+    if (data.tableId === table.id) {
+      // Update table to show post-game state
+      setTable(prev => ({
+        ...prev,
+        status: 'post_game',
+        gameId: undefined,
+      }));
+      sounds.chatNotification(); // Notify player that game finished
+    }
+  });
+
   // Sync ready state with seat
   useEffect(() => {
     if (mySeat) {

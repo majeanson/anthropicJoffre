@@ -100,6 +100,12 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
       // Leave any previous lounge connection for this player (handles reconnection)
       const existingSocketId = playerNameToSocket.get(playerName);
       if (existingSocketId && existingSocketId !== socket.id) {
+        // Notify others if player was in voice before cleaning up
+        const wasInVoice = loungeVoice.has(existingSocketId);
+        if (wasInVoice) {
+          io.to('lounge').emit('lounge_voice_participant_left', { playerName });
+        }
+
         // Clean up old socket's entries
         loungePlayers.delete(existingSocketId);
         loungeVoice.delete(existingSocketId);
@@ -462,6 +468,15 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
         return;
       }
 
+      // Rate limiting for chat messages
+      const ip = getSocketIP(socket);
+      const rateLimit = rateLimiters.chat.checkLimit(playerName, ip);
+      if (!rateLimit.allowed) {
+        socket.emit('error', { message: 'Too many messages. Please slow down.', context: 'lounge_chat' });
+        return;
+      }
+      rateLimiters.chat.recordRequest(playerName, ip);
+
       const { message } = payload;
       if (!message || message.trim().length === 0) {
         return;
@@ -526,22 +541,34 @@ export function updatePlayerStatus(
   tableId?: string
 ): void {
   const socketId = playerNameToSocket.get(playerName);
-  if (socketId) {
-    const player = loungePlayers.get(socketId);
-    if (player) {
-      player.status = status;
-      player.gameId = gameId;
-      player.tableId = tableId;
-      player.lastActivity = Date.now();
-
-      io.to('lounge').emit('lounge_player_status_changed', {
-        playerName,
-        status,
-        gameId,
-        tableId,
-      });
-    }
+  if (!socketId) {
+    // Player is not in the lounge - this is normal if they're not using lounge features
+    logger.debug(`updatePlayerStatus: ${playerName} not found in lounge (may not be in lounge)`);
+    return;
   }
+
+  const player = loungePlayers.get(socketId);
+  if (!player) {
+    // Socket ID exists in map but player data doesn't - this is a bug/race condition
+    logger.warn(`updatePlayerStatus: Socket ${socketId} found for ${playerName} but no player data exists`);
+    // Clean up the stale mapping
+    playerNameToSocket.delete(playerName);
+    return;
+  }
+
+  player.status = status;
+  player.gameId = gameId;
+  player.tableId = tableId;
+  player.lastActivity = Date.now();
+
+  io.to('lounge').emit('lounge_player_status_changed', {
+    playerName,
+    status,
+    gameId,
+    tableId,
+  });
+
+  logger.debug(`${playerName} status updated to ${status}${tableId ? ` (table: ${tableId})` : ''}${gameId ? ` (game: ${gameId})` : ''}`);
 }
 
 export function addLoungeActivity(

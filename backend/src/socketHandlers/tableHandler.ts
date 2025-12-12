@@ -124,6 +124,24 @@ function broadcastTableUpdate(io: Server, table: LoungeTable): void {
   io.to('lounge').emit('lounge_table_updated', { table });
 }
 
+/**
+ * Clean up a table completely, including making all sockets leave the room.
+ * Call this before deleting a table from the tables map.
+ */
+async function cleanupTableRoom(io: Server, tableId: string): Promise<void> {
+  const roomName = `table:${tableId}`;
+  try {
+    // Get all sockets in this room and make them leave
+    const socketsInRoom = await io.in(roomName).fetchSockets();
+    for (const socket of socketsInRoom) {
+      socket.leave(roomName);
+    }
+    logger.debug(`Cleaned up table room ${roomName} (${socketsInRoom.length} sockets removed)`);
+  } catch (error) {
+    logger.warn(`Failed to clean up table room ${roomName}:`, error);
+  }
+}
+
 function broadcastActivity(
   io: Server,
   type: string,
@@ -444,13 +462,22 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       // Note: Keep playerTables entry - they're still "at" the table, just not seated
 
       // Reset table status if was ready, and reset ALL players' ready state
-      if (table.status === 'ready') {
+      const wasReady = table.status === 'ready';
+      if (wasReady) {
         table.status = 'gathering';
         // Reset all human players' ready state when table goes back to gathering
         table.seats.forEach(s => {
           if (s.playerName && !s.isBot) {
             s.isReady = false;
           }
+        });
+        // Add system message to explain the reset
+        table.chatMessages.push({
+          playerId: 'system',
+          playerName: 'System',
+          teamId: null,
+          message: `${playerName} stood up - ready status reset`,
+          timestamp: Date.now(),
         });
       }
 
@@ -511,10 +538,12 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
 
       // If no human players remain, delete the table (bots can't play alone)
       if (remainingHumans.length === 0) {
-        tables.delete(tableId);
-        tableGameStartTimes.delete(tableId);
         io.to(`table:${tableId}`).emit('table_deleted', { tableId });
         io.to('lounge').emit('lounge_table_deleted', { tableId });
+        // Clean up socket room before deleting table
+        cleanupTableRoom(io, tableId);
+        tables.delete(tableId);
+        tableGameStartTimes.delete(tableId);
         logger.info(`Table ${tableId} deleted (only bots remaining)`);
         return;
       }
@@ -1101,10 +1130,12 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
 
       // If no human players remain, delete the table (bots can't play alone)
       if (remainingHumans.length === 0) {
-        tables.delete(tableId);
-        tableGameStartTimes.delete(tableId);
         io.to(`table:${tableId}`).emit('table_deleted', { tableId });
         io.to('lounge').emit('lounge_table_deleted', { tableId });
+        // Clean up socket room before deleting table
+        cleanupTableRoom(io, tableId);
+        tables.delete(tableId);
+        tableGameStartTimes.delete(tableId);
         logger.info(`Table ${tableId} deleted (all humans disconnected, only bots remaining)`);
         return;
       }
