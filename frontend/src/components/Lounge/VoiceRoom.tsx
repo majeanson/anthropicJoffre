@@ -7,34 +7,31 @@
 
 import { LoungeVoiceParticipant } from '../../types/game';
 import { Button } from '../ui/Button';
-import { Socket } from 'socket.io-client';
 
 interface VoiceRoomProps {
-  socket: Socket | null;
   playerName: string;
   participants: LoungeVoiceParticipant[];
   onJoinVoice: () => void;
   onLeaveVoice: () => void;
+  onToggleMute: () => void;
   isInVoice: boolean;
+  isConnecting: boolean;
+  isMuted: boolean;
+  error: string | null;
 }
 
 export function VoiceRoom({
-  socket,
   playerName,
   participants,
   onJoinVoice,
   onLeaveVoice,
+  onToggleMute,
   isInVoice,
+  isConnecting,
+  isMuted,
+  error,
 }: VoiceRoomProps) {
-  const myParticipant = participants.find(p => p.playerName === playerName);
-  const isMuted = myParticipant?.isMuted ?? false;
   const speakingCount = participants.filter(p => p.isSpeaking).length;
-
-  const handleToggleMute = () => {
-    if (socket) {
-      socket.emit('lounge_voice_mute', { isMuted: !isMuted });
-    }
-  };
 
   return (
     <div className={`
@@ -176,6 +173,16 @@ export function VoiceRoom({
           </div>
         )}
 
+        {/* Error message */}
+        {error && (
+          <div className="mb-3 p-3 rounded-lg bg-red-500/20 border border-red-500/30">
+            <p className="text-sm text-red-400 flex items-center gap-2">
+              <span>⚠️</span>
+              {error}
+            </p>
+          </div>
+        )}
+
         {/* Controls */}
         <div className="flex gap-2">
           {isInVoice ? (
@@ -183,7 +190,7 @@ export function VoiceRoom({
               <Button
                 variant={isMuted ? 'danger' : 'success'}
                 size="md"
-                onClick={handleToggleMute}
+                onClick={onToggleMute}
                 className="flex-1"
                 leftIcon={<span>{isMuted ? '🔇' : '🎤'}</span>}
               >
@@ -204,9 +211,10 @@ export function VoiceRoom({
               size="lg"
               onClick={onJoinVoice}
               fullWidth
-              leftIcon={<span>🎤</span>}
+              disabled={isConnecting}
+              leftIcon={<span>{isConnecting ? '⏳' : '🎤'}</span>}
             >
-              Join Voice Chat
+              {isConnecting ? 'Connecting...' : 'Join Voice Chat'}
             </Button>
           )}
         </div>

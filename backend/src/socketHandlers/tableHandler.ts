@@ -85,11 +85,13 @@ function broadcastActivity(
 }
 
 export function setupTableHandler(io: Server, socket: Socket): void {
-  const playerName = (socket as unknown as { playerName?: string }).playerName || 'Anonymous';
+  // Get player name from socket.data (set during authentication/connection)
+  const getPlayerName = (): string => socket.data.playerName || 'Anonymous';
 
   // Create a new table
   socket.on('create_table', (payload: CreateTablePayload) => {
     try {
+      const playerName = getPlayerName();
       const { name, settings } = payload;
 
       // Validate
@@ -155,6 +157,7 @@ export function setupTableHandler(io: Server, socket: Socket): void {
   // Join an existing table
   socket.on('join_table', (payload: JoinTablePayload) => {
     try {
+      const playerName = getPlayerName();
       const { tableId, seatPosition } = payload;
 
       const table = tables.get(tableId);
@@ -222,6 +225,7 @@ export function setupTableHandler(io: Server, socket: Socket): void {
   // Leave a table
   socket.on('leave_table', (payload: LeaveTablePayload) => {
     try {
+      const playerName = getPlayerName();
       const { tableId } = payload;
 
       const table = tables.get(tableId);
@@ -287,6 +291,7 @@ export function setupTableHandler(io: Server, socket: Socket): void {
   // Change seat at table
   socket.on('set_seat', (payload: SetSeatPayload) => {
     try {
+      const playerName = getPlayerName();
       const { tableId, seatPosition } = payload;
 
       const table = tables.get(tableId);
@@ -330,6 +335,7 @@ export function setupTableHandler(io: Server, socket: Socket): void {
   // Add a bot to a seat
   socket.on('add_bot_to_table', (payload: AddBotToTablePayload) => {
     try {
+      const playerName = getPlayerName();
       const { tableId, seatPosition, difficulty } = payload;
 
       const table = tables.get(tableId);
@@ -379,6 +385,7 @@ export function setupTableHandler(io: Server, socket: Socket): void {
   // Remove player/bot from seat
   socket.on('remove_from_seat', (payload: RemoveFromSeatPayload) => {
     try {
+      const playerName = getPlayerName();
       const { tableId, seatPosition } = payload;
 
       const table = tables.get(tableId);
@@ -447,6 +454,7 @@ export function setupTableHandler(io: Server, socket: Socket): void {
   // Toggle ready status
   socket.on('set_ready', (payload: SetReadyPayload) => {
     try {
+      const playerName = getPlayerName();
       const { tableId, isReady } = payload;
 
       const table = tables.get(tableId);
@@ -485,6 +493,7 @@ export function setupTableHandler(io: Server, socket: Socket): void {
   // Start the game (host only)
   socket.on('start_table_game', (payload: StartTableGamePayload) => {
     try {
+      const playerName = getPlayerName();
       const { tableId } = payload;
 
       const table = tables.get(tableId);
@@ -544,6 +553,7 @@ export function setupTableHandler(io: Server, socket: Socket): void {
   // Send chat message to table
   socket.on('table_chat', (payload: { tableId: string; message: string }) => {
     try {
+      const playerName = getPlayerName();
       const { tableId, message } = payload;
 
       const table = tables.get(tableId);
@@ -614,6 +624,7 @@ export function setupTableHandler(io: Server, socket: Socket): void {
 
   // Handle disconnect - remove from table
   socket.on('disconnect', () => {
+    const playerName = getPlayerName();
     const tableId = playerTables.get(playerName);
     if (tableId) {
       const table = tables.get(tableId);

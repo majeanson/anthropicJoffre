@@ -31,6 +31,7 @@ import { LoungeHeader } from './LoungeHeader';
 import { TableRoom } from './TableRoom';
 import { CreateTableModal } from './CreateTableModal';
 import { useSocketEvent } from '../../hooks/useSocketEvent';
+import { useLoungeVoice } from '../../hooks/useLoungeVoice';
 import { sounds } from '../../utils/sounds';
 import { Button } from '../ui/Button';
 
@@ -69,8 +70,18 @@ export function Lounge({
   const [liveGames, setLiveGames] = useState<LiveGame[]>([]);
   const [loungeMessages, setLoungeMessages] = useState<ChatMessage[]>([]);
 
+  // Voice chat with microphone permission handling
+  const {
+    isInVoice,
+    isConnecting: isVoiceConnecting,
+    isMuted,
+    error: voiceError,
+    joinVoice,
+    leaveVoice,
+    toggleMute,
+  } = useLoungeVoice({ socket });
+
   // Local state
-  const [isInVoice, setIsInVoice] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('tables');
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -96,12 +107,16 @@ export function Lounge({
     voiceParticipants: LoungeVoiceParticipant[];
     onlinePlayers: LoungePlayer[];
     liveGames: LiveGame[];
+    chatMessages?: ChatMessage[];
   }) => {
     setTables(data.tables);
     setActivities(data.activities);
     setVoiceParticipants(data.voiceParticipants);
     setOnlinePlayers(data.onlinePlayers);
     setLiveGames(data.liveGames);
+    if (data.chatMessages) {
+      setLoungeMessages(data.chatMessages);
+    }
   });
 
   // Activity feed updates
@@ -184,7 +199,6 @@ export function Lounge({
     participants: LoungeVoiceParticipant[];
   }) => {
     setVoiceParticipants(data.participants);
-    setIsInVoice(true);
   });
 
   // Live games updates
@@ -211,20 +225,15 @@ export function Lounge({
   });
 
   // Actions
-  const handleJoinVoice = useCallback(() => {
-    if (socket) {
-      socket.emit('join_lounge_voice');
-      sounds.buttonClick();
-    }
-  }, [socket]);
+  const handleJoinVoice = useCallback(async () => {
+    sounds.buttonClick();
+    await joinVoice();
+  }, [joinVoice]);
 
   const handleLeaveVoice = useCallback(() => {
-    if (socket) {
-      socket.emit('leave_lounge_voice');
-      setIsInVoice(false);
-      sounds.buttonClick();
-    }
-  }, [socket]);
+    sounds.buttonClick();
+    leaveVoice();
+  }, [leaveVoice]);
 
   const handleCreateTable = useCallback(() => {
     setShowCreateModal(true);
@@ -363,12 +372,15 @@ export function Lounge({
         {/* Left Sidebar - Voice + Players */}
         <div className="col-span-3 space-y-4">
           <VoiceRoom
-            socket={socket}
             playerName={playerName}
             participants={voiceParticipants}
             onJoinVoice={handleJoinVoice}
             onLeaveVoice={handleLeaveVoice}
+            onToggleMute={toggleMute}
             isInVoice={isInVoice}
+            isConnecting={isVoiceConnecting}
+            isMuted={isMuted}
+            error={voiceError}
           />
           <WhoIsHere
             players={onlinePlayers}
@@ -416,12 +428,15 @@ export function Lounge({
         {/* Voice Room - Always visible at top on mobile */}
         <div className="p-2">
           <VoiceRoom
-            socket={socket}
             playerName={playerName}
             participants={voiceParticipants}
             onJoinVoice={handleJoinVoice}
             onLeaveVoice={handleLeaveVoice}
+            onToggleMute={toggleMute}
             isInVoice={isInVoice}
+            isConnecting={isVoiceConnecting}
+            isMuted={isMuted}
+            error={voiceError}
           />
         </div>
 

@@ -26,6 +26,7 @@ import {
   WaveAtPlayerPayload,
   InviteToTablePayload,
   ActivityEventType,
+  ChatMessage,
 } from '../types/game.js';
 import { getAllTables, getTable } from './tableHandler.js';
 
@@ -34,7 +35,9 @@ const loungePlayers = new Map<string, LoungePlayer>(); // socketId -> LoungePlay
 const playerNameToSocket = new Map<string, string>(); // playerName -> socketId
 const loungeVoice = new Map<string, LoungeVoiceParticipant>(); // socketId -> voice participant
 const recentActivities: LoungeActivity[] = []; // Last 50 activities
+const loungeChatMessages: ChatMessage[] = []; // Last 100 chat messages
 const MAX_ACTIVITIES = 50;
+const MAX_CHAT_MESSAGES = 100;
 
 // Track live games
 const liveGames = new Map<string, LiveGame>();
@@ -59,11 +62,14 @@ function addActivity(
 }
 
 export function setupLoungeHandler(io: Server, socket: Socket): void {
-  const playerName = (socket as unknown as { playerName?: string }).playerName || 'Anonymous';
+  // Get player name from socket.data (set during authentication/connection)
+  const getPlayerName = (): string => socket.data.playerName || 'Anonymous';
 
   // Join the lounge
   socket.on('join_lounge', () => {
     try {
+      const playerName = getPlayerName();
+
       // Leave any previous lounge connection for this player
       const existingSocketId = playerNameToSocket.get(playerName);
       if (existingSocketId && existingSocketId !== socket.id) {
@@ -89,6 +95,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
         voiceParticipants: Array.from(loungeVoice.values()),
         onlinePlayers: Array.from(loungePlayers.values()),
         liveGames: Array.from(liveGames.values()),
+        chatMessages: loungeChatMessages,
       });
 
       // Broadcast join to others
@@ -106,6 +113,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   // Leave the lounge
   socket.on('leave_lounge', () => {
     try {
+      const playerName = getPlayerName();
       const player = loungePlayers.get(socket.id);
       if (player) {
         loungePlayers.delete(socket.id);
@@ -128,6 +136,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   // Update player status
   socket.on('set_player_status', (payload: SetPlayerStatusPayload) => {
     try {
+      const playerName = getPlayerName();
       const { status } = payload;
       const player = loungePlayers.get(socket.id);
 
@@ -162,6 +171,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   // Wave at another player
   socket.on('wave_at_player', (payload: WaveAtPlayerPayload) => {
     try {
+      const playerName = getPlayerName();
       const { targetPlayerName } = payload;
 
       if (targetPlayerName === playerName) {
@@ -199,6 +209,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   // Invite player to table
   socket.on('invite_to_table', (payload: InviteToTablePayload) => {
     try {
+      const playerName = getPlayerName();
       const { tableId, targetPlayerName } = payload;
 
       const table = getTable(tableId);
@@ -240,6 +251,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   // Join lounge voice
   socket.on('join_lounge_voice', () => {
     try {
+      const playerName = getPlayerName();
       const player = loungePlayers.get(socket.id);
       if (!player) {
         socket.emit('error', { message: 'Not in lounge', context: 'join_lounge_voice' });
@@ -273,6 +285,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   // Leave lounge voice
   socket.on('leave_lounge_voice', () => {
     try {
+      const playerName = getPlayerName();
       const participant = loungeVoice.get(socket.id);
       if (participant) {
         loungeVoice.delete(socket.id);
@@ -290,6 +303,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   // Toggle mute in lounge voice
   socket.on('lounge_voice_mute', (payload: { isMuted: boolean }) => {
     try {
+      const playerName = getPlayerName();
       const participant = loungeVoice.get(socket.id);
       if (participant) {
         participant.isMuted = payload.isMuted;
@@ -306,6 +320,7 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
   // Voice speaking indicator
   socket.on('lounge_voice_speaking', (payload: { isSpeaking: boolean }) => {
     try {
+      const playerName = getPlayerName();
       const participant = loungeVoice.get(socket.id);
       if (participant) {
         participant.isSpeaking = payload.isSpeaking;
@@ -348,8 +363,58 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
     }
   });
 
+  // Send chat message to lounge
+  socket.on('lounge_chat', (payload: { message: string }) => {
+    try {
+      const playerName = getPlayerName();
+      const player = loungePlayers.get(socket.id);
+
+      if (!player) {
+        socket.emit('error', { message: 'Not in lounge', context: 'lounge_chat' });
+        return;
+      }
+
+      const { message } = payload;
+      if (!message || message.trim().length === 0) {
+        return;
+      }
+
+      const chatMessage: ChatMessage = {
+        playerId: socket.id,
+        playerName,
+        teamId: null,
+        message: message.slice(0, 500), // Limit message length
+        timestamp: Date.now(),
+      };
+
+      loungeChatMessages.push(chatMessage);
+
+      // Keep only last 100 messages
+      if (loungeChatMessages.length > MAX_CHAT_MESSAGES) {
+        loungeChatMessages.shift();
+      }
+
+      io.to('lounge').emit('lounge_chat_message', { message: chatMessage });
+
+      logger.info(`Lounge chat from ${playerName}: ${message.slice(0, 50)}...`);
+    } catch (error) {
+      logger.error('Error sending lounge chat:', error);
+      socket.emit('error', { message: 'Failed to send message', context: 'lounge_chat' });
+    }
+  });
+
+  // Get chat history
+  socket.on('get_lounge_chat', () => {
+    try {
+      socket.emit('lounge_chat_history', { messages: loungeChatMessages });
+    } catch (error) {
+      logger.error('Error getting chat history:', error);
+    }
+  });
+
   // Handle disconnect
   socket.on('disconnect', () => {
+    const playerName = getPlayerName();
     const player = loungePlayers.get(socket.id);
     if (player) {
       loungePlayers.delete(socket.id);
