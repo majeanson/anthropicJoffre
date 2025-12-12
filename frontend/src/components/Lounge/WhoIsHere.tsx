@@ -117,47 +117,52 @@ export function WhoIsHere({
 
                 {/* Actions (not for self) */}
                 {!isSelf && (
-                  <div className="flex gap-1">
+                  <div className="flex gap-0.5 sm:gap-1">
                     <button
                       onClick={() => onWave(player.playerName)}
-                      className="p-1.5 rounded hover:bg-skin-primary transition-colors"
+                      className="p-2 sm:p-1.5 rounded hover:bg-skin-primary active:bg-skin-accent/20 transition-colors touch-manipulation min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                       title="Wave"
+                      aria-label={`Wave to ${player.playerName}`}
                     >
-                      <span className="text-sm">👋</span>
+                      <span className="text-base sm:text-sm">👋</span>
                     </button>
                     <button
                       onClick={() => onMessage(player.playerName)}
-                      className="p-1.5 rounded hover:bg-skin-primary transition-colors"
+                      className="p-2 sm:p-1.5 rounded hover:bg-skin-primary active:bg-skin-accent/20 transition-colors touch-manipulation min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                       title="Message"
+                      aria-label={`Message ${player.playerName}`}
                     >
-                      <span className="text-sm">💬</span>
+                      <span className="text-base sm:text-sm">💬</span>
                     </button>
                     {/* Add Friend button - only for non-friends when authenticated */}
                     {isAuthenticated && !player.isFriend && onAddFriend && (
                       <button
                         onClick={() => onAddFriend(player.playerName)}
-                        className="p-1.5 rounded hover:bg-green-500/20 transition-colors"
+                        className="p-2 sm:p-1.5 rounded hover:bg-green-500/20 active:bg-green-500/30 transition-colors touch-manipulation min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                         title="Add Friend"
+                        aria-label={`Add ${player.playerName} as friend`}
                       >
-                        <span className="text-sm">➕</span>
+                        <span className="text-base sm:text-sm">➕</span>
                       </button>
                     )}
                     {/* Invite to Table button - only when at a table */}
                     {isAtTable && onInviteToTable && (
                       <button
                         onClick={() => onInviteToTable(player.playerName)}
-                        className="p-1.5 rounded hover:bg-blue-500/20 transition-colors"
+                        className="p-2 sm:p-1.5 rounded hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                         title="Invite to Table"
+                        aria-label={`Invite ${player.playerName} to table`}
                       >
-                        <span className="text-sm">🎴</span>
+                        <span className="text-base sm:text-sm">🎴</span>
                       </button>
                     )}
                     <button
                       onClick={() => onViewProfile(player.playerName)}
-                      className="p-1.5 rounded hover:bg-skin-primary transition-colors"
+                      className="p-2 sm:p-1.5 rounded hover:bg-skin-primary active:bg-skin-accent/20 transition-colors touch-manipulation min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                       title="View Profile"
+                      aria-label={`View ${player.playerName}'s profile`}
                     >
-                      <span className="text-sm">👤</span>
+                      <span className="text-base sm:text-sm">👤</span>
                     </button>
                   </div>
                 )}

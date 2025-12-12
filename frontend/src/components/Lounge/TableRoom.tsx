@@ -40,6 +40,8 @@ export function TableRoom({
   const [chatInput, setChatInput] = useState('');
   const [isReady, setIsReady] = useState(false);
   const [isStartingGame, setIsStartingGame] = useState(false);
+  // Loading states for seat actions (tracked by position for sit, 'stand' for stand up)
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
 
   const isHost = table.hostName === playerName;
   const mySeat = table.seats.find(s => s.playerName === playerName);
@@ -53,6 +55,8 @@ export function TableRoom({
   useSocketEvent(socket, 'table_updated', (data: { table: LoungeTable }) => {
     if (data.table.id === table.id) {
       setTable(data.table);
+      // Clear any pending seat action since the table state has changed
+      setPendingAction(null);
     }
   });
 
@@ -70,10 +74,15 @@ export function TableRoom({
     }
   });
 
-  // Listen for errors (to clear loading state on game start failure)
+  // Listen for errors (to clear loading states on failures)
   useSocketEvent(socket, 'error', (data: { message: string; context?: string }) => {
     if (data.context === 'start_table_game') {
       setIsStartingGame(false);
+    }
+    // Clear pending seat actions on any seat-related errors
+    if (data.context === 'sit_at_table' || data.context === 'stand_from_table' ||
+        data.context === 'add_bot_to_table' || data.context === 'remove_from_seat') {
+      setPendingAction(null);
     }
   });
 
@@ -98,18 +107,20 @@ export function TableRoom({
   }, [mySeat]);
 
   const handleSitDown = useCallback((position: number) => {
-    if (socket && !isSeated) {
+    if (socket && !isSeated && !pendingAction) {
+      setPendingAction(`sit:${position}`);
       socket.emit('sit_at_table', { tableId: table.id, position });
       sounds.buttonClick();
     }
-  }, [socket, table.id, isSeated]);
+  }, [socket, table.id, isSeated, pendingAction]);
 
   const handleStandUp = useCallback(() => {
-    if (socket && isSeated) {
+    if (socket && isSeated && !pendingAction) {
+      setPendingAction('stand');
       socket.emit('stand_from_table', { tableId: table.id });
       sounds.buttonClick();
     }
-  }, [socket, table.id, isSeated]);
+  }, [socket, table.id, isSeated, pendingAction]);
 
   const handleToggleReady = useCallback(() => {
     if (socket && isSeated) {
@@ -119,18 +130,20 @@ export function TableRoom({
   }, [socket, table.id, isSeated, isReady]);
 
   const handleAddBot = useCallback((position: number) => {
-    if (socket && isHost) {
+    if (socket && isHost && !pendingAction) {
+      setPendingAction(`bot:${position}`);
       socket.emit('add_bot_to_table', { tableId: table.id, seatPosition: position, difficulty: 'medium' });
       sounds.buttonClick();
     }
-  }, [socket, table.id, isHost]);
+  }, [socket, table.id, isHost, pendingAction]);
 
   const handleRemoveFromSeat = useCallback((position: number) => {
-    if (socket && isHost) {
+    if (socket && isHost && !pendingAction) {
+      setPendingAction(`remove:${position}`);
       socket.emit('remove_from_seat', { tableId: table.id, seatPosition: position });
       sounds.buttonClick();
     }
-  }, [socket, table.id, isHost]);
+  }, [socket, table.id, isHost, pendingAction]);
 
   const handleStartGame = useCallback(() => {
     if (socket && canStart && !isStartingGame) {
@@ -212,6 +225,7 @@ export function TableRoom({
                   isHost={isHost}
                   canSit={!isSeated && !seat.playerName}
                   teamColor={teamColors[1]}
+                  pendingAction={pendingAction}
                   onSit={() => handleSitDown(seat.position)}
                   onStand={handleStandUp}
                   onAddBot={() => handleAddBot(seat.position)}
@@ -233,6 +247,7 @@ export function TableRoom({
                   isHost={isHost}
                   canSit={!isSeated && !seat.playerName}
                   teamColor={teamColors[2]}
+                  pendingAction={pendingAction}
                   onSit={() => handleSitDown(seat.position)}
                   onStand={handleStandUp}
                   onAddBot={() => handleAddBot(seat.position)}
@@ -332,6 +347,7 @@ interface SeatCardProps {
   isHost: boolean;
   canSit: boolean;
   teamColor: string;
+  pendingAction: string | null;
   onSit: () => void;
   onStand: () => void;
   onAddBot: () => void;
@@ -344,6 +360,7 @@ function SeatCard({
   isHost,
   canSit,
   teamColor,
+  pendingAction,
   onSit,
   onStand,
   onAddBot,
@@ -351,6 +368,13 @@ function SeatCard({
 }: SeatCardProps) {
   const isEmpty = !seat.playerName;
   const isBot = seat.isBot;
+
+  // Determine loading states for this specific seat
+  const isSitting = pendingAction === `sit:${seat.position}`;
+  const isStanding = pendingAction === 'stand' && isCurrentPlayer;
+  const isAddingBot = pendingAction === `bot:${seat.position}`;
+  const isRemoving = pendingAction === `remove:${seat.position}`;
+  const hasAnyPending = !!pendingAction;
 
   return (
     <div className={`
@@ -368,13 +392,25 @@ function SeatCard({
           <p className="text-sm text-skin-muted">Empty Seat</p>
           <div className="flex gap-2 justify-center">
             {canSit && (
-              <Button variant="primary" size="xs" onClick={onSit}>
-                Sit Here
+              <Button
+                variant="primary"
+                size="xs"
+                onClick={onSit}
+                disabled={hasAnyPending}
+                loading={isSitting}
+              >
+                {isSitting ? 'Sitting...' : 'Sit Here'}
               </Button>
             )}
             {isHost && (
-              <Button variant="ghost" size="xs" onClick={onAddBot}>
-                + Bot
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={onAddBot}
+                disabled={hasAnyPending}
+                loading={isAddingBot}
+              >
+                {isAddingBot ? 'Adding...' : '+ Bot'}
               </Button>
             )}
           </div>
@@ -404,13 +440,25 @@ function SeatCard({
           {/* Actions */}
           <div className="flex gap-2 justify-center">
             {isCurrentPlayer && (
-              <Button variant="ghost" size="xs" onClick={onStand}>
-                Stand Up
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={onStand}
+                disabled={hasAnyPending}
+                loading={isStanding}
+              >
+                {isStanding ? 'Standing...' : 'Stand Up'}
               </Button>
             )}
             {isHost && !isCurrentPlayer && (
-              <Button variant="danger" size="xs" onClick={onRemove}>
-                Remove
+              <Button
+                variant="danger"
+                size="xs"
+                onClick={onRemove}
+                disabled={hasAnyPending}
+                loading={isRemoving}
+              >
+                {isRemoving ? 'Removing...' : 'Remove'}
               </Button>
             )}
           </div>

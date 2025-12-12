@@ -11,7 +11,7 @@
 
 import { Server, Socket } from 'socket.io';
 import logger from '../utils/logger.js';
-import { getFriendsWithStatus } from '../db/friends.js';
+import { getFriendsWithStatus, getFriendsAmong } from '../db/friends.js';
 import { rateLimiters, getSocketIP } from '../utils/rateLimiter.js';
 
 // Generate unique ID (same pattern as elsewhere in codebase)
@@ -148,14 +148,22 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
       const activity = addActivity('player_joined_lounge', playerName, {});
       io.to('lounge').emit('lounge_activity', activity);
 
+      // Get all existing player names (excluding the joining player)
+      const existingPlayerNames = Array.from(loungePlayers.values())
+        .filter(p => p.playerName !== playerName)
+        .map(p => p.playerName);
+
+      // Batch query: find which existing players are friends with the new player
+      // This is O(1) DB query instead of O(n) queries!
+      const friendsOfNewPlayer = await getFriendsAmong(playerName, existingPlayerNames);
+
       // Send player_joined to each other lounge member with their specific isFriend status
       for (const [socketId, loungePlayer] of loungePlayers.entries()) {
         if (socketId !== socket.id) {
-          // Check if the new player is a friend of this existing player
           const existingSocket = io.sockets.sockets.get(socketId);
           if (existingSocket) {
-            const friends = await getFriendsWithStatus(loungePlayer.playerName);
-            const isFriend = friends.some(f => f.player_name === playerName);
+            // Check if the new player is a friend of this existing player (from batch result)
+            const isFriend = friendsOfNewPlayer.has(loungePlayer.playerName);
             existingSocket.emit('lounge_player_joined', {
               player: { ...player, isFriend },
             });

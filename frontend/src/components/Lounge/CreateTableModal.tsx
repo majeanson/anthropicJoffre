@@ -46,6 +46,8 @@ export function CreateTableModal({
       if (data.context === 'create_table') {
         setIsCreating(false);
         setError(data.message);
+        // Auto-clear error after 5 seconds so user can retry cleanly
+        setTimeout(() => setError(null), 5000);
       }
     };
 
@@ -57,6 +59,8 @@ export function CreateTableModal({
       if (isCreating) {
         setIsCreating(false);
         setError('Table creation timed out. Please try again.');
+        // Auto-clear timeout error after 5 seconds so user can retry cleanly
+        setTimeout(() => setError(null), 5000);
       }
     }, 10000);
 

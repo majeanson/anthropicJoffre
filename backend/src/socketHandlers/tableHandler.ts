@@ -937,12 +937,15 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       }
 
       // Join all table sockets to the game room
+      // Join all table sockets to the game room and leave the table room
+      // Important: Leave table room to prevent receiving duplicate events
       const tableRoom = io.sockets.adapter.rooms.get(`table:${tableId}`);
       if (tableRoom) {
         for (const socketId of tableRoom) {
           const playerSocket = io.sockets.sockets.get(socketId);
           if (playerSocket) {
             playerSocket.join(gameId);
+            playerSocket.leave(`table:${tableId}`);
           }
         }
       }
@@ -1115,6 +1118,10 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       currentSeat.playerName = null;
       currentSeat.isReady = false;
       playerTables.delete(playerName);
+
+      // Update lounge status back to 'in_lounge' (they disconnected from table)
+      // Note: They may be fully offline, but updatePlayerStatus handles that gracefully
+      updatePlayerStatus(io, playerName, 'in_lounge', undefined, undefined);
 
       // Add system message
       currentTable.chatMessages.push({

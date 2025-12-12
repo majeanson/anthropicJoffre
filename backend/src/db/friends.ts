@@ -291,6 +291,40 @@ export async function areFriends(player1: string, player2: string): Promise<bool
 }
 
 /**
+ * Batch check if a player is friends with multiple other players.
+ * Returns a Set of player names that are friends with the given player.
+ * Much more efficient than calling areFriends() in a loop (single query vs N queries).
+ */
+export async function getFriendsAmong(
+  playerName: string,
+  potentialFriends: string[]
+): Promise<Set<string>> {
+  if (potentialFriends.length === 0) {
+    return new Set();
+  }
+
+  try {
+    // Query friendships where playerName is involved and the other party is in potentialFriends
+    const result = await query(
+      `SELECT
+         CASE
+           WHEN player1_name = $1 THEN player2_name
+           ELSE player1_name
+         END as friend_name
+       FROM friendships
+       WHERE (player1_name = $1 AND player2_name = ANY($2))
+          OR (player2_name = $1 AND player1_name = ANY($2))`,
+      [playerName, potentialFriends]
+    );
+
+    return new Set(result.rows.map((row: { friend_name: string }) => row.friend_name));
+  } catch (error) {
+    console.error('Error getting friends among list:', error);
+    return new Set();
+  }
+}
+
+/**
  * Get friends count for a player
  */
 export async function getFriendsCount(playerName: string): Promise<number> {
