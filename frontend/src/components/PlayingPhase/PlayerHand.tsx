@@ -488,24 +488,6 @@ function MobileFanLayout({
           );
         })}
       </div>
-      {/* Card position indicator */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-1.5 pb-1" aria-hidden="true">
-        {displayHand.map((_, index) => {
-          const activeIndex = previewCardIndex !== null ? previewCardIndex : focusedCardIndex;
-          return (
-            <button
-              key={index}
-              onClick={() => { handleCardFocus(index); sounds.cardDeal(); }}
-              className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                index === activeIndex
-                  ? 'bg-skin-text-accent scale-125'
-                  : 'bg-skin-muted/50 hover:bg-skin-muted'
-              }`}
-              aria-label={`Go to card ${index + 1}`}
-            />
-          );
-        })}
-      </div>
     </>
   );
 }
