@@ -116,8 +116,8 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
       <div className="space-y-6">
         {/* Completion Message */}
         {stats.allCompleted && (
-          <div className="mb-4 bg-green-100 border-2 border-green-500 rounded-lg p-4">
-            <p className="text-green-800 font-bold text-center">
+          <div className="mb-4 bg-green-900/50 border-2 border-green-500 rounded-lg p-4">
+            <p className="text-green-300 font-bold text-center">
               🎉 Congratulations! You've completed all tutorials!
             </p>
           </div>
@@ -187,14 +187,14 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
                 {/* Expandable Content */}
                 {isExpanded && (
                   <div className="px-3 pb-3 pt-0 border-t border-skin-default">
-                    <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="mt-3 p-3 bg-slate-800 rounded-lg border border-slate-600">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">{TUTORIAL_ICONS[phase]}</span>
-                        <span className="text-blue-800 font-bold text-sm">
+                        <span className="text-blue-300 font-bold text-sm">
                           {TUTORIAL_TITLES[phase]}
                         </span>
                       </div>
-                      <p className="text-skin-primary text-sm whitespace-pre-line leading-relaxed">
+                      <p className="text-slate-100 text-sm whitespace-pre-line leading-relaxed">
                         {TUTORIAL_CONTENT[phase]}
                       </p>
                     </div>
@@ -207,9 +207,9 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
 
         {/* Help Text */}
         {!stats.allCompleted && (
-          <div className="mt-6 bg-blue-50 border border-blue-300 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
-              <span className="font-bold">💡 Tip:</span> Tutorials appear automatically as you play.
+          <div className="mt-6 bg-slate-800 border border-slate-600 rounded-lg p-4">
+            <p className="text-sm text-slate-100">
+              <span className="font-bold text-blue-300">💡 Tip:</span> Tutorials appear automatically as you play.
               Complete all steps to unlock the "Tutorial Master" achievement!
             </p>
           </div>
