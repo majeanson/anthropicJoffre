@@ -268,28 +268,23 @@ export function BeginnerTutorial({
         </div>
       </div>
 
-      {/* Content - solid colors for consistent readability on all themes */}
-      <div className="bg-slate-800 p-4 max-h-[400px] overflow-y-auto">
+      {/* Content - uses skin-aware colors for theme compatibility */}
+      <div className="bg-skin-secondary p-4 max-h-[400px] overflow-y-auto">
         {/* Show all accumulated steps */}
         {accumulatedSteps.map((step, index) => (
           <div
             key={step.phase}
-            className={index > 0 ? 'mt-4 pt-4 border-t border-slate-600' : ''}
+            className={index > 0 ? 'mt-4 pt-4 border-t border-skin-default' : ''}
           >
             {/* Step header */}
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xl" aria-hidden="true">
                 {step.icon}
               </span>
-              <span className="text-blue-300 text-sm font-bold">{step.title}</span>
-              {step.phase === currentStep?.phase && (
-                <span className="ml-auto text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-semibold">
-                  NEW
-                </span>
-              )}
+              <span className="text-skin-info text-sm font-bold">{step.title}</span>
             </div>
             {/* Step content */}
-            <p className="text-slate-100 text-sm whitespace-pre-line leading-relaxed">
+            <p className="text-skin-primary text-sm whitespace-pre-line leading-relaxed">
               {step.content}
             </p>
           </div>
@@ -297,7 +292,7 @@ export function BeginnerTutorial({
       </div>
 
       {/* Actions - slightly darker footer */}
-      <div className="bg-slate-900 px-4 py-3 border-t border-slate-700">
+      <div className="bg-skin-tertiary px-4 py-3 border-t border-skin-default">
         <Button
           variant="primary"
           fullWidth
