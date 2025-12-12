@@ -25,16 +25,23 @@ interface OnlineTabProps {
   setPlayerName: (name: string) => void;
 }
 
-function getStatusLabel(status: string): string {
+function getStatusLabel(status: string): { label: string; icon: string; color: string } {
   switch (status) {
     case 'in_lobby':
-      return 'In Lobby';
+      return { label: 'In Lobby', icon: '🏠', color: 'text-green-500' };
     case 'in_game':
-      return 'Playing';
+    case 'playing':
+      return { label: 'Playing', icon: '🃏', color: 'text-purple-500' };
     case 'in_team_selection':
-      return 'Setting up';
+      return { label: 'Setting up', icon: '⚙️', color: 'text-yellow-500' };
+    case 'in_lounge':
+      return { label: 'In Lounge', icon: '🛋️', color: 'text-blue-500' };
+    case 'at_table':
+      return { label: 'At Table', icon: '🎴', color: 'text-orange-500' };
+    case 'spectating':
+      return { label: 'Spectating', icon: '👁️', color: 'text-cyan-500' };
     default:
-      return status;
+      return { label: status, icon: '❓', color: 'text-gray-500' };
   }
 }
 
@@ -84,6 +91,7 @@ export function OnlineTab({
           const isFriend = friends.some((f) => f.player_name === player.playerName);
           const showFriendButton = user && !isBot && !isSelf && !isFriend;
           const isLfg = player.lookingForGame === true;
+          const statusInfo = getStatusLabel(player.status);
 
           return (
             <div
@@ -114,8 +122,8 @@ export function OnlineTab({
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-[var(--color-text-secondary)]">
-                      {getStatusLabel(player.status)}
+                    <p className={`text-xs ${statusInfo.color}`}>
+                      {statusInfo.icon} {statusInfo.label}
                     </p>
                   </div>
                 </div>

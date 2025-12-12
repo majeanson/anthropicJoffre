@@ -50,6 +50,8 @@ interface LoungeProps {
   onJoinGame?: (gameId: string, playerName: string) => void;
   /** Direct game state setter for table games (already joined) */
   onTableGameStart?: (gameId: string, gameState: GameState) => void;
+  /** Callback to update current table ID (for social features like invite from friends panel) */
+  onTableChange?: (tableId: string | null) => void;
 }
 
 type MobileTab = 'tables' | 'chat' | 'players' | 'games';
@@ -66,6 +68,7 @@ export function Lounge({
   onBackToLobby,
   onJoinGame,
   onTableGameStart,
+  onTableChange,
 }: LoungeProps) {
   // Lounge state
   const [tables, setTables] = useState<LoungeTable[]>([]);
@@ -101,6 +104,11 @@ export function Lounge({
 
   // Get the selected table object
   const selectedTable = tables.find(t => t.id === selectedTableId);
+
+  // Notify parent when table selection changes (for invite functionality)
+  useEffect(() => {
+    onTableChange?.(selectedTableId);
+  }, [selectedTableId, onTableChange]);
 
   // Join lounge on mount
   useEffect(() => {
@@ -391,6 +399,30 @@ export function Lounge({
     setMobileTab('tables');
   }, []);
 
+  const handleAddFriend = useCallback((targetName: string) => {
+    if (socket) {
+      socket.emit('send_friend_request', { toPlayer: targetName });
+      sounds.buttonClick();
+      setToastMessage({
+        message: `Friend request sent to ${targetName}`,
+        variant: 'success',
+        title: 'Request Sent',
+      });
+    }
+  }, [socket]);
+
+  const handleInviteToTable = useCallback((targetName: string) => {
+    if (socket && selectedTableId) {
+      socket.emit('invite_to_table', { tableId: selectedTableId, targetPlayerName: targetName });
+      sounds.buttonClick();
+      setToastMessage({
+        message: `Invited ${targetName} to join your table`,
+        variant: 'success',
+        title: 'Invite Sent',
+      });
+    }
+  }, [socket, selectedTableId]);
+
   // If user is in a table room, show the TableRoom view
   if (selectedTable) {
     return (
@@ -435,6 +467,10 @@ export function Lounge({
             onWave={handleWave}
             onViewProfile={onViewProfile}
             onMessage={onOpenMessages}
+            onAddFriend={handleAddFriend}
+            onInviteToTable={handleInviteToTable}
+            isAuthenticated={!!user}
+            isAtTable={!!selectedTableId}
           />
         );
       case 'games':
@@ -505,6 +541,10 @@ export function Lounge({
             onWave={handleWave}
             onViewProfile={onViewProfile}
             onMessage={onOpenMessages}
+            onAddFriend={handleAddFriend}
+            onInviteToTable={handleInviteToTable}
+            isAuthenticated={!!user}
+            isAtTable={!!selectedTableId}
           />
         </div>
 

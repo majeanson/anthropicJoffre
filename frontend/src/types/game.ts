@@ -261,8 +261,9 @@ export interface GameHistoryEntry {
 export interface OnlinePlayer {
   socketId: string;
   playerName: string;
-  status: 'in_lobby' | 'in_game' | 'in_team_selection';
+  status: 'in_lobby' | 'in_game' | 'in_team_selection' | 'in_lounge' | 'at_table' | 'playing' | 'spectating';
   gameId?: string;
+  tableId?: string; // Lounge table ID if at a table
   lastActivity: number;
   lookingForGame?: boolean; // True if player is actively looking for teammates
 }

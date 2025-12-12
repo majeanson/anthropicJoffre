@@ -93,6 +93,8 @@ interface GlobalUIProps {
   // Retention features: XP popup and quest toast
   xpPopupComponent?: React.ReactNode;
   questToastComponent?: React.ReactNode;
+  // Lounge table ID for invite functionality
+  currentTableId?: string | null;
 }
 
 const GlobalUI: React.FC<GlobalUIProps> = ({
@@ -133,6 +135,7 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   onJoinGame,
   xpPopupComponent,
   questToastComponent,
+  currentTableId,
 }) => {
   void _onOpenProfile; // Reserved for future use
   const modals = useModals();
@@ -227,6 +230,7 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
             auth.user?.username || gameState?.players.find((p) => p.id === socket?.id)?.name || ''
           }
           onStartConversation={handleStartConversation}
+          currentTableId={currentTableId}
         />
         {/* Direct Messages Panel */}
         {auth.user && (

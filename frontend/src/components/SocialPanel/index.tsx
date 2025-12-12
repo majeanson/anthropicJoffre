@@ -55,6 +55,7 @@ interface SocialPanelProps {
   lobbyMessages?: ChatMessage[];
   sendLobbyMessage?: (message: string) => void;
   onShowWhyRegister?: () => void;
+  onOpenLounge?: () => void;
 }
 
 export function SocialPanel({
@@ -70,6 +71,7 @@ export function SocialPanel({
   lobbyMessages = [],
   sendLobbyMessage = () => {},
   onShowWhyRegister,
+  onOpenLounge,
 }: SocialPanelProps) {
   const [showDirectMessages, setShowDirectMessages] = useState(false);
   const [unreadDMCount, setUnreadDMCount] = useState(0);
@@ -260,6 +262,21 @@ export function SocialPanel({
         >
           💭
         </Button>
+        {/* Go to Lounge button - always visible */}
+        {onOpenLounge && (
+          <Button
+            onClick={() => {
+              sounds.buttonClick();
+              onOpenLounge();
+            }}
+            variant="secondary"
+            size="sm"
+            className="ml-auto bg-gradient-to-r from-purple-500/20 to-blue-500/20 border-purple-500/50 hover:border-purple-400"
+            title="Go to the Social Lounge"
+          >
+            🛋️ Lounge
+          </Button>
+        )}
       </div>
 
       {/* Content Area */}

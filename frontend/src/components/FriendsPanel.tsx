@@ -38,6 +38,8 @@ interface FriendsPanelProps {
   isOpen: boolean;
   onClose: () => void;
   onStartConversation?: (username: string) => void;
+  /** Current table ID if user is in a lounge table (enables "Invite to Table" action) */
+  currentTableId?: string | null;
 }
 
 export default function FriendsPanel({
@@ -46,6 +48,7 @@ export default function FriendsPanel({
   isOpen,
   onClose,
   onStartConversation,
+  currentTableId,
 }: FriendsPanelProps) {
   // Early returns BEFORE hooks
   if (!isOpen) return null;
@@ -186,6 +189,12 @@ export default function FriendsPanel({
     }
   };
 
+  const handleInviteToTable = (friendName: string) => {
+    if (socket && currentTableId) {
+      socket.emit('invite_to_table', { tableId: currentTableId, targetPlayerName: friendName });
+    }
+  };
+
   const pendingRequestsCount = pendingRequests.length;
 
   // Define tabs with badges
@@ -268,6 +277,17 @@ export default function FriendsPanel({
                           className="bg-blue-600 hover:bg-blue-500 border-blue-700"
                         >
                           💬 Message
+                        </Button>
+                      )}
+                      {currentTableId && friend.is_online && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => handleInviteToTable(friend.player_name)}
+                          className="bg-green-600 hover:bg-green-500 border-green-700"
+                          title="Invite to your table in the Lounge"
+                        >
+                          🎴 Invite
                         </Button>
                       )}
                       {friend.is_online && friend.game_id && (

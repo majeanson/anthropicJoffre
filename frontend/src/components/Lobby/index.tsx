@@ -449,6 +449,7 @@ export function Lobby({
                     lobbyMessages={lobbyMessages}
                     sendLobbyMessage={sendLobbyMessage}
                     onShowWhyRegister={onShowWhyRegister}
+                    onOpenLounge={onOpenLounge}
                   />
                 )}
 

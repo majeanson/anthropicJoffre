@@ -13,6 +13,12 @@ interface WhoIsHereProps {
   onWave: (targetName: string) => void;
   onViewProfile: (playerName: string) => void;
   onMessage: (playerName: string) => void;
+  onAddFriend?: (targetName: string) => void;
+  onInviteToTable?: (targetName: string) => void;
+  /** Whether current user is authenticated (enables friend requests) */
+  isAuthenticated?: boolean;
+  /** Whether current user is at a table (enables invite action) */
+  isAtTable?: boolean;
 }
 
 const statusConfig: Record<PlayerStatus, { icon: string; label: string; color: string }> = {
@@ -30,6 +36,10 @@ export function WhoIsHere({
   onWave,
   onViewProfile,
   onMessage,
+  onAddFriend,
+  onInviteToTable,
+  isAuthenticated = false,
+  isAtTable = false,
 }: WhoIsHereProps) {
   // Sort: LFG first, then by status, then alphabetically
   const sortedPlayers = [...players].sort((a, b) => {
@@ -122,6 +132,26 @@ export function WhoIsHere({
                     >
                       <span className="text-sm">💬</span>
                     </button>
+                    {/* Add Friend button - only for non-friends when authenticated */}
+                    {isAuthenticated && !player.isFriend && onAddFriend && (
+                      <button
+                        onClick={() => onAddFriend(player.playerName)}
+                        className="p-1.5 rounded hover:bg-green-500/20 transition-colors"
+                        title="Add Friend"
+                      >
+                        <span className="text-sm">➕</span>
+                      </button>
+                    )}
+                    {/* Invite to Table button - only when at a table */}
+                    {isAtTable && onInviteToTable && (
+                      <button
+                        onClick={() => onInviteToTable(player.playerName)}
+                        className="p-1.5 rounded hover:bg-blue-500/20 transition-colors"
+                        title="Invite to Table"
+                      >
+                        <span className="text-sm">🎴</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => onViewProfile(player.playerName)}
                       className="p-1.5 rounded hover:bg-skin-primary transition-colors"

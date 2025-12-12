@@ -254,6 +254,8 @@ function AppContent() {
 
   // Social Lounge view state - enables the "hang out first" experience
   const [showLounge, setShowLounge] = useState(false);
+  // Current lounge table ID for social features (invite to table from friends panel)
+  const [currentLoungeTableId, setCurrentLoungeTableId] = useState<string | null>(null);
 
   // Missing state variables for GlobalUI and DebugControls
   const [missedActions, setMissedActions] = useState<unknown[]>([]);
@@ -495,6 +497,37 @@ function AppContent() {
       socket.off('game_invite_received', handleGameInviteReceived);
     };
   }, [socket, showToast, currentPlayerName, beginnerMode]);
+
+  // Table invite received (from Lounge) - show notification with action to go to lounge
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleTableInviteReceived = (data: {
+      tableId: string;
+      tableName: string;
+      hostName: string;
+      inviterName: string;
+    }) => {
+      showToast(
+        `${data.inviterName} invited you to join "${data.tableName}"`,
+        'info',
+        10000, // 10 second timeout
+        {
+          label: 'Go to Lounge',
+          onClick: () => {
+            setShowLounge(true);
+          },
+        }
+      );
+      logger.info(`[Social] Table invite received from ${data.inviterName} for table ${data.tableName}`);
+    };
+
+    socket.on('table_invite_received', handleTableInviteReceived);
+
+    return () => {
+      socket.off('table_invite_received', handleTableInviteReceived);
+    };
+  }, [socket, showToast, setShowLounge]);
 
   // Sprint 4 Phase 4.4: Game event listeners extracted to custom hook
   useGameEventListeners({
@@ -963,6 +996,8 @@ function AppContent() {
     // Retention features: XP popup and quest toast
     xpPopupComponent: XPGainPopupComponent,
     questToastComponent: QuestCompletedToastComponent,
+    // Lounge table ID for invite functionality
+    currentTableId: currentLoungeTableId,
   };
 
   if (!gameState) {
@@ -1000,6 +1035,7 @@ function AppContent() {
                   setGameState(gameState);
                   setShowLounge(false);
                 }}
+                onTableChange={setCurrentLoungeTableId}
               />
             </Suspense>
           </ErrorBoundary>
