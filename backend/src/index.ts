@@ -212,6 +212,8 @@ import { registerSocialHandlers } from './socketHandlers/social'; // Sprint 16 D
 import { registerQuestHandlers } from './socketHandlers/quests'; // Sprint 19: Daily Engagement System
 import { registerVoiceHandlers } from './socketHandlers/voice'; // Voice chat WebRTC signaling
 import { registerSideBetsHandlers, autoResolveBets, expireGameBets } from './socketHandlers/sideBets'; // Side betting system
+import { setupTableHandler } from './socketHandlers/tableHandler'; // Social lounge tables
+import { setupLoungeHandler } from './socketHandlers/loungeHandler'; // Social lounge system
 import { updatePlayerBalance } from './db/sideBets'; // For coin rewards
 import {
   generateSessionToken as generateSessionTokenUtil,
@@ -1337,6 +1339,12 @@ io.on('connection', (socket) => {
     logger,
     errorBoundaries,
   });
+
+  // ============================================================================
+  // Social Lounge Handlers - Tables and presence system
+  // ============================================================================
+  setupTableHandler(io, socket);
+  setupLoungeHandler(io, socket);
 
   // ============================================================================
   // Connection Handlers - Refactored (Sprint 3)

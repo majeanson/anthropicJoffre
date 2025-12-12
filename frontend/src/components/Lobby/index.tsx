@@ -57,6 +57,7 @@ export function Lobby({
   onShowRegister,
   onShowProgress,
   onShowWhyRegister,
+  onOpenLounge,
 }: LobbyProps) {
   const { user, updateProfile, getUserProfile, isLoading: authLoading } = useAuth();
   // Use authenticated username if available, otherwise use stored playerName for guests
@@ -429,6 +430,7 @@ export function Lobby({
                     user={user}
                     onShowLogin={onShowLogin}
                     onShowRegister={onShowRegister}
+                    onOpenLounge={onOpenLounge}
                   />
                 )}
 

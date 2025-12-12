@@ -38,6 +38,7 @@ interface PlayContentProps {
   user: User | null;
   onShowLogin?: () => void;
   onShowRegister?: () => void;
+  onOpenLounge?: () => void;
 }
 
 export function PlayContent({
@@ -57,6 +58,7 @@ export function PlayContent({
   user,
   onShowLogin,
   onShowRegister,
+  onOpenLounge,
 }: PlayContentProps) {
   const tierInfo = getUserTierInfo(user, playerName);
   const isGuest = tierInfo.tier === 'guest';
@@ -225,6 +227,42 @@ export function PlayContent({
           </ElegantButton>
         </div>
       </div>
+
+      {/* Social Lounge - Hang out first, play games second */}
+      {onOpenLounge && (
+        <div
+          className="
+            p-4
+            rounded-[var(--radius-lg)]
+            border-2 border-[var(--color-accent)]
+            bg-gradient-to-r from-[var(--color-accent)]/10 to-[var(--color-accent)]/5
+          "
+          style={{
+            boxShadow: '0 0 20px rgba(var(--color-accent-rgb), 0.15)',
+          }}
+        >
+          <h3 className="text-xs font-display uppercase tracking-wider text-[var(--color-accent)] mb-2 text-center">
+            Social Hub
+          </h3>
+          <p className="text-xs text-[var(--color-text-muted)] text-center mb-3">
+            Chat, voice, and find players to game with
+          </p>
+          <Button
+            data-testid="open-lounge-button"
+            data-keyboard-nav="open-lounge"
+            variant="elegant"
+            size="lg"
+            onClick={() => {
+              sounds.buttonClick();
+              onOpenLounge();
+            }}
+            fullWidth
+            leftIcon={<span>🎴</span>}
+          >
+            Enter the Lounge
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

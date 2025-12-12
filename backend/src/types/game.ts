@@ -172,6 +172,14 @@ export interface TimeoutConfig {
   playingTimeout: number; // milliseconds
 }
 
+export interface ChatMessage {
+  playerId: string;
+  playerName: string;
+  teamId: 1 | 2 | null;
+  message: string;
+  timestamp: number;
+}
+
 export interface Spectator {
   id: string;
   name: string;
@@ -481,4 +489,198 @@ export interface SideBetPromptResolutionEvent {
   bet: SideBet;
   timing: 'trick' | 'round' | 'game';
   message: string;
+}
+
+// ==================== SOCIAL LOUNGE SYSTEM ====================
+
+/**
+ * Player status in the lounge
+ */
+export type PlayerStatus =
+  | 'in_lounge'      // Hanging out, available to chat/play
+  | 'at_table'       // Sitting at a table, waiting for game
+  | 'playing'        // In active game
+  | 'spectating'     // Watching a game
+  | 'away'           // AFK / Do Not Disturb
+  | 'looking_for_game'; // Actively seeking players (highlighted)
+
+/**
+ * A table in the lounge (pre-game gathering spot)
+ */
+export interface LoungeTable {
+  id: string;
+  name: string;
+  hostName: string;
+  createdAt: number;
+  seats: TableSeat[];
+  settings: TableSettings;
+  status: 'gathering' | 'ready' | 'in_game' | 'post_game';
+  gameId?: string; // Set when game starts
+  chatMessages: ChatMessage[];
+}
+
+/**
+ * A seat at a table
+ */
+export interface TableSeat {
+  position: 0 | 1 | 2 | 3; // 0,2 = Team 1, 1,3 = Team 2
+  teamId: 1 | 2;
+  playerName: string | null;
+  isBot: boolean;
+  botDifficulty?: BotDifficulty;
+  isReady: boolean;
+}
+
+/**
+ * Table game settings
+ */
+export interface TableSettings {
+  persistenceMode: 'elo' | 'casual';
+  allowBots: boolean;
+  isPrivate: boolean;
+  maxSpectators: number;
+}
+
+/**
+ * Activity event in the lounge
+ */
+export type ActivityEventType =
+  | 'player_joined_lounge'
+  | 'player_left_lounge'
+  | 'table_created'
+  | 'table_started'
+  | 'game_finished'
+  | 'player_looking_for_game'
+  | 'player_waved'
+  | 'achievement_unlocked';
+
+export interface LoungeActivity {
+  id: string;
+  type: ActivityEventType;
+  timestamp: number;
+  playerName: string;
+  data: {
+    targetPlayer?: string;
+    tableName?: string;
+    tableId?: string;
+    gameResult?: {
+      winningTeam: 1 | 2;
+      score: string; // e.g., "42-38"
+    };
+    achievementName?: string;
+  };
+}
+
+/**
+ * Lounge state for a player
+ */
+export interface LoungeState {
+  tables: LoungeTable[];
+  activities: LoungeActivity[];
+  voiceParticipants: LoungeVoiceParticipant[];
+  onlinePlayers: LoungePlayer[];
+  liveGames: LiveGame[];
+}
+
+/**
+ * Player in the lounge with status
+ */
+export interface LoungePlayer {
+  socketId: string;
+  playerName: string;
+  status: PlayerStatus;
+  tableId?: string;
+  gameId?: string;
+  lastActivity: number;
+  isFriend?: boolean;
+}
+
+/**
+ * Voice participant in lounge voice room
+ */
+export interface LoungeVoiceParticipant {
+  socketId: string;
+  playerName: string;
+  isMuted: boolean;
+  isSpeaking: boolean;
+  joinedAt: number;
+}
+
+/**
+ * A live game that can be spectated
+ */
+export interface LiveGame {
+  gameId: string;
+  team1Players: string[];
+  team2Players: string[];
+  team1Score: number;
+  team2Score: number;
+  phase: GamePhase;
+  currentTrick: number;
+  totalTricks: number;
+  spectatorCount: number;
+}
+
+// Socket event payloads for lounge
+export interface CreateTablePayload {
+  name: string;
+  settings: TableSettings;
+}
+
+export interface JoinTablePayload {
+  tableId: string;
+  seatPosition?: 0 | 1 | 2 | 3;
+}
+
+export interface LeaveTablePayload {
+  tableId: string;
+}
+
+export interface SetSeatPayload {
+  tableId: string;
+  seatPosition: 0 | 1 | 2 | 3;
+}
+
+export interface AddBotToTablePayload {
+  tableId: string;
+  seatPosition: 0 | 1 | 2 | 3;
+  difficulty: BotDifficulty;
+}
+
+export interface RemoveFromSeatPayload {
+  tableId: string;
+  seatPosition: 0 | 1 | 2 | 3;
+}
+
+export interface SetReadyPayload {
+  tableId: string;
+  isReady: boolean;
+}
+
+export interface StartTableGamePayload {
+  tableId: string;
+}
+
+export interface TableUpdatedEvent {
+  table: LoungeTable;
+}
+
+export interface WaveAtPlayerPayload {
+  targetPlayerName: string;
+}
+
+export interface InviteToTablePayload {
+  tableId: string;
+  targetPlayerName: string;
+}
+
+export interface TableInviteReceivedEvent {
+  tableId: string;
+  tableName: string;
+  hostName: string;
+  inviterName: string;
+}
+
+export interface SetPlayerStatusPayload {
+  status: PlayerStatus;
 }

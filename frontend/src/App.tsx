@@ -53,6 +53,10 @@ const BeginnerTutorial = lazy(() =>
 const HowToPlay = lazy(() =>
   import('./components/HowToPlay').then((m) => ({ default: m.HowToPlay }))
 );
+// Social Lounge - hang out first, play games second
+const Lounge = lazy(() =>
+  import('./components/Lounge').then((m) => ({ default: m.Lounge }))
+);
 // Sprint 19: Quest system components (integrated via Stats tab → ProfileProgressModal)
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
@@ -247,6 +251,9 @@ function AppContent() {
 
   // "Why Register" modal state (shows HowToPlay on register tab)
   const [showWhyRegister, setShowWhyRegister] = useState(false);
+
+  // Social Lounge view state - enables the "hang out first" experience
+  const [showLounge, setShowLounge] = useState(false);
 
   // Missing state variables for GlobalUI and DebugControls
   const [missedActions, setMissedActions] = useState<unknown[]>([]);
@@ -963,23 +970,53 @@ function AppContent() {
       <>
         <GlobalUI {...globalUIProps} />
 
-        <Lobby
-          onCreateGame={handleCreateGame}
-          onJoinGame={handleJoinGame}
-          onSpectateGame={handleSpectateGame}
-          onQuickPlay={handleQuickPlay}
-          onRejoinGame={handleRejoinGame}
-          hasValidSession={hasValidSession}
-          autoJoinGameId={autoJoinGameId}
-          onlinePlayers={onlinePlayers}
-          socket={socket}
-          botDifficulty={botDifficulty}
-          onShowLogin={modals.openLoginModal}
-          onShowRegister={modals.openRegisterModal}
-          onBotDifficultyChange={setBotDifficulty}
-          onShowProgress={() => setShowPersonalHub(true)}
-          onShowWhyRegister={() => setShowWhyRegister(true)}
-        />
+        {/* Social Lounge - "hang out first, play games second" */}
+        {showLounge ? (
+          <ErrorBoundary componentName="Lounge">
+            <Suspense
+              fallback={
+                <div className="min-h-screen bg-skin-primary flex items-center justify-center">
+                  <div className="text-skin-primary text-2xl">Loading Lounge...</div>
+                </div>
+              }
+            >
+              <Lounge
+                socket={socket}
+                playerName={currentPlayerName}
+                user={auth.user}
+                onSpectateGame={handleSpectateGame}
+                onViewProfile={handleClickPlayer}
+                onOpenMessages={(playerName) => {
+                  setDmRecipient(playerName || null);
+                  setShowDirectMessages(true);
+                }}
+                onShowLogin={modals.openLoginModal}
+                onShowRegister={modals.openRegisterModal}
+                onBackToLobby={() => setShowLounge(false)}
+                onJoinGame={handleJoinGame}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        ) : (
+          <Lobby
+            onCreateGame={handleCreateGame}
+            onJoinGame={handleJoinGame}
+            onSpectateGame={handleSpectateGame}
+            onQuickPlay={handleQuickPlay}
+            onRejoinGame={handleRejoinGame}
+            hasValidSession={hasValidSession}
+            autoJoinGameId={autoJoinGameId}
+            onlinePlayers={onlinePlayers}
+            socket={socket}
+            botDifficulty={botDifficulty}
+            onShowLogin={modals.openLoginModal}
+            onShowRegister={modals.openRegisterModal}
+            onBotDifficultyChange={setBotDifficulty}
+            onShowProgress={() => setShowPersonalHub(true)}
+            onShowWhyRegister={() => setShowWhyRegister(true)}
+            onOpenLounge={() => setShowLounge(true)}
+          />
+        )}
 
         {/* Bot Takeover Modal - for joining games that are full with bots */}
         {botTakeoverModal && (

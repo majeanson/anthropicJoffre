@@ -33,4 +33,5 @@ export interface LobbyProps {
   onShowRegister?: () => void;
   onShowProgress?: () => void;
   onShowWhyRegister?: () => void;
+  onOpenLounge?: () => void;
 }
