@@ -104,14 +104,14 @@ export function TableRoom({
 
   const handleAddBot = useCallback((position: number) => {
     if (socket && isHost) {
-      socket.emit('add_bot_to_table', { tableId: table.id, position, difficulty: 'medium' });
+      socket.emit('add_bot_to_table', { tableId: table.id, seatPosition: position, difficulty: 'medium' });
       sounds.buttonClick();
     }
   }, [socket, table.id, isHost]);
 
   const handleRemoveFromSeat = useCallback((position: number) => {
     if (socket && isHost) {
-      socket.emit('remove_from_seat', { tableId: table.id, position });
+      socket.emit('remove_from_seat', { tableId: table.id, seatPosition: position });
       sounds.buttonClick();
     }
   }, [socket, table.id, isHost]);
