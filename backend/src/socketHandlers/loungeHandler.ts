@@ -492,3 +492,26 @@ export function getLoungePlayerSocketId(playerName: string): string | undefined 
 export function isPlayerInLounge(playerName: string): boolean {
   return playerNameToSocket.has(playerName);
 }
+
+/**
+ * Remove player from lounge voice chat when they join a table.
+ * This ensures they don't stay in the lounge voice room while at a table.
+ */
+export function removePlayerFromLoungeVoice(io: Server, playerName: string): void {
+  const socketId = playerNameToSocket.get(playerName);
+  if (!socketId) return;
+
+  const participant = loungeVoice.get(socketId);
+  if (participant) {
+    loungeVoice.delete(socketId);
+
+    // Try to remove from socket room
+    const socket = io.sockets.sockets.get(socketId);
+    if (socket) {
+      socket.leave('lounge_voice');
+    }
+
+    io.to('lounge').emit('lounge_voice_participant_left', { playerName });
+    logger.info(`${playerName} auto-removed from lounge voice (joined table)`);
+  }
+}

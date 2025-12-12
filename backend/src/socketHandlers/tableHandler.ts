@@ -29,7 +29,7 @@ import {
   Player,
   PlayerSession,
 } from '../types/game.js';
-import { getLoungePlayerSocketId } from './loungeHandler.js';
+import { getLoungePlayerSocketId, removePlayerFromLoungeVoice } from './loungeHandler.js';
 
 // Generate unique ID (same pattern as elsewhere in codebase)
 function generateId(): string {
@@ -49,8 +49,46 @@ const playerTables = new Map<string, string>(); // playerName -> tableId
 // Track disconnect timeouts for table players
 const tableDisconnectTimeouts = new Map<string, NodeJS.Timeout>(); // playerName -> timeout
 
+// Lock for seat assignment to prevent race conditions
+// Format: "tableId:position" -> timestamp when locked
+const seatLocks = new Map<string, number>();
+const SEAT_LOCK_TIMEOUT = 5000; // 5 seconds max lock time
+
+// Helper to acquire seat lock (returns true if acquired)
+function acquireSeatLock(tableId: string, position: number): boolean {
+  const lockKey = `${tableId}:${position}`;
+  const now = Date.now();
+
+  // Clean up stale lock if exists
+  const existingLock = seatLocks.get(lockKey);
+  if (existingLock && now - existingLock > SEAT_LOCK_TIMEOUT) {
+    seatLocks.delete(lockKey);
+  }
+
+  // Try to acquire
+  if (seatLocks.has(lockKey)) {
+    return false; // Already locked
+  }
+
+  seatLocks.set(lockKey, now);
+  return true;
+}
+
+// Release seat lock
+function releaseSeatLock(tableId: string, position: number): void {
+  seatLocks.delete(`${tableId}:${position}`);
+}
+
 // Disconnect grace period (30 seconds)
 const TABLE_DISCONNECT_TIMEOUT = 30000;
+
+// Orphan table check interval (5 minutes)
+const ORPHAN_CHECK_INTERVAL = 5 * 60 * 1000;
+// How long a table can be in_game without a valid game before cleanup (10 minutes)
+const ORPHAN_TABLE_TIMEOUT = 10 * 60 * 1000;
+
+// Track when tables entered in_game state
+const tableGameStartTimes = new Map<string, number>(); // tableId -> timestamp
 
 // Bot name generator
 const BOT_NAMES = ['Bot Alphonse', 'Bot Bertha', 'Bot Claude', 'Bot Diane'];
@@ -178,6 +216,9 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       // Join socket room for this table
       socket.join(`table:${tableId}`);
 
+      // Remove from lounge voice if they were in it
+      removePlayerFromLoungeVoice(io, playerName);
+
       logger.info(`Table created: ${tableId} by ${playerName}`);
 
       socket.emit('table_created', { table });
@@ -211,6 +252,17 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         return;
       }
 
+      // Check if table is private (only allow joining via invite)
+      if (table.settings.isPrivate) {
+        // Allow if already at table or if host (returning after disconnect)
+        const isAtTable = table.seats.some(s => s.playerName === playerName);
+        const isHost = table.hostName === playerName;
+        if (!isAtTable && !isHost) {
+          socket.emit('error', { message: 'This table is private. You need an invite to join.', context: 'join_table' });
+          return;
+        }
+      }
+
       // Check if player is already at a different table
       const currentTableId = playerTables.get(playerName);
       if (currentTableId && currentTableId !== tableId) {
@@ -226,7 +278,7 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         return;
       }
 
-      // Find an empty seat
+      // Find an empty seat with atomic lock to prevent race conditions
       let targetSeat: TableSeat | undefined;
       if (seatPosition !== undefined) {
         targetSeat = table.seats.find(s => s.position === seatPosition && s.playerName === null && !s.isBot);
@@ -239,11 +291,30 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         return;
       }
 
+      // Try to acquire lock on this seat to prevent race conditions
+      if (!acquireSeatLock(tableId, targetSeat.position)) {
+        socket.emit('error', { message: 'Seat is being claimed by another player', context: 'join_table' });
+        return;
+      }
+
+      // Double-check seat is still empty after acquiring lock
+      if (targetSeat.playerName !== null || targetSeat.isBot) {
+        releaseSeatLock(tableId, targetSeat.position);
+        socket.emit('error', { message: 'Seat was just taken', context: 'join_table' });
+        return;
+      }
+
       targetSeat.playerName = playerName;
       targetSeat.isReady = false;
       playerTables.set(playerName, tableId);
 
+      // Release the lock now that seat is assigned
+      releaseSeatLock(tableId, targetSeat.position);
+
       socket.join(`table:${tableId}`);
+
+      // Remove from lounge voice if they were in it
+      removePlayerFromLoungeVoice(io, playerName);
 
       // Clear any disconnect timeout for this player
       const timeout = tableDisconnectTimeouts.get(playerName);
@@ -303,10 +374,26 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         return;
       }
 
+      // Try to acquire lock on this seat to prevent race conditions
+      if (!acquireSeatLock(tableId, position)) {
+        socket.emit('error', { message: 'Seat is being claimed by another player', context: 'sit_at_table' });
+        return;
+      }
+
+      // Double-check seat is still empty after acquiring lock
+      if (targetSeat.playerName !== null || targetSeat.isBot) {
+        releaseSeatLock(tableId, position);
+        socket.emit('error', { message: 'Seat was just taken', context: 'sit_at_table' });
+        return;
+      }
+
       // Sit down
       targetSeat.playerName = playerName;
       targetSeat.isReady = false;
       playerTables.set(playerName, tableId);
+
+      // Release the lock now that seat is assigned
+      releaseSeatLock(tableId, position);
 
       // Join socket room if not already
       socket.join(`table:${tableId}`);
@@ -413,31 +500,40 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         timestamp: Date.now(),
       });
 
-      // If host left, transfer host or delete table
+      // Check remaining human players (exclude bots)
+      const remainingHumans = table.seats.filter(s => s.playerName !== null && !s.isBot);
+
+      // If no human players remain, delete the table (bots can't play alone)
+      if (remainingHumans.length === 0) {
+        tables.delete(tableId);
+        tableGameStartTimes.delete(tableId);
+        io.to(`table:${tableId}`).emit('table_deleted', { tableId });
+        io.to('lounge').emit('lounge_table_deleted', { tableId });
+        logger.info(`Table ${tableId} deleted (only bots remaining)`);
+        return;
+      }
+
+      // If host left, transfer to another human player
       if (table.hostName === playerName) {
-        const remainingPlayers = table.seats.filter(s => s.playerName !== null && !s.isBot);
-        if (remainingPlayers.length > 0) {
-          table.hostName = remainingPlayers[0].playerName as string;
-          table.chatMessages.push({
-            playerId: 'system',
-            playerName: 'System',
-            teamId: null,
-            message: `${table.hostName} is now the host`,
-            timestamp: Date.now(),
-          });
-        } else {
-          // No players left, delete table
-          tables.delete(tableId);
-          io.to(`table:${tableId}`).emit('table_deleted', { tableId });
-          io.to('lounge').emit('lounge_table_deleted', { tableId });
-          logger.info(`Table ${tableId} deleted (no players)`);
-          return;
-        }
+        table.hostName = remainingHumans[0].playerName as string;
+        table.chatMessages.push({
+          playerId: 'system',
+          playerName: 'System',
+          teamId: null,
+          message: `${table.hostName} is now the host`,
+          timestamp: Date.now(),
+        });
       }
 
       // Reset status if was ready
       if (table.status === 'ready') {
         table.status = 'gathering';
+        // Reset all human players' ready state when table goes back to gathering
+        table.seats.forEach(s => {
+          if (s.playerName && !s.isBot) {
+            s.isReady = false;
+          }
+        });
       }
 
       logger.info(`${playerName} left table ${tableId}`);
@@ -531,12 +627,16 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         return;
       }
 
+      // Validate bot difficulty
+      const validDifficulties = ['easy', 'medium', 'hard'];
+      const botDifficulty = validDifficulties.includes(difficulty) ? difficulty : 'medium';
+
       const existingNames = getTablePlayerNames(table);
       const botName = generateBotName(existingNames);
 
       targetSeat.playerName = botName;
       targetSeat.isBot = true;
-      targetSeat.botDifficulty = difficulty || 'medium';
+      targetSeat.botDifficulty = botDifficulty;
       targetSeat.isReady = true; // Bots are always ready
 
       // Check if table is now ready
@@ -781,6 +881,7 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       // Update table status
       table.status = 'in_game';
       table.gameId = gameId;
+      tableGameStartTimes.set(tableId, Date.now());
 
       // Have all human players join the game room
       for (const seat of table.seats) {
@@ -909,12 +1010,25 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
   // ============================================================================
   socket.on('get_table', (payload: { tableId: string }) => {
     try {
+      const playerName = getPlayerName();
       const { tableId } = payload;
       const table = tables.get(tableId);
       if (!table) {
         socket.emit('error', { message: 'Table not found', context: 'get_table' });
         return;
       }
+
+      // Check if table is private and player has access
+      if (table.settings.isPrivate) {
+        const isAtTable = table.seats.some(s => s.playerName === playerName);
+        const isHost = table.hostName === playerName;
+
+        if (!isAtTable && !isHost) {
+          socket.emit('error', { message: 'This table is private', context: 'get_table' });
+          return;
+        }
+      }
+
       socket.emit('table_details', { table });
     } catch (error) {
       logger.error('Error getting table:', error);
@@ -973,30 +1087,40 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         timestamp: Date.now(),
       });
 
-      // Handle host leaving
+      // Check remaining human players (exclude bots)
+      const remainingHumans = currentTable.seats.filter(s => s.playerName !== null && !s.isBot);
+
+      // If no human players remain, delete the table (bots can't play alone)
+      if (remainingHumans.length === 0) {
+        tables.delete(tableId);
+        tableGameStartTimes.delete(tableId);
+        io.to(`table:${tableId}`).emit('table_deleted', { tableId });
+        io.to('lounge').emit('lounge_table_deleted', { tableId });
+        logger.info(`Table ${tableId} deleted (all humans disconnected, only bots remaining)`);
+        return;
+      }
+
+      // If host left, transfer to another human player
       if (currentTable.hostName === playerName) {
-        const remainingPlayers = currentTable.seats.filter(s => s.playerName !== null && !s.isBot);
-        if (remainingPlayers.length > 0) {
-          currentTable.hostName = remainingPlayers[0].playerName as string;
-          currentTable.chatMessages.push({
-            playerId: 'system',
-            playerName: 'System',
-            teamId: null,
-            message: `${currentTable.hostName} is now the host`,
-            timestamp: Date.now(),
-          });
-        } else {
-          // Delete empty table
-          tables.delete(tableId);
-          io.to('lounge').emit('lounge_table_deleted', { tableId });
-          logger.info(`Table ${tableId} deleted (all players disconnected)`);
-          return;
-        }
+        currentTable.hostName = remainingHumans[0].playerName as string;
+        currentTable.chatMessages.push({
+          playerId: 'system',
+          playerName: 'System',
+          teamId: null,
+          message: `${currentTable.hostName} is now the host`,
+          timestamp: Date.now(),
+        });
       }
 
       // Reset status if was ready
       if (currentTable.status === 'ready') {
         currentTable.status = 'gathering';
+        // Reset all human players' ready state when table goes back to gathering
+        currentTable.seats.forEach(s => {
+          if (s.playerName && !s.isBot) {
+            s.isReady = false;
+          }
+        });
       }
 
       broadcastTableUpdate(io, currentTable);
@@ -1040,6 +1164,7 @@ export function returnTableToPostGame(io: Server, tableId: string): void {
     const previousGameId = table.gameId;
     table.status = 'post_game';
     table.gameId = undefined;
+    tableGameStartTimes.delete(tableId); // Clean up tracking
 
     // Reset ready states for human players
     table.seats.forEach(s => {
@@ -1085,4 +1210,39 @@ export function clearPlayerFromTable(playerName: string): void {
     }
     playerTables.delete(playerName);
   }
+}
+
+/**
+ * Start periodic cleanup of orphaned tables stuck in in_game state.
+ * Called once during server startup.
+ */
+export function startTableOrphanCleanup(io: Server, games: Map<string, unknown>): void {
+  setInterval(() => {
+    const now = Date.now();
+    let cleanedCount = 0;
+
+    for (const [tableId, table] of tables.entries()) {
+      // Only check tables in in_game status
+      if (table.status !== 'in_game') continue;
+
+      // Check if the game still exists
+      const gameExists = table.gameId && games.has(table.gameId);
+      if (gameExists) continue;
+
+      // Check if enough time has passed since game started
+      const startTime = tableGameStartTimes.get(tableId);
+      if (startTime && now - startTime < ORPHAN_TABLE_TIMEOUT) continue;
+
+      // Table is orphaned - return it to post_game
+      logger.warn(`Cleaning up orphaned table ${tableId} (${table.name}) - game ${table.gameId} no longer exists`);
+      returnTableToPostGame(io, tableId);
+      cleanedCount++;
+    }
+
+    if (cleanedCount > 0) {
+      logger.info(`Orphan cleanup: returned ${cleanedCount} tables to post_game`);
+    }
+  }, ORPHAN_CHECK_INTERVAL);
+
+  logger.info('Table orphan cleanup started (checking every 5 minutes)');
 }
