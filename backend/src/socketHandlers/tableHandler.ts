@@ -13,6 +13,7 @@
 
 import { Server, Socket } from 'socket.io';
 import logger from '../utils/logger.js';
+import { sanitizeChatMessage } from '../utils/sanitization.js';
 import {
   LoungeTable,
   TableSeat,
@@ -54,6 +55,11 @@ const tableDisconnectTimeouts = new Map<string, NodeJS.Timeout>(); // playerName
 const seatLocks = new Map<string, number>();
 const SEAT_LOCK_TIMEOUT = 5000; // 5 seconds max lock time
 
+// Lock for table creation to prevent rapid multi-create race conditions
+// Format: playerName -> timestamp when locked
+const tableCreationLocks = new Map<string, number>();
+const TABLE_CREATION_LOCK_TIMEOUT = 3000; // 3 seconds max lock time
+
 // Helper to acquire seat lock (returns true if acquired)
 function acquireSeatLock(tableId: string, position: number): boolean {
   const lockKey = `${tableId}:${position}`;
@@ -77,6 +83,30 @@ function acquireSeatLock(tableId: string, position: number): boolean {
 // Release seat lock
 function releaseSeatLock(tableId: string, position: number): void {
   seatLocks.delete(`${tableId}:${position}`);
+}
+
+// Helper to acquire table creation lock (returns true if acquired)
+function acquireTableCreationLock(playerName: string): boolean {
+  const now = Date.now();
+
+  // Clean up stale lock if exists
+  const existingLock = tableCreationLocks.get(playerName);
+  if (existingLock && now - existingLock > TABLE_CREATION_LOCK_TIMEOUT) {
+    tableCreationLocks.delete(playerName);
+  }
+
+  // Try to acquire
+  if (tableCreationLocks.has(playerName)) {
+    return false; // Already locked
+  }
+
+  tableCreationLocks.set(playerName, now);
+  return true;
+}
+
+// Release table creation lock
+function releaseTableCreationLock(playerName: string): void {
+  tableCreationLocks.delete(playerName);
 }
 
 // Disconnect grace period (30 seconds)
@@ -184,23 +214,33 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
   // create_table - Create a new table
   // ============================================================================
   socket.on('create_table', (payload: CreateTablePayload) => {
+    const playerName = getPlayerName();
+
+    // Acquire lock to prevent rapid multi-create race condition
+    if (!acquireTableCreationLock(playerName)) {
+      socket.emit('error', { message: 'Please wait before creating another table', context: 'create_table' });
+      return;
+    }
+
     try {
-      const playerName = getPlayerName();
       const { name, settings } = payload;
 
       // Validate
       if (!name || name.trim().length === 0) {
+        releaseTableCreationLock(playerName);
         socket.emit('error', { message: 'Table name is required', context: 'create_table' });
         return;
       }
 
       if (name.length > 30) {
+        releaseTableCreationLock(playerName);
         socket.emit('error', { message: 'Table name too long (max 30 chars)', context: 'create_table' });
         return;
       }
 
       // Check if player is already at a table
       if (playerTables.has(playerName)) {
+        releaseTableCreationLock(playerName);
         socket.emit('error', { message: 'You are already at a table', context: 'create_table' });
         return;
       }
@@ -245,7 +285,11 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         tableName: table.name,
         tableId: table.id,
       });
+
+      // Release lock after successful creation
+      releaseTableCreationLock(playerName);
     } catch (error) {
+      releaseTableCreationLock(playerName);
       logger.error('Error creating table:', error);
       socket.emit('error', { message: 'Failed to create table', context: 'create_table' });
     }
@@ -418,6 +462,9 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
 
       // Join socket room if not already
       socket.join(`table:${tableId}`);
+
+      // Remove from lounge voice if they were in it (safety cleanup)
+      removePlayerFromLoungeVoice(io, playerName);
 
       logger.info(`${playerName} sat at position ${position} at table ${tableId}`);
 
@@ -1008,11 +1055,24 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         return;
       }
 
+      // Sanitize message to prevent XSS attacks
+      if (!message || message.trim().length === 0) {
+        return;
+      }
+
+      let sanitizedMessage: string;
+      try {
+        sanitizedMessage = sanitizeChatMessage(message);
+      } catch {
+        socket.emit('error', { message: 'Invalid message content', context: 'table_chat' });
+        return;
+      }
+
       const chatMessage: ChatMessage = {
         playerId: socket.id,
         playerName,
         teamId: seat.teamId,
-        message: message.slice(0, 500), // Limit message length
+        message: sanitizedMessage,
         timestamp: Date.now(),
       };
 

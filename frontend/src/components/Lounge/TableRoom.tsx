@@ -224,6 +224,7 @@ export function TableRoom({
                   isCurrentPlayer={seat.playerName === playerName}
                   isHost={isHost}
                   canSit={!isSeated && !seat.playerName}
+                  canStand={!(isHost && humanCount === 1)}
                   teamColor={teamColors[1]}
                   pendingAction={pendingAction}
                   onSit={() => handleSitDown(seat.position)}
@@ -246,6 +247,7 @@ export function TableRoom({
                   isCurrentPlayer={seat.playerName === playerName}
                   isHost={isHost}
                   canSit={!isSeated && !seat.playerName}
+                  canStand={!(isHost && humanCount === 1)}
                   teamColor={teamColors[2]}
                   pendingAction={pendingAction}
                   onSit={() => handleSitDown(seat.position)}
@@ -346,6 +348,7 @@ interface SeatCardProps {
   isCurrentPlayer: boolean;
   isHost: boolean;
   canSit: boolean;
+  canStand: boolean;
   teamColor: string;
   pendingAction: string | null;
   onSit: () => void;
@@ -359,6 +362,7 @@ function SeatCard({
   isCurrentPlayer,
   isHost,
   canSit,
+  canStand,
   teamColor,
   pendingAction,
   onSit,
@@ -444,8 +448,9 @@ function SeatCard({
                 variant="ghost"
                 size="xs"
                 onClick={onStand}
-                disabled={hasAnyPending}
+                disabled={hasAnyPending || !canStand}
                 loading={isStanding}
+                title={!canStand ? 'Host cannot stand up alone. Leave the table instead.' : undefined}
               >
                 {isStanding ? 'Standing...' : 'Stand Up'}
               </Button>

@@ -10,6 +10,7 @@ import { Socket } from 'socket.io';
 import { Logger } from 'winston';
 import { ZodSchema } from 'zod';
 import { validateInput } from '../validation/schemas';
+import { sanitizeChatMessage as sanitizeXSS } from '../utils/sanitization';
 
 /**
  * Validate chat message input against a Zod schema
@@ -80,9 +81,16 @@ export function rateLimitChatMessage(
 
 /**
  * Sanitize and validate message content
- * @returns sanitized message or null if empty
+ * Uses DOMPurify to remove XSS attack vectors and HTML tags
+ * @returns sanitized message or null if empty/invalid
  */
 export function sanitizeChatMessage(message: string): string | null {
-  const sanitized = message.trim();
-  return sanitized.length > 0 ? sanitized : null;
+  try {
+    // Use the XSS-safe sanitization from utils
+    const sanitized = sanitizeXSS(message);
+    return sanitized;
+  } catch {
+    // sanitizeXSS throws on empty or invalid messages
+    return null;
+  }
 }

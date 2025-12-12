@@ -288,6 +288,9 @@ export function useVoiceChat({
     const handleVoiceState = (data: { participants: VoiceParticipant[] }) => {
       setParticipants(data.participants);
 
+      // Clear any previous error on successful voice state update
+      setError(null);
+
       // If we just joined and there are other participants, connect to them
       if (isVoiceEnabled) {
         data.participants.forEach((p) => {

@@ -13,6 +13,7 @@ import { Server, Socket } from 'socket.io';
 import logger from '../utils/logger.js';
 import { getFriendsWithStatus, getFriendsAmong } from '../db/friends.js';
 import { rateLimiters, getSocketIP } from '../utils/rateLimiter.js';
+import { sanitizeChatMessage } from '../utils/sanitization.js';
 
 // Generate unique ID (same pattern as elsewhere in codebase)
 function generateId(): string {
@@ -317,6 +318,12 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
         return;
       }
 
+      // For private tables, only host can invite
+      if (table.settings.isPrivate && table.hostName !== playerName) {
+        socket.emit('error', { message: 'Only the host can invite to a private table', context: 'invite_to_table' });
+        return;
+      }
+
       // Check if target is already at the table
       const targetAtTable = table.seats.some(s => s.playerName === targetPlayerName);
       if (targetAtTable) {
@@ -490,11 +497,20 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
         return;
       }
 
+      // Sanitize message to prevent XSS attacks
+      let sanitizedMessage: string;
+      try {
+        sanitizedMessage = sanitizeChatMessage(message);
+      } catch {
+        socket.emit('error', { message: 'Invalid message content', context: 'lounge_chat' });
+        return;
+      }
+
       const chatMessage: ChatMessage = {
         playerId: socket.id,
         playerName,
         teamId: null,
-        message: message.slice(0, 500), // Limit message length
+        message: sanitizedMessage,
         timestamp: Date.now(),
       };
 
