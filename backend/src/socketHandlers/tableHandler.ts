@@ -545,6 +545,8 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         tables.delete(tableId);
         tableGameStartTimes.delete(tableId);
         logger.info(`Table ${tableId} deleted (only bots remaining)`);
+        // Still emit table_left to the leaving player so frontend can handle it
+        socket.emit('table_left', { tableId });
         return;
       }
 
