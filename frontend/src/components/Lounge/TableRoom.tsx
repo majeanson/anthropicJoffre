@@ -12,7 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
-import { LoungeTable, ChatMessage } from '../../types/game';
+import { LoungeTable, ChatMessage, GameState } from '../../types/game';
 import { Button } from '../ui/Button';
 import { sounds } from '../../utils/sounds';
 import { useSocketEvent } from '../../hooks/useSocketEvent';
@@ -22,7 +22,7 @@ interface TableRoomProps {
   table: LoungeTable;
   playerName: string;
   onLeave: () => void;
-  onGameStart: (gameId: string) => void;
+  onGameStart: (gameId: string, gameState?: GameState) => void;
 }
 
 export function TableRoom({
@@ -58,10 +58,10 @@ export function TableRoom({
   });
 
   // Listen for game start
-  useSocketEvent(socket, 'table_game_started', (data: { gameId: string; tableId: string }) => {
+  useSocketEvent(socket, 'table_game_started', (data: { gameId: string; tableId: string; gameState?: GameState }) => {
     if (data.tableId === table.id) {
       sounds.gameStart();
-      onGameStart(data.gameId);
+      onGameStart(data.gameId, data.gameState);
     }
   });
 

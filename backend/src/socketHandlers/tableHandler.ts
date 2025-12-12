@@ -4,19 +4,18 @@
  * Tables are the social hub where players gather before games.
  * Unlike the old "Create Game" flow, tables let people hang out,
  * chat, and decide when to start playing together.
+ *
+ * CRITICAL INTEGRATION:
+ * - Tables create actual GameState objects when starting
+ * - Players transition from table → game seamlessly
+ * - Status updates cascade to lounge
  */
 
 import { Server, Socket } from 'socket.io';
 import logger from '../utils/logger.js';
-
-// Generate unique ID (same pattern as elsewhere in codebase)
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
-}
 import {
   LoungeTable,
   TableSeat,
-  TableSettings,
   CreateTablePayload,
   JoinTablePayload,
   LeaveTablePayload,
@@ -26,14 +25,31 @@ import {
   SetReadyPayload,
   StartTableGamePayload,
   ChatMessage,
-  BotDifficulty,
+  GameState,
+  Player,
+  PlayerSession,
 } from '../types/game.js';
 
-// In-memory storage for tables (consider Redis for production)
+// Generate unique ID (same pattern as elsewhere in codebase)
+function generateId(): string {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+}
+
+function generateGameId(): string {
+  return Math.random().toString(36).substring(2, 10).toUpperCase();
+}
+
+// In-memory storage for tables
 const tables = new Map<string, LoungeTable>();
 
 // Track which table each player is at
 const playerTables = new Map<string, string>(); // playerName -> tableId
+
+// Track disconnect timeouts for table players
+const tableDisconnectTimeouts = new Map<string, NodeJS.Timeout>(); // playerName -> timeout
+
+// Disconnect grace period (30 seconds)
+const TABLE_DISCONNECT_TIMEOUT = 30000;
 
 // Bot name generator
 const BOT_NAMES = ['Bot Alphonse', 'Bot Bertha', 'Bot Claude', 'Bot Diane'];
@@ -84,11 +100,32 @@ function broadcastActivity(
   });
 }
 
-export function setupTableHandler(io: Server, socket: Socket): void {
+/**
+ * Dependencies needed by table handler to create games
+ */
+export interface TableHandlerDependencies {
+  games: Map<string, GameState>;
+  io: Server;
+  createSession: (playerName: string, socketId: string, gameId: string, isBot: boolean) => Promise<PlayerSession>;
+  updateOnlinePlayer: (socketId: string, playerName: string, status: 'in_lobby' | 'in_game' | 'in_team_selection', gameId?: string) => void;
+  emitGameUpdate: (gameId: string, gameState: GameState) => void;
+}
+
+// Store dependencies for use in handlers
+let deps: TableHandlerDependencies | null = null;
+
+export function setupTableHandler(io: Server, socket: Socket, dependencies?: TableHandlerDependencies): void {
+  // Store dependencies if provided
+  if (dependencies) {
+    deps = dependencies;
+  }
+
   // Get player name from socket.data (set during authentication/connection)
   const getPlayerName = (): string => socket.data.playerName || 'Anonymous';
 
-  // Create a new table
+  // ============================================================================
+  // create_table - Create a new table
+  // ============================================================================
   socket.on('create_table', (payload: CreateTablePayload) => {
     try {
       const playerName = getPlayerName();
@@ -154,7 +191,9 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Join an existing table
+  // ============================================================================
+  // join_table - Join an existing table (takes first available seat)
+  // ============================================================================
   socket.on('join_table', (payload: JoinTablePayload) => {
     try {
       const playerName = getPlayerName();
@@ -180,7 +219,9 @@ export function setupTableHandler(io: Server, socket: Socket): void {
 
       // Check if already at this table
       if (table.seats.some(s => s.playerName === playerName)) {
-        socket.emit('error', { message: 'You are already at this table', context: 'join_table' });
+        // Already seated - just join the socket room
+        socket.join(`table:${tableId}`);
+        socket.emit('table_joined', { table });
         return;
       }
 
@@ -203,6 +244,13 @@ export function setupTableHandler(io: Server, socket: Socket): void {
 
       socket.join(`table:${tableId}`);
 
+      // Clear any disconnect timeout for this player
+      const timeout = tableDisconnectTimeouts.get(playerName);
+      if (timeout) {
+        clearTimeout(timeout);
+        tableDisconnectTimeouts.delete(playerName);
+      }
+
       // Add system message
       table.chatMessages.push({
         playerId: 'system',
@@ -222,7 +270,106 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Leave a table
+  // ============================================================================
+  // sit_at_table - Sit at a specific seat (for players already at table)
+  // ============================================================================
+  socket.on('sit_at_table', (payload: { tableId: string; position: number }) => {
+    try {
+      const playerName = getPlayerName();
+      const { tableId, position } = payload;
+
+      const table = tables.get(tableId);
+      if (!table) {
+        socket.emit('error', { message: 'Table not found', context: 'sit_at_table' });
+        return;
+      }
+
+      // Check if player is already seated somewhere
+      const currentSeat = table.seats.find(s => s.playerName === playerName);
+      if (currentSeat) {
+        socket.emit('error', { message: 'You are already seated', context: 'sit_at_table' });
+        return;
+      }
+
+      const targetSeat = table.seats.find(s => s.position === position);
+      if (!targetSeat) {
+        socket.emit('error', { message: 'Invalid seat position', context: 'sit_at_table' });
+        return;
+      }
+
+      if (targetSeat.playerName !== null || targetSeat.isBot) {
+        socket.emit('error', { message: 'Seat is occupied', context: 'sit_at_table' });
+        return;
+      }
+
+      // Sit down
+      targetSeat.playerName = playerName;
+      targetSeat.isReady = false;
+      playerTables.set(playerName, tableId);
+
+      // Join socket room if not already
+      socket.join(`table:${tableId}`);
+
+      logger.info(`${playerName} sat at position ${position} at table ${tableId}`);
+
+      socket.emit('seat_taken', { tableId, position });
+      broadcastTableUpdate(io, table);
+    } catch (error) {
+      logger.error('Error sitting at table:', error);
+      socket.emit('error', { message: 'Failed to sit at table', context: 'sit_at_table' });
+    }
+  });
+
+  // ============================================================================
+  // stand_from_table - Stand up from current seat (stay at table but not seated)
+  // ============================================================================
+  socket.on('stand_from_table', (payload: { tableId: string }) => {
+    try {
+      const playerName = getPlayerName();
+      const { tableId } = payload;
+
+      const table = tables.get(tableId);
+      if (!table) {
+        socket.emit('error', { message: 'Table not found', context: 'stand_from_table' });
+        return;
+      }
+
+      const seat = table.seats.find(s => s.playerName === playerName);
+      if (!seat) {
+        socket.emit('error', { message: 'You are not seated', context: 'stand_from_table' });
+        return;
+      }
+
+      // Can't stand if you're the only player and host
+      const humanPlayers = table.seats.filter(s => s.playerName && !s.isBot);
+      if (humanPlayers.length === 1 && table.hostName === playerName) {
+        socket.emit('error', { message: 'Host cannot stand up alone. Leave the table instead.', context: 'stand_from_table' });
+        return;
+      }
+
+      // Stand up (but stay at table tracking)
+      seat.playerName = null;
+      seat.isReady = false;
+      // Note: Keep playerTables entry - they're still "at" the table, just not seated
+
+      // Reset table status if was ready
+      if (table.status === 'ready') {
+        table.status = 'gathering';
+      }
+
+      logger.info(`${playerName} stood up at table ${tableId}`);
+
+      socket.emit('stood_up', { tableId });
+      broadcastTableUpdate(io, table);
+    } catch (error) {
+      logger.error('Error standing from table:', error);
+      socket.emit('error', { message: 'Failed to stand from table', context: 'stand_from_table' });
+    }
+  });
+
+  // ============================================================================
+  // leave_table - Leave a table entirely
+  // ============================================================================
   socket.on('leave_table', (payload: LeaveTablePayload) => {
     try {
       const playerName = getPlayerName();
@@ -236,7 +383,10 @@ export function setupTableHandler(io: Server, socket: Socket): void {
 
       const seat = table.seats.find(s => s.playerName === playerName);
       if (!seat) {
-        socket.emit('error', { message: 'You are not at this table', context: 'leave_table' });
+        // Not seated, just leave the socket room
+        playerTables.delete(playerName);
+        socket.leave(`table:${tableId}`);
+        socket.emit('table_left', { tableId });
         return;
       }
 
@@ -278,6 +428,11 @@ export function setupTableHandler(io: Server, socket: Socket): void {
         }
       }
 
+      // Reset status if was ready
+      if (table.status === 'ready') {
+        table.status = 'gathering';
+      }
+
       logger.info(`${playerName} left table ${tableId}`);
 
       socket.emit('table_left', { tableId });
@@ -288,7 +443,9 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Change seat at table
+  // ============================================================================
+  // set_seat - Change seat position (move from current to new seat)
+  // ============================================================================
   socket.on('set_seat', (payload: SetSeatPayload) => {
     try {
       const playerName = getPlayerName();
@@ -332,7 +489,9 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Add a bot to a seat
+  // ============================================================================
+  // add_bot_to_table - Add a bot to an empty seat (host only)
+  // ============================================================================
   socket.on('add_bot_to_table', (payload: AddBotToTablePayload) => {
     try {
       const playerName = getPlayerName();
@@ -373,6 +532,13 @@ export function setupTableHandler(io: Server, socket: Socket): void {
       targetSeat.botDifficulty = difficulty || 'medium';
       targetSeat.isReady = true; // Bots are always ready
 
+      // Check if table is now ready
+      const allFilled = table.seats.every(s => s.playerName !== null);
+      const allReady = table.seats.every(s => s.isReady);
+      if (allFilled && allReady) {
+        table.status = 'ready';
+      }
+
       logger.info(`Bot ${botName} added to table ${tableId} at position ${seatPosition}`);
 
       broadcastTableUpdate(io, table);
@@ -382,7 +548,9 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Remove player/bot from seat
+  // ============================================================================
+  // remove_from_seat - Remove player/bot from seat (host only)
+  // ============================================================================
   socket.on('remove_from_seat', (payload: RemoveFromSeatPayload) => {
     try {
       const playerName = getPlayerName();
@@ -433,6 +601,11 @@ export function setupTableHandler(io: Server, socket: Socket): void {
       targetSeat.botDifficulty = undefined;
       targetSeat.isReady = false;
 
+      // Reset status if was ready
+      if (table.status === 'ready') {
+        table.status = 'gathering';
+      }
+
       // Add system message
       table.chatMessages.push({
         playerId: 'system',
@@ -451,7 +624,9 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Toggle ready status
+  // ============================================================================
+  // set_ready - Toggle ready status
+  // ============================================================================
   socket.on('set_ready', (payload: SetReadyPayload) => {
     try {
       const playerName = getPlayerName();
@@ -490,8 +665,10 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Start the game (host only)
-  socket.on('start_table_game', (payload: StartTableGamePayload) => {
+  // ============================================================================
+  // start_table_game - Start the game (host only) - CREATES ACTUAL GAME
+  // ============================================================================
+  socket.on('start_table_game', async (payload: StartTableGamePayload) => {
     try {
       const playerName = getPlayerName();
       const { tableId } = payload;
@@ -514,43 +691,121 @@ export function setupTableHandler(io: Server, socket: Socket): void {
         return;
       }
 
-      // Check all are ready (or allow host to override)
+      // Check all are ready
       const allReady = table.seats.every(s => s.isReady);
       if (!allReady) {
-        // For now, require all ready. Could add host override later.
         socket.emit('error', { message: 'All players must be ready', context: 'start_table_game' });
         return;
       }
 
-      table.status = 'in_game';
+      // Check if we have dependencies to create a game
+      if (!deps) {
+        logger.error('Table handler dependencies not set - cannot create game');
+        socket.emit('error', { message: 'Game system unavailable', context: 'start_table_game' });
+        return;
+      }
 
-      // Emit event to create the actual game
-      // The main game handler will pick this up and create a game with these players
-      io.to(`table:${tableId}`).emit('table_game_starting', {
+      // Create the actual game
+      const gameId = generateGameId();
+      const hasBots = table.seats.some(s => s.isBot);
+
+      // Create players from seats
+      const players: Player[] = table.seats.map((seat, index) => ({
+        id: seat.isBot ? `bot-${seat.position}-${Date.now()}` : `player-${seat.position}`,
+        name: seat.playerName!,
+        teamId: seat.teamId as 1 | 2,
+        hand: [],
+        tricksWon: 0,
+        pointsWon: 0,
+        isBot: seat.isBot,
+        botDifficulty: seat.botDifficulty,
+      }));
+
+      // Create game state
+      const gameState: GameState = {
+        id: gameId,
+        creatorId: socket.id,
+        persistenceMode: table.settings.persistenceMode || 'casual',
+        isBotGame: hasBots,
+        phase: 'team_selection', // Start at team selection so they can verify teams
+        players,
+        currentBets: [],
+        highestBet: null,
+        trump: null,
+        currentTrick: [],
+        previousTrick: null,
+        currentPlayerIndex: 0,
+        dealerIndex: 0,
+        teamScores: { team1: 0, team2: 0 },
+        roundNumber: 1,
+        roundHistory: [],
+        currentRoundTricks: [],
+        tableId, // Link back to table
+      };
+
+      // Store game in games map
+      deps.games.set(gameId, gameState);
+
+      // Update table status
+      table.status = 'in_game';
+      table.gameId = gameId;
+
+      // Have all human players join the game room
+      for (const seat of table.seats) {
+        if (!seat.isBot && seat.playerName) {
+          // Create session for each player
+          try {
+            await deps.createSession(seat.playerName, socket.id, gameId, false);
+          } catch (err) {
+            logger.warn(`Failed to create session for ${seat.playerName}:`, err);
+          }
+
+          // Update online player status
+          deps.updateOnlinePlayer(socket.id, seat.playerName, 'in_team_selection', gameId);
+        }
+      }
+
+      // Join all table sockets to the game room
+      const tableRoom = io.sockets.adapter.rooms.get(`table:${tableId}`);
+      if (tableRoom) {
+        for (const socketId of tableRoom) {
+          const playerSocket = io.sockets.sockets.get(socketId);
+          if (playerSocket) {
+            playerSocket.join(gameId);
+          }
+        }
+      }
+
+      logger.info(`Game ${gameId} created from table ${tableId}`);
+
+      // Emit to table players that the game has started
+      // This is the event the frontend expects!
+      io.to(`table:${tableId}`).emit('table_game_started', {
+        gameId,
         tableId,
-        players: table.seats.map(s => ({
-          name: s.playerName,
-          teamId: s.teamId,
-          isBot: s.isBot,
-          botDifficulty: s.botDifficulty,
-        })),
-        settings: table.settings,
+        gameState,
       });
 
-      logger.info(`Game starting from table ${tableId}`);
+      // Also emit game state to game room
+      deps.emitGameUpdate(gameId, gameState);
 
+      // Update lounge with table status
       broadcastTableUpdate(io, table);
       broadcastActivity(io, 'table_started', playerName, {
         tableName: table.name,
         tableId: table.id,
+        gameId,
       });
+
     } catch (error) {
       logger.error('Error starting table game:', error);
       socket.emit('error', { message: 'Failed to start game', context: 'start_table_game' });
     }
   });
 
-  // Send chat message to table
+  // ============================================================================
+  // table_chat - Send chat message to table
+  // ============================================================================
   socket.on('table_chat', (payload: { tableId: string; message: string }) => {
     try {
       const playerName = getPlayerName();
@@ -590,7 +845,9 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Get all tables (for lounge view)
+  // ============================================================================
+  // get_tables - Get all public tables (for lounge view)
+  // ============================================================================
   socket.on('get_tables', () => {
     try {
       const tableList = Array.from(tables.values())
@@ -606,7 +863,9 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Get specific table details
+  // ============================================================================
+  // get_table - Get specific table details
+  // ============================================================================
   socket.on('get_table', (payload: { tableId: string }) => {
     try {
       const { tableId } = payload;
@@ -622,49 +881,106 @@ export function setupTableHandler(io: Server, socket: Socket): void {
     }
   });
 
-  // Handle disconnect - remove from table
+  // ============================================================================
+  // disconnect - Handle player disconnect with grace period
+  // ============================================================================
   socket.on('disconnect', () => {
     const playerName = getPlayerName();
     const tableId = playerTables.get(playerName);
-    if (tableId) {
-      const table = tables.get(tableId);
-      if (table) {
-        const seat = table.seats.find(s => s.playerName === playerName);
-        if (seat) {
-          seat.playerName = null;
-          seat.isReady = false;
-          playerTables.delete(playerName);
 
-          // Add system message
-          table.chatMessages.push({
+    if (!tableId) return;
+
+    const table = tables.get(tableId);
+    if (!table) {
+      playerTables.delete(playerName);
+      return;
+    }
+
+    const seat = table.seats.find(s => s.playerName === playerName);
+    if (!seat) {
+      playerTables.delete(playerName);
+      return;
+    }
+
+    // If table is in game, don't remove - game handler handles it
+    if (table.status === 'in_game') {
+      return;
+    }
+
+    // Set a timeout to remove player after grace period
+    const timeout = setTimeout(() => {
+      tableDisconnectTimeouts.delete(playerName);
+
+      // Re-check if player is still disconnected
+      const currentTable = tables.get(tableId);
+      if (!currentTable) return;
+
+      const currentSeat = currentTable.seats.find(s => s.playerName === playerName);
+      if (!currentSeat) return;
+
+      // Remove player
+      currentSeat.playerName = null;
+      currentSeat.isReady = false;
+      playerTables.delete(playerName);
+
+      // Add system message
+      currentTable.chatMessages.push({
+        playerId: 'system',
+        playerName: 'System',
+        teamId: null,
+        message: `${playerName} disconnected`,
+        timestamp: Date.now(),
+      });
+
+      // Handle host leaving
+      if (currentTable.hostName === playerName) {
+        const remainingPlayers = currentTable.seats.filter(s => s.playerName !== null && !s.isBot);
+        if (remainingPlayers.length > 0) {
+          currentTable.hostName = remainingPlayers[0].playerName as string;
+          currentTable.chatMessages.push({
             playerId: 'system',
             playerName: 'System',
             teamId: null,
-            message: `${playerName} disconnected`,
+            message: `${currentTable.hostName} is now the host`,
             timestamp: Date.now(),
           });
-
-          // Handle host leaving
-          if (table.hostName === playerName) {
-            const remainingPlayers = table.seats.filter(s => s.playerName !== null && !s.isBot);
-            if (remainingPlayers.length > 0) {
-              table.hostName = remainingPlayers[0].playerName as string;
-            } else {
-              // Delete empty table
-              tables.delete(tableId);
-              io.to('lounge').emit('lounge_table_deleted', { tableId });
-              return;
-            }
-          }
-
-          broadcastTableUpdate(io, table);
+        } else {
+          // Delete empty table
+          tables.delete(tableId);
+          io.to('lounge').emit('lounge_table_deleted', { tableId });
+          logger.info(`Table ${tableId} deleted (all players disconnected)`);
+          return;
         }
       }
-    }
+
+      // Reset status if was ready
+      if (currentTable.status === 'ready') {
+        currentTable.status = 'gathering';
+      }
+
+      broadcastTableUpdate(io, currentTable);
+      logger.info(`${playerName} removed from table ${tableId} after disconnect timeout`);
+    }, TABLE_DISCONNECT_TIMEOUT);
+
+    tableDisconnectTimeouts.set(playerName, timeout);
+
+    // Add pending disconnect message
+    table.chatMessages.push({
+      playerId: 'system',
+      playerName: 'System',
+      teamId: null,
+      message: `${playerName} disconnected (waiting to reconnect...)`,
+      timestamp: Date.now(),
+    });
+
+    broadcastTableUpdate(io, table);
   });
 }
 
-// Export helper functions for other handlers
+// ============================================================================
+// Exported helper functions for other handlers
+// ============================================================================
+
 export function getTable(tableId: string): LoungeTable | undefined {
   return tables.get(tableId);
 }
@@ -677,20 +993,44 @@ export function setTableGameId(tableId: string, gameId: string): void {
   }
 }
 
-export function returnTableToPostGame(tableId: string): void {
+export function returnTableToPostGame(io: Server, tableId: string): void {
   const table = tables.get(tableId);
   if (table) {
     table.status = 'post_game';
     table.gameId = undefined;
-    // Reset ready states
+    // Reset ready states for human players
     table.seats.forEach(s => {
       if (!s.isBot) {
         s.isReady = false;
       }
+    });
+    broadcastTableUpdate(io, table);
+    broadcastActivity(io, 'game_finished', table.hostName, {
+      tableName: table.name,
+      tableId: table.id,
     });
   }
 }
 
 export function getAllTables(): LoungeTable[] {
   return Array.from(tables.values());
+}
+
+export function getPlayerTable(playerName: string): string | undefined {
+  return playerTables.get(playerName);
+}
+
+export function clearPlayerFromTable(playerName: string): void {
+  const tableId = playerTables.get(playerName);
+  if (tableId) {
+    const table = tables.get(tableId);
+    if (table) {
+      const seat = table.seats.find(s => s.playerName === playerName);
+      if (seat) {
+        seat.playerName = null;
+        seat.isReady = false;
+      }
+    }
+    playerTables.delete(playerName);
+  }
 }

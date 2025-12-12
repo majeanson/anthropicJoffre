@@ -1343,7 +1343,15 @@ io.on('connection', (socket) => {
   // ============================================================================
   // Social Lounge Handlers - Tables and presence system
   // ============================================================================
-  setupTableHandler(io, socket);
+  setupTableHandler(io, socket, {
+    games,
+    io,
+    createSession: async (playerName: string, socketId: string, gameId: string, isBot: boolean) => {
+      return createDBSession(playerName, socketId, gameId);
+    },
+    updateOnlinePlayer,
+    emitGameUpdate,
+  });
   setupLoungeHandler(io, socket);
 
   // ============================================================================

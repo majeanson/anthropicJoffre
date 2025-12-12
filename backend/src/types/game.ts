@@ -135,6 +135,7 @@ export interface GameState {
   rematchVotes?: string[]; // Array of player names who voted for rematch (stable across reconnections)
   currentTimeout?: PlayerTimeout; // Current active timeout for turn-based phases
   afkWarnings?: Map<string, number>; // playerId -> warning count (kick after 3)
+  tableId?: string; // Link to lounge table if created from table
 }
 
 export interface GameHistory {

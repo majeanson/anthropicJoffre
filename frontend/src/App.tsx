@@ -994,6 +994,12 @@ function AppContent() {
                 onShowRegister={modals.openRegisterModal}
                 onBackToLobby={() => setShowLounge(false)}
                 onJoinGame={handleJoinGame}
+                onTableGameStart={(gameId, gameState) => {
+                  // Direct game state set for table games (players already joined)
+                  setGameId(gameId);
+                  setGameState(gameState);
+                  setShowLounge(false);
+                }}
               />
             </Suspense>
           </ErrorBoundary>

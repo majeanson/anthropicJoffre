@@ -20,6 +20,7 @@ import {
   LoungeVoiceParticipant,
   LiveGame,
   ChatMessage,
+  GameState,
 } from '../../types/game';
 import { VoiceRoom } from './VoiceRoom';
 import { TablesView } from './TablesView';
@@ -46,6 +47,8 @@ interface LoungeProps {
   onShowRegister: () => void;
   onBackToLobby?: () => void;
   onJoinGame?: (gameId: string, playerName: string) => void;
+  /** Direct game state setter for table games (already joined) */
+  onTableGameStart?: (gameId: string, gameState: GameState) => void;
 }
 
 type MobileTab = 'tables' | 'chat' | 'players' | 'games';
@@ -61,6 +64,7 @@ export function Lounge({
   onShowRegister,
   onBackToLobby,
   onJoinGame,
+  onTableGameStart,
 }: LoungeProps) {
   // Lounge state
   const [tables, setTables] = useState<LoungeTable[]>([]);
@@ -258,11 +262,15 @@ export function Lounge({
     sounds.buttonClick();
   }, []);
 
-  const handleGameStart = useCallback((gameId: string) => {
-    if (onJoinGame) {
+  const handleGameStart = useCallback((gameId: string, gameState?: GameState) => {
+    // If gameState is provided (from table game), use direct setter
+    if (gameState && onTableGameStart) {
+      onTableGameStart(gameId, gameState);
+    } else if (onJoinGame) {
+      // Fallback to join_game flow (shouldn't happen for table games)
       onJoinGame(gameId, playerName);
     }
-  }, [onJoinGame, playerName]);
+  }, [onJoinGame, onTableGameStart, playerName]);
 
   const handleWave = useCallback((targetName: string) => {
     if (socket) {

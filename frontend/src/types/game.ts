@@ -137,6 +137,7 @@ export interface GameState {
   roundEndTimestamp?: number; // Timestamp when round ended (for 60s timer)
   rematchVotes?: string[]; // Array of player names who voted for rematch (stable across reconnections)
   currentTimeout?: PlayerTimeout; // Current active timeout for turn-based phases
+  tableId?: string; // Link to lounge table if created from table
 }
 
 export interface PlayerSession {
