@@ -264,21 +264,40 @@ export function DirectMessagesPanel({
         };
   };
 
+  // On mobile, show either conversation list OR messages (not both)
+  const showConversationList = !selectedConversation;
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Direct Messages"
+      title={selectedConversation ? (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setSelectedConversation(null)}
+            className="sm:hidden p-1 -ml-1 rounded hover:bg-white/10 transition-colors"
+            aria-label="Back to conversations"
+          >
+            <span className="text-lg">←</span>
+          </button>
+          <span className="truncate">{selectedConversation}</span>
+        </div>
+      ) : 'Direct Messages'}
       icon={<span className="text-2xl">💬</span>}
       theme="blue"
       size="xl"
-      customHeight="h-[calc(100vh-4rem)] sm:h-[600px]"
+      mobileFullScreen={true}
       contentClassName="flex flex-col p-0 overflow-hidden"
     >
       {/* Main Content */}
-      <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
-        {/* Conversations List */}
-        <div className="w-full sm:w-80 border-b sm:border-b-0 sm:border-r border-skin-subtle overflow-y-auto max-h-40 sm:max-h-none">
+      <div className="flex-1 flex flex-col sm:flex-row overflow-hidden min-h-0">
+        {/* Conversations List - Hidden on mobile when conversation is selected */}
+        <div className={`
+          w-full sm:w-80
+          border-b sm:border-b-0 sm:border-r border-skin-subtle
+          overflow-y-auto
+          ${showConversationList ? 'flex-1 sm:flex-none' : 'hidden sm:block'}
+        `}>
           {loading && (
             <div className="p-4">
               <ListSkeleton count={8} hasAvatar={true} hasSecondaryText={true} />
@@ -333,8 +352,11 @@ export function DirectMessagesPanel({
           })}
         </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 flex flex-col">
+        {/* Messages Area - Full height on mobile when conversation selected */}
+        <div className={`
+          flex-1 flex flex-col min-h-0
+          ${!showConversationList ? 'flex' : 'hidden sm:flex'}
+        `}>
           {!selectedConversation && (
             <div className="flex-1 flex items-center justify-center">
               <EmptyState
@@ -348,7 +370,7 @@ export function DirectMessagesPanel({
           {selectedConversation && (
             <>
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
                 {messages.length === 0 && (
                   <EmptyState icon="👋" title="No messages yet" description="Say hi!" compact />
                 )}
@@ -367,10 +389,10 @@ export function DirectMessagesPanel({
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input */}
+              {/* Input - Safe area padding for mobile bottom */}
               <form
                 onSubmit={handleSendMessage}
-                className="p-4 border-t border-skin-subtle flex gap-2"
+                className="p-3 sm:p-4 border-t border-skin-subtle flex gap-2 bg-skin-secondary/50 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
               >
                 <Input
                   ref={inputRef}
@@ -384,9 +406,10 @@ export function DirectMessagesPanel({
                   type="submit"
                   variant="primary"
                   disabled={!inputMessage.trim() || sendingMessage}
-                  className="bg-blue-600 hover:bg-blue-500 border-blue-700"
+                  className="bg-blue-600 hover:bg-blue-500 border-blue-700 px-4"
                 >
-                  Send
+                  <span className="hidden sm:inline">Send</span>
+                  <span className="sm:hidden">➤</span>
                 </Button>
               </form>
             </>
