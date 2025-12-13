@@ -14,6 +14,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import { LoungeTable, ChatMessage, GameState } from '../../types/game';
 import { Button } from '../ui/Button';
+import { Modal } from '../ui/Modal';
 import { sounds } from '../../utils/sounds';
 import { useSocketEvent } from '../../hooks/useSocketEvent';
 
@@ -42,6 +43,10 @@ export function TableRoom({
   const [isStartingGame, setIsStartingGame] = useState(false);
   // Loading states for seat actions (tracked by position for sit, 'stand' for stand up)
   const [pendingAction, setPendingAction] = useState<string | null>(null);
+
+  // Confirmation modals state
+  const [confirmRemove, setConfirmRemove] = useState<{ position: number; playerName: string } | null>(null);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   const isHost = table.hostName === playerName;
   const mySeat = table.seats.find(s => s.playerName === playerName);
@@ -106,6 +111,19 @@ export function TableRoom({
     }
   }, [mySeat]);
 
+  // Timeout for pending seat actions to prevent stuck UI
+  useEffect(() => {
+    if (!pendingAction) return;
+
+    const timeout = setTimeout(() => {
+      setPendingAction(null);
+      // Show a toast or console warning - action timed out
+      console.warn('Seat action timed out:', pendingAction);
+    }, 10000); // 10 second timeout
+
+    return () => clearTimeout(timeout);
+  }, [pendingAction]);
+
   const handleSitDown = useCallback((position: number) => {
     if (socket && !isSeated && !pendingAction) {
       setPendingAction(`sit:${position}`);
@@ -139,11 +157,21 @@ export function TableRoom({
 
   const handleRemoveFromSeat = useCallback((position: number) => {
     if (socket && isHost && !pendingAction) {
-      setPendingAction(`remove:${position}`);
-      socket.emit('remove_from_seat', { tableId: table.id, seatPosition: position });
+      // Find the player name to show in confirmation
+      const seat = table.seats.find(s => s.position === position);
+      const targetName = seat?.playerName || 'this player';
+      setConfirmRemove({ position, playerName: targetName });
       sounds.buttonClick();
     }
-  }, [socket, table.id, isHost, pendingAction]);
+  }, [socket, isHost, pendingAction, table.seats]);
+
+  const confirmRemovePlayer = useCallback(() => {
+    if (socket && confirmRemove && !pendingAction) {
+      setPendingAction(`remove:${confirmRemove.position}`);
+      socket.emit('remove_from_seat', { tableId: table.id, seatPosition: confirmRemove.position });
+      setConfirmRemove(null);
+    }
+  }, [socket, table.id, confirmRemove, pendingAction]);
 
   const handleStartGame = useCallback(() => {
     if (socket && canStart && !isStartingGame) {
@@ -161,11 +189,25 @@ export function TableRoom({
   }, [socket, table.id, chatInput]);
 
   const handleLeave = useCallback(() => {
+    // Host leaving will delete the table - show confirmation
+    if (isHost) {
+      setShowLeaveConfirm(true);
+      sounds.buttonClick();
+      return;
+    }
     if (socket) {
       socket.emit('leave_table', { tableId: table.id });
     }
     onLeave();
     sounds.buttonClick();
+  }, [socket, table.id, onLeave, isHost]);
+
+  const confirmLeaveAsHost = useCallback(() => {
+    if (socket) {
+      socket.emit('leave_table', { tableId: table.id });
+    }
+    setShowLeaveConfirm(false);
+    onLeave();
   }, [socket, table.id, onLeave]);
 
   // Team colors for visual distinction
@@ -178,6 +220,59 @@ export function TableRoom({
 
   return (
     <div className="min-h-screen bg-skin-primary p-4">
+      {/* Confirmation Modals */}
+      <Modal
+        isOpen={!!confirmRemove}
+        onClose={() => setConfirmRemove(null)}
+        title="Remove Player"
+        icon="⚠️"
+        theme="red"
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setConfirmRemove(null)}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={confirmRemovePlayer}>
+              Remove
+            </Button>
+          </>
+        }
+      >
+        <p className="text-skin-primary">
+          Are you sure you want to remove <strong>{confirmRemove?.playerName}</strong> from the table?
+        </p>
+        <p className="text-sm text-skin-muted mt-2">
+          They will be able to rejoin the table if there's an open seat.
+        </p>
+      </Modal>
+
+      <Modal
+        isOpen={showLeaveConfirm}
+        onClose={() => setShowLeaveConfirm(false)}
+        title="Leave Table"
+        icon="⚠️"
+        theme="red"
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setShowLeaveConfirm(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={confirmLeaveAsHost}>
+              Leave & Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-skin-primary">
+          As the host, leaving will <strong>delete this table</strong> and kick all other players.
+        </p>
+        <p className="text-sm text-skin-muted mt-2">
+          Are you sure you want to leave?
+        </p>
+      </Modal>
+
       <div className="max-w-4xl mx-auto space-y-4">
         {/* Header */}
         <div className="bg-skin-secondary rounded-xl border-2 border-skin-default p-4">

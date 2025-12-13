@@ -38,6 +38,11 @@ export interface ToastProps {
   onClose: () => void;
   /** Show close button */
   showCloseButton?: boolean;
+  /** Optional action button */
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
 // Variant styles using CSS variables
@@ -111,6 +116,7 @@ export function Toast({
   autoDismiss = 0,
   onClose,
   showCloseButton = true,
+  action,
 }: ToastProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [progress, setProgress] = useState(100);
@@ -199,6 +205,27 @@ export function Toast({
         >
           {message}
         </p>
+        {action && (
+          <button
+            onClick={() => {
+              action.onClick();
+              handleClose();
+            }}
+            className="
+              mt-2 px-3 py-1.5
+              text-xs font-medium
+              rounded-md
+              transition-colors
+              bg-skin-accent text-white
+              hover:brightness-110
+            "
+            style={{
+              backgroundColor: style.borderVar,
+            }}
+          >
+            {action.label}
+          </button>
+        )}
       </div>
 
       {/* Close button */}

@@ -95,11 +95,21 @@ export function Lounge({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [joiningTableId, setJoiningTableId] = useState<string | null>(null); // Track pending join
 
+  // Pending invites (for private tables)
+  const [pendingInvites, setPendingInvites] = useState<Array<{
+    tableId: string;
+    tableName: string;
+    hostName: string;
+    inviterName: string;
+    receivedAt: number;
+  }>>([]);
+
   // Toast notifications
   const [toastMessage, setToastMessage] = useState<{
     message: string;
     variant: 'success' | 'warning' | 'error' | 'info';
     title?: string;
+    action?: { label: string; onClick: () => void };
   } | null>(null);
 
   // Get the selected table object
@@ -120,6 +130,29 @@ export function Lounge({
       };
     }
   }, [socket, playerName]);
+
+  // Handle socket disconnect - clear UI state to prevent stale data
+  useSocketEvent(socket, 'disconnect', () => {
+    setSelectedTableId(null);
+    setJoiningTableId(null);
+    setShowCreateModal(false);
+  });
+
+  // Timeout for pending join to prevent stuck state
+  useEffect(() => {
+    if (!joiningTableId) return;
+
+    const timeout = setTimeout(() => {
+      setJoiningTableId(null);
+      setToastMessage({
+        message: 'Join request timed out. Please try again.',
+        variant: 'error',
+        title: 'Timeout',
+      });
+    }, 10000); // 10 second timeout
+
+    return () => clearTimeout(timeout);
+  }, [joiningTableId]);
 
   // Handle initial lounge state
   useSocketEvent(socket, 'lounge_state', (data: {
@@ -288,7 +321,7 @@ export function Lounge({
     });
   });
 
-  // Table invite received
+  // Table invite received - store for later and show actionable toast
   useSocketEvent(socket, 'table_invite_received', (data: {
     tableId: string;
     tableName: string;
@@ -296,12 +329,50 @@ export function Lounge({
     inviterName: string;
   }) => {
     sounds.chatNotification();
+
+    // Store the invite (avoid duplicates)
+    setPendingInvites(prev => {
+      const exists = prev.some(inv => inv.tableId === data.tableId);
+      if (exists) return prev;
+      return [...prev, { ...data, receivedAt: Date.now() }];
+    });
+
+    // Show toast with join action
     setToastMessage({
       message: `${data.inviterName} invited you to join "${data.tableName}"`,
       variant: 'info',
       title: '📨 Table Invite',
+      action: {
+        label: 'Join',
+        onClick: () => {
+          if (socket && !joiningTableId) {
+            setJoiningTableId(data.tableId);
+            socket.emit('join_table', { tableId: data.tableId });
+            // Remove from pending invites
+            setPendingInvites(prev => prev.filter(inv => inv.tableId !== data.tableId));
+          }
+        },
+      },
     });
   });
+
+  // Clear invite when table is deleted
+  useEffect(() => {
+    // Remove invites for tables that no longer exist
+    setPendingInvites(prev => prev.filter(inv =>
+      tables.some(t => t.id === inv.tableId) || !tables.length
+    ));
+  }, [tables]);
+
+  // Expire old invites (5 minutes)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+      setPendingInvites(prev => prev.filter(inv => inv.receivedAt > fiveMinutesAgo));
+    }, 30000); // Check every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Player removed from table notification
   useSocketEvent(socket, 'player_removed_from_table', (data: {
@@ -433,6 +504,21 @@ export function Lounge({
     }
   }, [socket, selectedTableId]);
 
+  const handleAcceptInvite = useCallback((tableId: string) => {
+    if (socket && !joiningTableId) {
+      setJoiningTableId(tableId);
+      socket.emit('join_table', { tableId });
+      // Remove from pending invites
+      setPendingInvites(prev => prev.filter(inv => inv.tableId !== tableId));
+      sounds.buttonClick();
+    }
+  }, [socket, joiningTableId]);
+
+  const handleDismissInvite = useCallback((tableId: string) => {
+    setPendingInvites(prev => prev.filter(inv => inv.tableId !== tableId));
+    sounds.buttonClick();
+  }, []);
+
   // If user is in a table room, show the TableRoom view
   if (selectedTable) {
     return (
@@ -502,7 +588,8 @@ export function Lounge({
             variant={toastMessage.variant}
             message={toastMessage.message}
             title={toastMessage.title}
-            autoDismiss={5000}
+            action={toastMessage.action}
+            autoDismiss={toastMessage.action ? 10000 : 5000}
             onClose={() => setToastMessage(null)}
           />
         </ToastContainer>
@@ -520,6 +607,9 @@ export function Lounge({
         onShowRegister={onShowRegister}
         onViewProfile={onViewProfile}
         onBackToLobby={onBackToLobby}
+        pendingInvites={pendingInvites}
+        onAcceptInvite={handleAcceptInvite}
+        onDismissInvite={handleDismissInvite}
       />
 
       {/* Create Table Modal */}

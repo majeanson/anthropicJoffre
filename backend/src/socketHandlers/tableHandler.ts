@@ -359,48 +359,50 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         return;
       }
 
-      // Double-check seat is still empty after acquiring lock
-      if (targetSeat.playerName !== null || targetSeat.isBot) {
+      // Use try/finally to guarantee lock release
+      try {
+        // Double-check seat is still empty after acquiring lock
+        if (targetSeat.playerName !== null || targetSeat.isBot) {
+          socket.emit('error', { message: 'Seat was just taken', context: 'join_table' });
+          return;
+        }
+
+        targetSeat.playerName = playerName;
+        targetSeat.isReady = false;
+        playerTables.set(playerName, tableId);
+
+        socket.join(`table:${tableId}`);
+
+        // Remove from lounge voice if they were in it
+        removePlayerFromLoungeVoice(io, playerName);
+
+        // Update player status in lounge to 'at_table'
+        updatePlayerStatus(io, playerName, 'at_table', undefined, tableId);
+
+        // Clear any disconnect timeout for this player
+        const timeout = tableDisconnectTimeouts.get(playerName);
+        if (timeout) {
+          clearTimeout(timeout);
+          tableDisconnectTimeouts.delete(playerName);
+        }
+
+        // Add system message
+        table.chatMessages.push({
+          playerId: 'system',
+          playerName: 'System',
+          teamId: null,
+          message: `${playerName} joined the table`,
+          timestamp: Date.now(),
+        });
+
+        logger.info(`${playerName} joined table ${tableId} at position ${targetSeat.position}`);
+
+        socket.emit('table_joined', { table });
+        broadcastTableUpdate(io, table);
+      } finally {
+        // Always release the lock
         releaseSeatLock(tableId, targetSeat.position);
-        socket.emit('error', { message: 'Seat was just taken', context: 'join_table' });
-        return;
       }
-
-      targetSeat.playerName = playerName;
-      targetSeat.isReady = false;
-      playerTables.set(playerName, tableId);
-
-      // Release the lock now that seat is assigned
-      releaseSeatLock(tableId, targetSeat.position);
-
-      socket.join(`table:${tableId}`);
-
-      // Remove from lounge voice if they were in it
-      removePlayerFromLoungeVoice(io, playerName);
-
-      // Update player status in lounge to 'at_table'
-      updatePlayerStatus(io, playerName, 'at_table', undefined, tableId);
-
-      // Clear any disconnect timeout for this player
-      const timeout = tableDisconnectTimeouts.get(playerName);
-      if (timeout) {
-        clearTimeout(timeout);
-        tableDisconnectTimeouts.delete(playerName);
-      }
-
-      // Add system message
-      table.chatMessages.push({
-        playerId: 'system',
-        playerName: 'System',
-        teamId: null,
-        message: `${playerName} joined the table`,
-        timestamp: Date.now(),
-      });
-
-      logger.info(`${playerName} joined table ${tableId} at position ${targetSeat.position}`);
-
-      socket.emit('table_joined', { table });
-      broadcastTableUpdate(io, table);
     } catch (error) {
       logger.error('Error joining table:', error);
       socket.emit('error', { message: 'Failed to join table', context: 'join_table' });
@@ -445,31 +447,33 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         return;
       }
 
-      // Double-check seat is still empty after acquiring lock
-      if (targetSeat.playerName !== null || targetSeat.isBot) {
+      // Use try/finally to guarantee lock release
+      try {
+        // Double-check seat is still empty after acquiring lock
+        if (targetSeat.playerName !== null || targetSeat.isBot) {
+          socket.emit('error', { message: 'Seat was just taken', context: 'sit_at_table' });
+          return;
+        }
+
+        // Sit down
+        targetSeat.playerName = playerName;
+        targetSeat.isReady = false;
+        playerTables.set(playerName, tableId);
+
+        // Join socket room if not already
+        socket.join(`table:${tableId}`);
+
+        // Remove from lounge voice if they were in it (safety cleanup)
+        removePlayerFromLoungeVoice(io, playerName);
+
+        logger.info(`${playerName} sat at position ${position} at table ${tableId}`);
+
+        socket.emit('seat_taken', { tableId, position });
+        broadcastTableUpdate(io, table);
+      } finally {
+        // Always release the lock
         releaseSeatLock(tableId, position);
-        socket.emit('error', { message: 'Seat was just taken', context: 'sit_at_table' });
-        return;
       }
-
-      // Sit down
-      targetSeat.playerName = playerName;
-      targetSeat.isReady = false;
-      playerTables.set(playerName, tableId);
-
-      // Release the lock now that seat is assigned
-      releaseSeatLock(tableId, position);
-
-      // Join socket room if not already
-      socket.join(`table:${tableId}`);
-
-      // Remove from lounge voice if they were in it (safety cleanup)
-      removePlayerFromLoungeVoice(io, playerName);
-
-      logger.info(`${playerName} sat at position ${position} at table ${tableId}`);
-
-      socket.emit('seat_taken', { tableId, position });
-      broadcastTableUpdate(io, table);
     } catch (error) {
       logger.error('Error sitting at table:', error);
       socket.emit('error', { message: 'Failed to sit at table', context: 'sit_at_table' });

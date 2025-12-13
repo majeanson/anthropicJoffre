@@ -5,10 +5,19 @@
  * Includes back button to return to main lobby.
  */
 
+import { useState, useRef, useEffect } from 'react';
 import { User } from '../../types/auth';
 import { LoungePlayer, LoungeVoiceParticipant } from '../../types/game';
 import { Button } from '../ui/Button';
 import { sounds } from '../../utils/sounds';
+
+interface PendingInvite {
+  tableId: string;
+  tableName: string;
+  hostName: string;
+  inviterName: string;
+  receivedAt: number;
+}
 
 interface LoungeHeaderProps {
   user: User | null;
@@ -21,6 +30,9 @@ interface LoungeHeaderProps {
   onShowRegister: () => void;
   onViewProfile: (playerName: string) => void;
   onBackToLobby?: () => void;
+  pendingInvites?: PendingInvite[];
+  onAcceptInvite?: (tableId: string) => void;
+  onDismissInvite?: (tableId: string) => void;
 }
 
 export function LoungeHeader({
@@ -34,7 +46,24 @@ export function LoungeHeader({
   onShowRegister,
   onViewProfile,
   onBackToLobby,
+  pendingInvites = [],
+  onAcceptInvite,
+  onDismissInvite,
 }: LoungeHeaderProps) {
+  const [showInvitesDropdown, setShowInvitesDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowInvitesDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <header className="bg-skin-secondary border-b-2 border-skin-default px-4 py-3 sticky top-0 z-30">
       <div className="max-w-[1600px] mx-auto flex items-center justify-between">
@@ -104,8 +133,93 @@ export function LoungeHeader({
           )}
         </div>
 
-        {/* Right: User info */}
+        {/* Right: Invites + User info */}
         <div className="flex items-center gap-3">
+          {/* Pending Invites Indicator */}
+          {pendingInvites.length > 0 && (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => {
+                  setShowInvitesDropdown(!showInvitesDropdown);
+                  sounds.buttonClick();
+                }}
+                className="
+                  relative p-2 rounded-lg
+                  bg-skin-tertiary hover:bg-skin-primary
+                  text-skin-primary
+                  transition-colors
+                "
+                title={`${pendingInvites.length} pending invite${pendingInvites.length !== 1 ? 's' : ''}`}
+              >
+                <span className="text-xl">📨</span>
+                <span className="
+                  absolute -top-1 -right-1
+                  min-w-[18px] h-[18px] px-1
+                  bg-red-500 text-white
+                  text-xs font-bold
+                  rounded-full
+                  flex items-center justify-center
+                  animate-pulse
+                ">
+                  {pendingInvites.length}
+                </span>
+              </button>
+
+              {/* Dropdown */}
+              {showInvitesDropdown && (
+                <div className="
+                  absolute right-0 top-full mt-2
+                  w-72 max-h-80 overflow-y-auto
+                  bg-skin-secondary border border-skin-default
+                  rounded-xl shadow-xl
+                  z-50
+                ">
+                  <div className="p-3 border-b border-skin-default">
+                    <h3 className="font-medium text-skin-primary text-sm">
+                      Table Invites
+                    </h3>
+                  </div>
+                  <div className="divide-y divide-skin-default">
+                    {pendingInvites.map((invite) => (
+                      <div key={invite.tableId} className="p-3 hover:bg-skin-tertiary transition-colors">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-skin-primary truncate">
+                              {invite.tableName}
+                            </p>
+                            <p className="text-xs text-skin-muted">
+                              From {invite.inviterName}
+                            </p>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="success"
+                              size="xs"
+                              onClick={() => {
+                                onAcceptInvite?.(invite.tableId);
+                                setShowInvitesDropdown(false);
+                              }}
+                            >
+                              Join
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="xs"
+                              onClick={() => onDismissInvite?.(invite.tableId)}
+                              title="Dismiss"
+                            >
+                              ✕
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {user ? (
             <button
               onClick={() => onViewProfile(playerName)}

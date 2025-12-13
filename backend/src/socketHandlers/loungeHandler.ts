@@ -516,9 +516,9 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
 
       loungeChatMessages.push(chatMessage);
 
-      // Keep only last 100 messages
+      // Keep only last 100 messages (use slice for efficiency)
       if (loungeChatMessages.length > MAX_CHAT_MESSAGES) {
-        loungeChatMessages.shift();
+        loungeChatMessages.splice(0, loungeChatMessages.length - MAX_CHAT_MESSAGES);
       }
 
       io.to('lounge').emit('lounge_chat_message', { message: chatMessage });
