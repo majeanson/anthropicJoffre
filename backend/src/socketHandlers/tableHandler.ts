@@ -53,7 +53,7 @@ const tableDisconnectTimeouts = new Map<string, NodeJS.Timeout>(); // playerName
 // Lock for seat assignment to prevent race conditions
 // Format: "tableId:position" -> timestamp when locked
 const seatLocks = new Map<string, number>();
-const SEAT_LOCK_TIMEOUT = 15000; // 15 seconds max lock time (increased for slow networks)
+const SEAT_LOCK_TIMEOUT = 8000; // 8 seconds max lock time (balanced for normal network latency)
 
 // Lock for table creation to prevent rapid multi-create race conditions
 // Format: playerName -> timestamp when locked

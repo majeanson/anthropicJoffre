@@ -166,6 +166,10 @@ export function LoungeChat({
         ref={messagesContainerRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto p-3 space-y-2"
+        role="log"
+        aria-label="Chat messages"
+        aria-live="polite"
+        aria-atomic="false"
       >
         {messages.length === 0 ? (
           <div className="text-center py-8 text-skin-muted text-sm">

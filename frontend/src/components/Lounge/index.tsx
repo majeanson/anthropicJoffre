@@ -10,7 +10,7 @@
  * - Mobile: Tabbed interface with quick access to key features
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { User } from '../../types/auth';
 import {
@@ -77,6 +77,9 @@ export function Lounge({
   const [onlinePlayers, setOnlinePlayers] = useState<LoungePlayer[]>([]);
   const [liveGames, setLiveGames] = useState<LiveGame[]>([]);
   const [loungeMessages, setLoungeMessages] = useState<ChatMessage[]>([]);
+
+  // Track seen message IDs to prevent duplicates on reconnection
+  const seenMessageIds = useRef<Set<string>>(new Set());
 
   // Voice chat with microphone permission handling
   const {
@@ -195,8 +198,17 @@ export function Lounge({
     sounds.chatNotification();
   });
 
-  // Lounge chat updates
+  // Lounge chat updates - with deduplication to prevent duplicates on reconnection
   useSocketEvent(socket, 'lounge_chat_message', (data: { message: ChatMessage }) => {
+    // Create unique ID from timestamp + playerName to detect duplicates
+    const msgId = `${data.message.timestamp}-${data.message.playerName}`;
+    if (seenMessageIds.current.has(msgId)) return;
+    seenMessageIds.current.add(msgId);
+    // Limit seen IDs to prevent memory growth (keep last 200)
+    if (seenMessageIds.current.size > 200) {
+      const idsArray = Array.from(seenMessageIds.current);
+      seenMessageIds.current = new Set(idsArray.slice(-150));
+    }
     setLoungeMessages(prev => [...prev, data.message].slice(-100));
   });
 
@@ -344,6 +356,12 @@ export function Lounge({
       }
       return [...prev, data.table];
     });
+    // Also update our own status in the players list to "at_table"
+    setOnlinePlayers(prev => prev.map(p =>
+      p.playerName === playerName
+        ? { ...p, status: 'at_table' as const, tableId: data.table.id }
+        : p
+    ));
   });
 
   // Table invite received - store for later and show actionable toast
@@ -355,9 +373,9 @@ export function Lounge({
   }) => {
     sounds.chatNotification();
 
-    // Store the invite (avoid duplicates)
+    // Store the invite (avoid duplicates - but allow different inviters for same table)
     setPendingInvites(prev => {
-      const exists = prev.some(inv => inv.tableId === data.tableId);
+      const exists = prev.some(inv => inv.tableId === data.tableId && inv.inviterName === data.inviterName);
       if (exists) return prev;
       return [...prev, { ...data, receivedAt: Date.now() }];
     });
@@ -389,11 +407,23 @@ export function Lounge({
     ));
   }, [tables]);
 
-  // Expire old invites (5 minutes)
+  // Expire old invites (5 minutes) and notify user
   useEffect(() => {
     const interval = setInterval(() => {
       const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
-      setPendingInvites(prev => prev.filter(inv => inv.receivedAt > fiveMinutesAgo));
+      setPendingInvites(prev => {
+        const expiring = prev.filter(inv => inv.receivedAt <= fiveMinutesAgo);
+        if (expiring.length > 0) {
+          // Show toast for expired invites
+          const names = expiring.map(inv => inv.tableName).join(', ');
+          setToastMessage({
+            message: `Invite${expiring.length > 1 ? 's' : ''} to "${names}" expired`,
+            variant: 'info',
+            title: 'Invite Expired',
+          });
+        }
+        return prev.filter(inv => inv.receivedAt > fiveMinutesAgo);
+      });
     }, 30000); // Check every 30 seconds
 
     return () => clearInterval(interval);
@@ -729,9 +759,9 @@ export function Lounge({
           {renderMobileContent()}
         </div>
 
-        {/* Bottom Navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 bg-skin-secondary border-t border-skin-default z-40">
-          <div className="grid grid-cols-4 gap-1 p-2">
+        {/* Bottom Navigation - with safe area padding for notched devices */}
+        <nav className="fixed bottom-0 left-0 right-0 bg-skin-secondary border-t border-skin-default z-40 pb-[env(safe-area-inset-bottom)]">
+          <div className="grid grid-cols-4 gap-1 p-2 px-[max(0.5rem,env(safe-area-inset-left))]">
             {(['tables', 'chat', 'players', 'games'] as const).map((tab) => (
               <button
                 key={tab}

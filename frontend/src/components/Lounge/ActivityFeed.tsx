@@ -81,7 +81,13 @@ export function ActivityFeed({
   onTableClick,
 }: ActivityFeedProps) {
   return (
-    <div className="bg-skin-secondary rounded-xl border-2 border-skin-default overflow-hidden">
+    <div
+      className="bg-skin-secondary rounded-xl border-2 border-skin-default overflow-hidden"
+      role="log"
+      aria-label="Activity feed"
+      aria-live="polite"
+      aria-atomic="false"
+    >
       {/* Header */}
       <div className="
         bg-gradient-to-r from-purple-500/10 via-pink-500/5 to-transparent

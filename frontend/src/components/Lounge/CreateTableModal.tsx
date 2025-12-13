@@ -81,6 +81,12 @@ export function CreateTableModal({
   const handleCreate = useCallback(() => {
     if (!socket || !tableName.trim() || isCreating) return;
 
+    // Check socket connection before attempting to create
+    if (!socket.connected) {
+      setError('Not connected to server. Please wait and try again.');
+      return;
+    }
+
     setIsCreating(true);
     setError(null);
     socket.emit('create_table', {
