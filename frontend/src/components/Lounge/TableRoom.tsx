@@ -202,8 +202,8 @@ export function TableRoom({
                 {table.status === 'in_game' && 'In Game'}
                 {table.status === 'post_game' && 'Game Finished'}
               </span>
-              <Button variant="ghost" size="sm" onClick={handleLeave}>
-                Leave Table
+              <Button variant="ghost" size="sm" onClick={handleLeave} leftIcon={<span>←</span>}>
+                Back to Lounge
               </Button>
             </div>
           </div>
@@ -380,32 +380,42 @@ function SeatCard({
   const isRemoving = pendingAction === `remove:${seat.position}`;
   const hasAnyPending = !!pendingAction;
 
+  // Handle clicking on empty seat to sit
+  const handleSeatClick = () => {
+    if (isEmpty && canSit && !hasAnyPending) {
+      onSit();
+    }
+  };
+
   return (
-    <div className={`
-      relative p-4 rounded-xl border-2 transition-all
-      bg-gradient-to-br ${teamColor}
-      ${isCurrentPlayer ? 'ring-2 ring-skin-accent ring-offset-2 ring-offset-skin-primary' : ''}
-      ${isEmpty ? 'border-dashed opacity-60 hover:opacity-100' : ''}
-    `}>
+    <div
+      className={`
+        relative p-4 rounded-xl border-2 transition-all
+        bg-gradient-to-br ${teamColor}
+        ${isCurrentPlayer ? 'ring-2 ring-skin-accent ring-offset-2 ring-offset-skin-primary' : ''}
+        ${isEmpty ? 'border-dashed opacity-60 hover:opacity-100' : ''}
+        ${isEmpty && canSit && !hasAnyPending ? 'cursor-pointer hover:scale-[1.02] hover:border-skin-accent' : ''}
+      `}
+      onClick={handleSeatClick}
+      role={isEmpty && canSit ? 'button' : undefined}
+      tabIndex={isEmpty && canSit ? 0 : undefined}
+      onKeyDown={(e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && isEmpty && canSit && !hasAnyPending) {
+          e.preventDefault();
+          onSit();
+        }
+      }}
+    >
       {isEmpty ? (
-        // Empty seat
+        // Empty seat - clickable area
         <div className="text-center space-y-2">
           <div className="w-16 h-16 mx-auto rounded-full bg-skin-tertiary border-2 border-dashed border-skin-default flex items-center justify-center">
             <span className="text-2xl text-skin-muted">?</span>
           </div>
-          <p className="text-sm text-skin-muted">Empty Seat</p>
-          <div className="flex gap-2 justify-center">
-            {canSit && (
-              <Button
-                variant="primary"
-                size="xs"
-                onClick={onSit}
-                disabled={hasAnyPending}
-                loading={isSitting}
-              >
-                {isSitting ? 'Sitting...' : 'Sit Here'}
-              </Button>
-            )}
+          <p className="text-sm text-skin-muted">
+            {canSit ? (isSitting ? 'Sitting...' : 'Click to Sit') : 'Empty Seat'}
+          </p>
+          <div className="flex gap-2 justify-center" onClick={(e) => e.stopPropagation()}>
             {isHost && (
               <Button
                 variant="ghost"
