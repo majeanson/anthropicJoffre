@@ -395,10 +395,12 @@ export function Lounge({
     if (data.context === 'join_table' || data.context === 'sit_at_table') {
       setJoiningTableId(null);
     }
+    // Use appropriate title based on error type
+    const isRateLimit = data.message.toLowerCase().includes('too many') || data.message.toLowerCase().includes('slow down');
     setToastMessage({
       message: data.message,
-      variant: 'error',
-      title: 'Error',
+      variant: isRateLimit ? 'warning' : 'error',
+      title: isRateLimit ? 'Rate Limited' : 'Error',
     });
   });
 
@@ -589,7 +591,7 @@ export function Lounge({
             message={toastMessage.message}
             title={toastMessage.title}
             action={toastMessage.action}
-            autoDismiss={toastMessage.action ? 10000 : 5000}
+            autoDismiss={toastMessage.action ? 15000 : 5000}
             onClose={() => setToastMessage(null)}
           />
         </ToastContainer>
@@ -727,6 +729,9 @@ export function Lounge({
                   {tab === 'games' && '👁️'}
                 </div>
                 <div className="text-xs font-medium capitalize">{tab}</div>
+                {tab === 'tables' && tables.filter(t => t.status === 'gathering').length > 0 && (
+                  <div className="text-[10px] text-green-400">{tables.filter(t => t.status === 'gathering').length} open</div>
+                )}
                 {tab === 'players' && (
                   <div className="text-[10px] text-skin-muted">{onlinePlayers.length}</div>
                 )}

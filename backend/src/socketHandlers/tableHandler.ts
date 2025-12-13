@@ -53,7 +53,7 @@ const tableDisconnectTimeouts = new Map<string, NodeJS.Timeout>(); // playerName
 // Lock for seat assignment to prevent race conditions
 // Format: "tableId:position" -> timestamp when locked
 const seatLocks = new Map<string, number>();
-const SEAT_LOCK_TIMEOUT = 5000; // 5 seconds max lock time
+const SEAT_LOCK_TIMEOUT = 15000; // 15 seconds max lock time (increased for slow networks)
 
 // Lock for table creation to prevent rapid multi-create race conditions
 // Format: playerName -> timestamp when locked
@@ -1059,11 +1059,19 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
         return;
       }
 
-      // Sanitize message to prevent XSS attacks
+      // Validate message
       if (!message || message.trim().length === 0) {
         return;
       }
 
+      // Enforce max message length (500 chars) to prevent abuse
+      const MAX_MESSAGE_LENGTH = 500;
+      if (message.length > MAX_MESSAGE_LENGTH) {
+        socket.emit('error', { message: `Message too long (max ${MAX_MESSAGE_LENGTH} characters)`, context: 'table_chat' });
+        return;
+      }
+
+      // Sanitize message to prevent XSS attacks
       let sanitizedMessage: string;
       try {
         sanitizedMessage = sanitizeChatMessage(message);

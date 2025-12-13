@@ -5,6 +5,7 @@
  * Allows quick social actions: wave, invite, message, view profile.
  */
 
+import { useMemo } from 'react';
 import { LoungePlayer, PlayerStatus } from '../../types/game';
 
 interface WhoIsHereProps {
@@ -21,13 +22,14 @@ interface WhoIsHereProps {
   isAtTable?: boolean;
 }
 
-const statusConfig: Record<PlayerStatus, { icon: string; label: string; color: string }> = {
-  in_lounge: { icon: '🟢', label: 'In Lounge', color: 'text-green-500' },
-  at_table: { icon: '🎴', label: 'At Table', color: 'text-blue-500' },
-  playing: { icon: '🃏', label: 'Playing', color: 'text-purple-500' },
-  spectating: { icon: '👁️', label: 'Spectating', color: 'text-yellow-500' },
-  away: { icon: '🔇', label: 'Away', color: 'text-gray-500' },
-  looking_for_game: { icon: '🔍', label: 'Looking for Game', color: 'text-orange-500' },
+// Colorblind-friendly status icons - using distinct shapes/symbols, not just colors
+const statusConfig: Record<PlayerStatus, { icon: string; label: string; color: string; shortLabel: string }> = {
+  in_lounge: { icon: '●', label: 'In Lounge', color: 'text-green-500', shortLabel: 'Lounge' },
+  at_table: { icon: '◆', label: 'At Table', color: 'text-blue-500', shortLabel: 'Table' },
+  playing: { icon: '▶', label: 'Playing', color: 'text-purple-500', shortLabel: 'Playing' },
+  spectating: { icon: '◎', label: 'Spectating', color: 'text-yellow-500', shortLabel: 'Watching' },
+  away: { icon: '◯', label: 'Away', color: 'text-gray-500', shortLabel: 'Away' },
+  looking_for_game: { icon: '★', label: 'Looking for Game', color: 'text-orange-500', shortLabel: 'LFG' },
 };
 
 export function WhoIsHere({
@@ -41,19 +43,21 @@ export function WhoIsHere({
   isAuthenticated = false,
   isAtTable = false,
 }: WhoIsHereProps) {
-  // Sort: LFG first, then by status, then alphabetically
-  const sortedPlayers = [...players].sort((a, b) => {
-    // Self first
-    if (a.playerName === playerName) return -1;
-    if (b.playerName === playerName) return 1;
-    // LFG priority
-    if (a.status === 'looking_for_game' && b.status !== 'looking_for_game') return -1;
-    if (b.status === 'looking_for_game' && a.status !== 'looking_for_game') return 1;
-    // Then alphabetically
-    return a.playerName.localeCompare(b.playerName);
-  });
+  // Memoize sorted players to avoid re-sorting on every render
+  const sortedPlayers = useMemo(() => {
+    return [...players].sort((a, b) => {
+      // Self first
+      if (a.playerName === playerName) return -1;
+      if (b.playerName === playerName) return 1;
+      // LFG priority
+      if (a.status === 'looking_for_game' && b.status !== 'looking_for_game') return -1;
+      if (b.status === 'looking_for_game' && a.status !== 'looking_for_game') return 1;
+      // Then alphabetically
+      return a.playerName.localeCompare(b.playerName);
+    });
+  }, [players, playerName]);
 
-  const lfgCount = players.filter(p => p.status === 'looking_for_game').length;
+  const lfgCount = useMemo(() => players.filter(p => p.status === 'looking_for_game').length, [players]);
 
   return (
     <div className="bg-skin-secondary rounded-xl border-2 border-skin-default p-4">
@@ -94,8 +98,13 @@ export function WhoIsHere({
                   ${player.status === 'looking_for_game' ? 'ring-2 ring-orange-500/50' : ''}
                 `}
               >
-                {/* Status icon */}
-                <span className="text-base" title={status.label}>
+                {/* Status icon with aria-label for screen readers */}
+                <span
+                  className={`text-base ${status.color}`}
+                  title={status.label}
+                  aria-label={status.label}
+                  role="img"
+                >
                   {status.icon}
                 </span>
 
@@ -107,11 +116,11 @@ export function WhoIsHere({
                       {isSelf && ' (you)'}
                     </span>
                     {player.isFriend && (
-                      <span className="text-xs" title="Friend">⭐</span>
+                      <span className="text-xs text-yellow-500" title="Friend" aria-label="Friend" role="img">★</span>
                     )}
                   </div>
                   <span className={`text-xs ${status.color}`}>
-                    {status.label}
+                    {status.shortLabel}
                   </span>
                 </div>
 

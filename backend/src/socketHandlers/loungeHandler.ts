@@ -497,6 +497,13 @@ export function setupLoungeHandler(io: Server, socket: Socket): void {
         return;
       }
 
+      // Enforce max message length (500 chars) to prevent abuse
+      const MAX_MESSAGE_LENGTH = 500;
+      if (message.length > MAX_MESSAGE_LENGTH) {
+        socket.emit('error', { message: `Message too long (max ${MAX_MESSAGE_LENGTH} characters)`, context: 'lounge_chat' });
+        return;
+      }
+
       // Sanitize message to prevent XSS attacks
       let sanitizedMessage: string;
       try {

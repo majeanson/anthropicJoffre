@@ -143,15 +143,28 @@ export function LoungeHeader({
                   setShowInvitesDropdown(!showInvitesDropdown);
                   sounds.buttonClick();
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setShowInvitesDropdown(!showInvitesDropdown);
+                    sounds.buttonClick();
+                  } else if (e.key === 'Escape' && showInvitesDropdown) {
+                    setShowInvitesDropdown(false);
+                  }
+                }}
                 className="
                   relative p-2 rounded-lg
                   bg-skin-tertiary hover:bg-skin-primary
                   text-skin-primary
                   transition-colors
+                  focus:outline-none focus:ring-2 focus:ring-skin-accent
                 "
                 title={`${pendingInvites.length} pending invite${pendingInvites.length !== 1 ? 's' : ''}`}
+                aria-expanded={showInvitesDropdown}
+                aria-haspopup="true"
+                aria-label={`${pendingInvites.length} pending table invite${pendingInvites.length !== 1 ? 's' : ''}`}
               >
-                <span className="text-xl">📨</span>
+                <span className="text-xl" role="img" aria-hidden="true">📨</span>
                 <span className="
                   absolute -top-1 -right-1
                   min-w-[18px] h-[18px] px-1
@@ -160,28 +173,37 @@ export function LoungeHeader({
                   rounded-full
                   flex items-center justify-center
                   animate-pulse
-                ">
+                " aria-hidden="true">
                   {pendingInvites.length}
                 </span>
               </button>
 
               {/* Dropdown */}
               {showInvitesDropdown && (
-                <div className="
-                  absolute right-0 top-full mt-2
-                  w-72 max-h-80 overflow-y-auto
-                  bg-skin-secondary border border-skin-default
-                  rounded-xl shadow-xl
-                  z-50
-                ">
+                <div
+                  className="
+                    absolute right-0 top-full mt-2
+                    w-72 max-h-80 overflow-y-auto
+                    bg-skin-secondary border border-skin-default
+                    rounded-xl shadow-xl
+                    z-50
+                  "
+                  role="menu"
+                  aria-label="Table invites"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      setShowInvitesDropdown(false);
+                    }
+                  }}
+                >
                   <div className="p-3 border-b border-skin-default">
                     <h3 className="font-medium text-skin-primary text-sm">
                       Table Invites
                     </h3>
                   </div>
-                  <div className="divide-y divide-skin-default">
+                  <div className="divide-y divide-skin-default" role="group">
                     {pendingInvites.map((invite) => (
-                      <div key={invite.tableId} className="p-3 hover:bg-skin-tertiary transition-colors">
+                      <div key={invite.tableId} className="p-3 hover:bg-skin-tertiary transition-colors" role="menuitem">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-skin-primary truncate">
@@ -207,6 +229,7 @@ export function LoungeHeader({
                               size="xs"
                               onClick={() => onDismissInvite?.(invite.tableId)}
                               title="Dismiss"
+                              aria-label={`Dismiss invite from ${invite.inviterName}`}
                             >
                               ✕
                             </Button>
