@@ -33,7 +33,11 @@ export function LoungeChat({
   const [mentionFilter, setMentionFilter] = useState('');
   const [mentionIndex, setMentionIndex] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+
+  const MAX_MESSAGE_LENGTH = 500;
 
   // Update messages when initial messages change
   useEffect(() => {
@@ -45,10 +49,21 @@ export function LoungeChat({
     setMessages(prev => [...prev, data.message]);
   });
 
-  // Auto-scroll to bottom
+  // Track scroll position to determine if user is at bottom
+  const handleScroll = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const threshold = 50; // pixels from bottom to consider "at bottom"
+    const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+    setIsAtBottom(atBottom);
+  }, []);
+
+  // Auto-scroll to bottom only if user was already at bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (isAtBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isAtBottom]);
 
   // Filter players for @mention
   const filteredPlayers = onlinePlayers
@@ -147,7 +162,11 @@ export function LoungeChat({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+      <div
+        ref={messagesContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto p-3 space-y-2"
+      >
         {messages.length === 0 ? (
           <div className="text-center py-8 text-skin-muted text-sm">
             <div className="text-2xl mb-2">💭</div>
@@ -212,9 +231,9 @@ export function LoungeChat({
 
       {/* Input */}
       <div className="relative p-3 pt-0">
-        {/* Mention suggestions */}
+        {/* Mention suggestions - positioned above on desktop, below on mobile */}
         {showMentions && filteredPlayers.length > 0 && (
-          <div className="absolute bottom-full left-3 right-3 mb-1 bg-skin-tertiary rounded-lg border border-skin-default shadow-lg overflow-hidden">
+          <div className="absolute left-3 right-3 sm:bottom-full sm:mb-1 sm:top-auto top-full mt-1 bg-skin-tertiary rounded-lg border border-skin-default shadow-lg overflow-hidden z-20">
             {filteredPlayers.map((p, i) => (
               <button
                 key={p.socketId}
@@ -231,15 +250,26 @@ export function LoungeChat({
           </div>
         )}
 
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder="Type a message... (@mention)"
-          className="w-full px-4 py-2 rounded-full bg-skin-tertiary text-skin-primary placeholder-skin-muted border border-skin-default focus:border-skin-accent focus:outline-none text-sm"
-        />
+        <div className="relative">
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            maxLength={MAX_MESSAGE_LENGTH}
+            placeholder="Type a message (use @name to mention)"
+            className="w-full px-4 py-2 pr-16 rounded-full bg-skin-tertiary text-skin-primary placeholder-skin-muted border border-skin-default focus:border-skin-accent focus:outline-none focus:ring-2 focus:ring-skin-accent/30 text-sm"
+          />
+          {/* Character counter - shows when approaching limit */}
+          {inputValue.length > MAX_MESSAGE_LENGTH * 0.8 && (
+            <span className={`absolute right-4 top-1/2 -translate-y-1/2 text-xs ${
+              inputValue.length >= MAX_MESSAGE_LENGTH ? 'text-red-500' : 'text-skin-muted'
+            }`}>
+              {inputValue.length}/{MAX_MESSAGE_LENGTH}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

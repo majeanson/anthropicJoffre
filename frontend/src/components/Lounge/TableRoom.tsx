@@ -358,12 +358,13 @@ export function TableRoom({
           <div className="mt-6 flex justify-center gap-4">
             {isSeated && (
               <Button
-                variant={isReady ? 'success' : 'secondary'}
+                variant={isReady ? 'success' : 'primary'}
                 size="lg"
                 onClick={handleToggleReady}
                 leftIcon={<span>{isReady ? '✓' : '○'}</span>}
+                title={isReady ? 'Click to unready' : 'Mark yourself as ready to play'}
               >
-                {isReady ? 'Ready!' : 'Click when Ready'}
+                {isReady ? 'Ready! (Click to Cancel)' : 'Ready Up'}
               </Button>
             )}
             {canStart && (
@@ -527,10 +528,14 @@ function SeatCard({
       ) : (
         // Occupied seat
         <div className="text-center space-y-2">
-          <div className={`
-            w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl
-            ${isBot ? 'bg-skin-muted' : 'bg-skin-accent'}
-          `}>
+          <div
+            className={`
+              w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl
+              ${isBot ? 'bg-skin-muted' : 'bg-skin-accent'}
+            `}
+            title={isBot ? `Bot: ${seat.playerName}` : seat.playerName || undefined}
+            aria-label={isBot ? `Bot player: ${seat.playerName}` : `Player: ${seat.playerName}`}
+          >
             {isBot ? '🤖' : seat.playerName?.slice(0, 2).toUpperCase()}
           </div>
           <p className={`text-sm font-medium ${isCurrentPlayer ? 'text-skin-accent' : 'text-skin-primary'}`}>

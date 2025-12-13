@@ -131,6 +131,22 @@ export function Lounge({
     }
   }, [socket, playerName]);
 
+  // Handle browser visibility changes - rejoin lounge when tab becomes visible
+  // This ensures state stays synchronized after the tab was backgrounded
+  useEffect(() => {
+    if (!socket || !playerName) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && socket.connected) {
+        // Re-request lounge state to sync up after being backgrounded
+        socket.emit('join_lounge');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [socket, playerName]);
+
   // Handle socket disconnect - clear UI state to prevent stale data
   useSocketEvent(socket, 'disconnect', () => {
     setSelectedTableId(null);
@@ -302,6 +318,15 @@ export function Lounge({
       message: `${data.playerName} waved at you!`,
       variant: 'info',
       title: '👋 Wave',
+    });
+  });
+
+  // Wave sent confirmation - show feedback to sender
+  useSocketEvent(socket, 'wave_sent', (data: { targetPlayerName: string }) => {
+    setToastMessage({
+      message: `You waved at ${data.targetPlayerName}`,
+      variant: 'success',
+      title: '👋 Wave Sent',
     });
   });
 
