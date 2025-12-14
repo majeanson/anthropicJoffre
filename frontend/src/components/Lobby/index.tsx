@@ -33,6 +33,22 @@ import { Tabs, Tab } from '../ui/Tabs';
 import { LobbyProps, LobbyMode, LobbyMainTab, LobbySocialTab, JoinType } from './types';
 import { useLobbyKeyboardNav } from './useLobbyKeyboardNav';
 
+// Valid lobby tabs for URL hash routing
+const VALID_LOBBY_TABS: LobbyMainTab[] = ['play', 'social', 'stats', 'settings'];
+
+/**
+ * Get initial tab from URL hash or default to 'play'
+ */
+function getInitialLobbyTab(): LobbyMainTab {
+  if (typeof window !== 'undefined') {
+    const hash = window.location.hash.slice(1); // Remove #
+    if (VALID_LOBBY_TABS.includes(hash as LobbyMainTab)) {
+      return hash as LobbyMainTab;
+    }
+  }
+  return 'play';
+}
+
 // Lazy load heavy modals
 const PlayerStatsModal = lazy(() =>
   import('../PlayerStatsModal').then((m) => ({ default: m.PlayerStatsModal }))
@@ -69,8 +85,33 @@ export function Lobby({
   const [showRules, setShowRules] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
-  const [mainTab, setMainTab] = useState<LobbyMainTab>('play');
+  const [mainTab, setMainTab] = useState<LobbyMainTab>(getInitialLobbyTab);
   const [socialTab, setSocialTab] = useState<LobbySocialTab>('online');
+
+  // URL hash routing for main tabs
+  useEffect(() => {
+    // Update URL hash when tab changes (only if not in Lounge which uses its own hash)
+    if (typeof window !== 'undefined' && !window.location.hash.includes('chat') &&
+        !window.location.hash.includes('tables') && !window.location.hash.includes('players') &&
+        !window.location.hash.includes('games')) {
+      const newHash = `#${mainTab}`;
+      if (window.location.hash !== newHash) {
+        window.history.replaceState(null, '', newHash);
+      }
+    }
+  }, [mainTab]);
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1);
+      if (VALID_LOBBY_TABS.includes(hash as LobbyMainTab)) {
+        setMainTab(hash as LobbyMainTab);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);

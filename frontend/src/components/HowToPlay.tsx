@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Button } from './ui';
 
 interface HowToPlayProps {
@@ -11,6 +11,25 @@ interface HowToPlayProps {
 }
 
 type TabId = 'rules' | 'features' | 'rewards' | 'register';
+
+// Valid tabs for URL hash routing (prefixed with 'help-' to avoid conflicts)
+const VALID_HELP_TABS: TabId[] = ['rules', 'features', 'rewards', 'register'];
+
+/**
+ * Get initial tab from URL hash (looks for #help-rules, #help-features, etc.)
+ */
+function getInitialHelpTab(defaultTab: TabId): TabId {
+  if (typeof window !== 'undefined') {
+    const hash = window.location.hash.slice(1); // Remove #
+    if (hash.startsWith('help-')) {
+      const tabId = hash.slice(5) as TabId; // Remove 'help-' prefix
+      if (VALID_HELP_TABS.includes(tabId)) {
+        return tabId;
+      }
+    }
+  }
+  return defaultTab;
+}
 
 interface Tab {
   id: TabId;
@@ -539,7 +558,34 @@ export function HowToPlay({
   if (isModal && !isOpen) return null;
 
   // Now safe to use hooks
-  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
+  const [activeTab, setActiveTab] = useState<TabId>(() =>
+    isModal ? initialTab : getInitialHelpTab(initialTab)
+  );
+
+  // URL hash routing (only for non-modal usage)
+  useEffect(() => {
+    if (isModal) return; // Don't update hash when used as modal
+    const newHash = `#help-${activeTab}`;
+    if (window.location.hash !== newHash) {
+      window.history.replaceState(null, '', newHash);
+    }
+  }, [activeTab, isModal]);
+
+  // Handle browser back/forward navigation (only for non-modal)
+  useEffect(() => {
+    if (isModal) return;
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1);
+      if (hash.startsWith('help-')) {
+        const tabId = hash.slice(5) as TabId;
+        if (VALID_HELP_TABS.includes(tabId)) {
+          setActiveTab(tabId);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [isModal]);
 
   const renderTabContent = () => {
     switch (activeTab) {
