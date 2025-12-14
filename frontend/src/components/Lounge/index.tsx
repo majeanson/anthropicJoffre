@@ -74,9 +74,27 @@ interface LoungeProps {
   onTableGameStart?: (gameId: string, gameState: GameState) => void;
   /** Callback to update current table ID (for social features like invite from friends panel) */
   onTableChange?: (tableId: string | null) => void;
+  /** Initial tab to show (defaults to 'chat' for mobile-first experience) */
+  initialTab?: MobileTab;
 }
 
 type MobileTab = 'tables' | 'chat' | 'players' | 'games';
+
+// Valid tab names for URL hash
+const VALID_TABS: MobileTab[] = ['tables', 'chat', 'players', 'games'];
+
+/**
+ * Get initial tab from URL hash or default to 'chat'
+ */
+function getInitialTab(): MobileTab {
+  if (typeof window !== 'undefined') {
+    const hash = window.location.hash.slice(1); // Remove #
+    if (VALID_TABS.includes(hash as MobileTab)) {
+      return hash as MobileTab;
+    }
+  }
+  return 'chat'; // Default to chat for mobile-first
+}
 
 export function Lounge({
   socket,
@@ -91,6 +109,7 @@ export function Lounge({
   onJoinGame,
   onTableGameStart,
   onTableChange,
+  initialTab,
 }: LoungeProps) {
   // Lounge state
   const [tables, setTables] = useState<LoungeTable[]>([]);
@@ -160,8 +179,8 @@ export function Lounge({
   }, [permission, requestPermission]);
 
   // Local state
-  const [mobileTab, setMobileTab] = useState<MobileTab>('tables');
-  const mobileTabRef = useRef<MobileTab>('tables'); // Ref for socket handlers
+  const [mobileTab, setMobileTab] = useState<MobileTab>(initialTab || getInitialTab());
+  const mobileTabRef = useRef<MobileTab>(initialTab || getInitialTab()); // Ref for socket handlers
 
   // Keep ref in sync with state for socket handlers
   useEffect(() => {
@@ -170,7 +189,26 @@ export function Lounge({
     if (mobileTab === 'chat') {
       setUnreadChatCount(0);
     }
+    // Update URL hash for bookmarking/sharing (without triggering page reload)
+    if (typeof window !== 'undefined') {
+      const newHash = `#${mobileTab}`;
+      if (window.location.hash !== newHash) {
+        window.history.replaceState(null, '', newHash);
+      }
+    }
   }, [mobileTab]);
+
+  // Handle browser back/forward navigation with hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1);
+      if (VALID_TABS.includes(hash as MobileTab)) {
+        setMobileTab(hash as MobileTab);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -990,7 +1028,7 @@ export function Lounge({
         {/* Bottom Navigation - with safe area padding for notched devices */}
         <nav className="fixed bottom-0 left-0 right-0 bg-skin-secondary border-t border-skin-default z-40 pb-[env(safe-area-inset-bottom)]">
           <div className="grid grid-cols-4 gap-1 p-2 px-[max(0.5rem,env(safe-area-inset-left))]">
-            {(['tables', 'chat', 'players', 'games'] as const).map((tab) => (
+            {(['chat', 'tables', 'players', 'games'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => {
