@@ -38,7 +38,6 @@ import { useLoungeVoice } from '../../hooks/useLoungeVoice';
 import { useAutoAway } from '../../hooks/useAutoAway';
 import { useBrowserNotifications } from '../../hooks/useBrowserNotifications';
 import { sounds } from '../../utils/sounds';
-import { Button } from '../ui/Button';
 import { Toast, ToastContainer } from '../ui/Toast';
 import { ErrorBoundary } from '../ErrorBoundary';
 
@@ -1040,22 +1039,7 @@ export function Lounge({
         </nav>
       </div>
 
-      {/* Back to Lobby FAB - Mobile only */}
-      {onBackToLobby && (
-        <div className="md:hidden fixed bottom-20 right-4 z-50">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              onBackToLobby();
-              sounds.buttonClick();
-            }}
-            className="shadow-lg"
-          >
-            ← Back
-          </Button>
-        </div>
-      )}
+      {/* Back button is now in header - removed floating FAB for cleaner mobile UX */}
     </div>
   );
 }

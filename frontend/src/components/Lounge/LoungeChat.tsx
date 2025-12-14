@@ -369,54 +369,60 @@ export function LoungeChat({
 
     if (e.key === 'Enter' && inputValue.trim()) {
       e.preventDefault();
-
-      if (editingMessage) {
-        // Edit message
-        socket?.emit('edit_message', {
-          messageId: editingMessage.messageId,
-          newText: inputValue.trim(),
-        });
-        setEditingMessage(null);
-      } else {
-        const messageText = inputValue.trim();
-
-        // Add optimistic message with 'sending' status
-        const tempId = tempIdCounter.current--;
-        const optimisticMessage: LoungeChatMessage = {
-          messageId: tempId,
-          playerName,
-          message: messageText,
-          timestamp: Date.now(),
-          replyToId: replyingTo?.messageId || null,
-          replyTo: replyingTo ? {
-            messageId: replyingTo.messageId,
-            playerName: replyingTo.playerName,
-            message: replyingTo.message,
-          } : null,
-          deliveryStatus: 'sending',
-        };
-        setMessages(prev => [...prev, optimisticMessage]);
-
-        // Send to server
-        onSendMessage({
-          message: messageText,
-          replyToId: replyingTo?.messageId || null,
-        });
-        setReplyingTo(null);
-
-        // Set timeout to mark as failed if no response
-        setTimeout(() => {
-          setMessages(prev => prev.map(m =>
-            m.messageId === tempId && m.deliveryStatus === 'sending'
-              ? { ...m, deliveryStatus: 'failed' }
-              : m
-          ));
-        }, 10000); // 10 second timeout
-      }
-
-      setInputValue('');
-      sendTypingIndicator(false);
+      handleSend();
     }
+  };
+
+  // Send message or save edit
+  const handleSend = () => {
+    if (!inputValue.trim() && !editingMessage) return;
+
+    if (editingMessage) {
+      // Edit message
+      socket?.emit('edit_message', {
+        messageId: editingMessage.messageId,
+        newText: inputValue.trim(),
+      });
+      setEditingMessage(null);
+    } else if (inputValue.trim()) {
+      const messageText = inputValue.trim();
+
+      // Add optimistic message with 'sending' status
+      const tempId = tempIdCounter.current--;
+      const optimisticMessage: LoungeChatMessage = {
+        messageId: tempId,
+        playerName,
+        message: messageText,
+        timestamp: Date.now(),
+        replyToId: replyingTo?.messageId || null,
+        replyTo: replyingTo ? {
+          messageId: replyingTo.messageId,
+          playerName: replyingTo.playerName,
+          message: replyingTo.message,
+        } : null,
+        deliveryStatus: 'sending',
+      };
+      setMessages(prev => [...prev, optimisticMessage]);
+
+      // Send to server
+      onSendMessage({
+        message: messageText,
+        replyToId: replyingTo?.messageId || null,
+      });
+      setReplyingTo(null);
+
+      // Set timeout to mark as failed if no response
+      setTimeout(() => {
+        setMessages(prev => prev.map(m =>
+          m.messageId === tempId && m.deliveryStatus === 'sending'
+            ? { ...m, deliveryStatus: 'failed' }
+            : m
+        ));
+      }, 10000); // 10 second timeout
+    }
+
+    setInputValue('');
+    sendTypingIndicator(false);
   };
 
   // Handle quick emoji
@@ -1090,13 +1096,14 @@ export function LoungeChat({
           <button
             onClick={() => setShowGifPicker(!showGifPicker)}
             className={`
-              p-2 rounded-full transition-colors flex-shrink-0
+              p-2 rounded-full transition-colors flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center
               ${showGifPicker
                 ? 'bg-skin-accent text-skin-inverse'
                 : 'bg-skin-tertiary hover:bg-skin-primary text-skin-muted hover:text-skin-primary'
               }
             `}
             title="Add GIF"
+            aria-label="Add GIF"
           >
             <span className="text-sm font-bold">GIF</span>
           </button>
@@ -1115,9 +1122,10 @@ export function LoungeChat({
                   ? "Edit your message..."
                   : replyingTo
                   ? `Reply to ${replyingTo.playerName}...`
-                  : "Type a message... (@mention, *italic*, **bold**, `code`)"
+                  : "Type a message..."
               }
-              className="w-full px-4 py-2 pr-16 rounded-full bg-skin-tertiary text-skin-primary placeholder-skin-muted border border-skin-default focus:border-skin-accent focus:outline-none focus:ring-2 focus:ring-skin-accent/30 text-sm"
+              className="w-full px-4 py-3 rounded-full bg-skin-tertiary text-skin-primary placeholder-skin-muted border border-skin-default focus:border-skin-accent focus:outline-none focus:ring-2 focus:ring-skin-accent/30 text-sm"
+              aria-label="Message input"
             />
             {inputValue.length > MAX_MESSAGE_LENGTH * 0.8 && (
               <span className={`absolute right-4 top-1/2 -translate-y-1/2 text-xs ${
@@ -1127,6 +1135,24 @@ export function LoungeChat({
               </span>
             )}
           </div>
+
+          {/* Send button - visible and accessible on mobile */}
+          <button
+            onClick={handleSend}
+            disabled={!inputValue.trim() && !editingMessage}
+            className={`
+              min-w-[44px] min-h-[44px] p-2 rounded-full transition-all flex-shrink-0
+              flex items-center justify-center
+              ${inputValue.trim() || editingMessage
+                ? 'bg-skin-accent text-skin-inverse hover:bg-skin-accent/90 active:scale-95'
+                : 'bg-skin-tertiary text-skin-muted cursor-not-allowed'
+              }
+            `}
+            title={editingMessage ? "Save edit" : "Send message"}
+            aria-label={editingMessage ? "Save edit" : "Send message"}
+          >
+            <span className="text-lg">{editingMessage ? '✓' : '➤'}</span>
+          </button>
         </div>
       </div>
     </div>

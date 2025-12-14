@@ -156,16 +156,17 @@ export function LoungeHeader({
                 sounds.buttonClick();
               }}
               className="
-                p-2 rounded-lg
-                bg-skin-tertiary hover:bg-skin-primary
+                min-w-[44px] min-h-[44px] p-2 rounded-lg
+                bg-skin-tertiary hover:bg-skin-primary active:scale-95
                 text-skin-secondary hover:text-skin-primary
-                transition-colors
-                hidden md:flex items-center gap-1
+                transition-all
+                flex items-center justify-center gap-1
               "
               title="Back to Lobby"
+              aria-label="Back to Lobby"
             >
               <span className="text-lg">←</span>
-              <span className="text-sm">Lobby</span>
+              <span className="text-sm hidden sm:inline">Lobby</span>
             </button>
           )}
           <div className="flex items-center gap-3">
