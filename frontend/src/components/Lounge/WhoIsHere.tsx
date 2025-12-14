@@ -16,10 +16,13 @@ interface WhoIsHereProps {
   onMessage: (playerName: string) => void;
   onAddFriend?: (targetName: string) => void;
   onInviteToTable?: (targetName: string) => void;
-  /** Whether current user is authenticated (enables friend requests) */
+  onBlockPlayer?: (targetName: string) => void;
+  /** Whether current user is authenticated (enables friend requests and blocking) */
   isAuthenticated?: boolean;
   /** Whether current user is at a table (enables invite action) */
   isAtTable?: boolean;
+  /** List of blocked player names to hide from the list */
+  blockedPlayers?: string[];
 }
 
 // Colorblind-friendly status icons - using distinct shapes/symbols, not just colors
@@ -40,22 +43,27 @@ export function WhoIsHere({
   onMessage,
   onAddFriend,
   onInviteToTable,
+  onBlockPlayer,
   isAuthenticated = false,
   isAtTable = false,
+  blockedPlayers = [],
 }: WhoIsHereProps) {
-  // Memoize sorted players to avoid re-sorting on every render
+  // Filter out blocked players and memoize sorted players
   const sortedPlayers = useMemo(() => {
-    return [...players].sort((a, b) => {
-      // Self first
-      if (a.playerName === playerName) return -1;
-      if (b.playerName === playerName) return 1;
-      // LFG priority
-      if (a.status === 'looking_for_game' && b.status !== 'looking_for_game') return -1;
-      if (b.status === 'looking_for_game' && a.status !== 'looking_for_game') return 1;
-      // Then alphabetically
-      return a.playerName.localeCompare(b.playerName);
-    });
-  }, [players, playerName]);
+    const blockedSet = new Set(blockedPlayers);
+    return [...players]
+      .filter(p => !blockedSet.has(p.playerName))
+      .sort((a, b) => {
+        // Self first
+        if (a.playerName === playerName) return -1;
+        if (b.playerName === playerName) return 1;
+        // LFG priority
+        if (a.status === 'looking_for_game' && b.status !== 'looking_for_game') return -1;
+        if (b.status === 'looking_for_game' && a.status !== 'looking_for_game') return 1;
+        // Then alphabetically
+        return a.playerName.localeCompare(b.playerName);
+      });
+  }, [players, playerName, blockedPlayers]);
 
   const lfgCount = useMemo(() => players.filter(p => p.status === 'looking_for_game').length, [players]);
 
@@ -119,9 +127,15 @@ export function WhoIsHere({
                       <span className="text-xs text-yellow-500" title="Friend" aria-label="Friend" role="img">★</span>
                     )}
                   </div>
-                  <span className={`text-xs ${status.color}`}>
-                    {status.shortLabel}
-                  </span>
+                  {player.statusMessage ? (
+                    <span className="text-xs text-skin-muted italic truncate block" title={player.statusMessage}>
+                      "{player.statusMessage}"
+                    </span>
+                  ) : (
+                    <span className={`text-xs ${status.color}`}>
+                      {status.shortLabel}
+                    </span>
+                  )}
                 </div>
 
                 {/* Actions (not for self) */}
@@ -173,6 +187,21 @@ export function WhoIsHere({
                     >
                       <span className="text-base sm:text-sm">👤</span>
                     </button>
+                    {/* Block button - only for authenticated users */}
+                    {isAuthenticated && onBlockPlayer && (
+                      <button
+                        onClick={() => {
+                          if (confirm(`Block ${player.playerName}? This will also remove them from your friends list.`)) {
+                            onBlockPlayer(player.playerName);
+                          }
+                        }}
+                        className="p-2 sm:p-1.5 rounded hover:bg-red-500/20 active:bg-red-500/30 transition-colors touch-manipulation min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+                        title="Block Player"
+                        aria-label={`Block ${player.playerName}`}
+                      >
+                        <span className="text-base sm:text-sm">🚫</span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

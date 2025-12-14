@@ -503,6 +503,9 @@ export interface LoungeState {
   voiceParticipants: LoungeVoiceParticipant[];
   onlinePlayers: LoungePlayer[];
   liveGames: LiveGame[];
+  chatMessages: LoungeChatMessage[];
+  typingPlayers: string[];
+  blockedPlayers?: string[];
 }
 
 /**
@@ -512,6 +515,8 @@ export interface LoungePlayer {
   socketId: string;
   playerName: string;
   status: PlayerStatus;
+  /** Custom status message (e.g., "BRB coffee", "Looking for partner") */
+  statusMessage?: string;
   tableId?: string;
   gameId?: string;
   lastActivity: number;
@@ -527,6 +532,106 @@ export interface LoungeVoiceParticipant {
   isMuted: boolean;
   isSpeaking: boolean;
   joinedAt: number;
+}
+
+/**
+ * Reaction on a lounge message
+ */
+export interface MessageReaction {
+  emoji: string;
+  count: number;
+  players: string[];
+}
+
+/**
+ * Enhanced lounge chat message with persistence support
+ */
+export interface LoungeChatMessage {
+  messageId: number;
+  playerName: string;
+  message: string;
+  timestamp: number;
+
+  // Media support
+  mediaType?: 'gif' | 'image' | 'link' | null;
+  mediaUrl?: string | null;
+  mediaThumbnailUrl?: string | null;
+  mediaAltText?: string | null;
+
+  // Reply support
+  replyToId?: number | null;
+  replyTo?: {
+    messageId: number;
+    playerName: string;
+    message: string;
+  } | null;
+
+  // Edit/delete support
+  isEdited?: boolean;
+  editedAt?: number | null;
+  isDeleted?: boolean;
+
+  // Mentions
+  mentions?: string[];
+
+  // Reactions
+  reactions?: MessageReaction[];
+
+  // Link preview (for URLs in message)
+  linkPreview?: {
+    url: string;
+    title?: string;
+    description?: string;
+    image?: string;
+    siteName?: string;
+    favicon?: string;
+  } | null;
+
+  // Delivery status
+  /** Message delivery status: 'sending' (optimistic), 'sent' (server confirmed), 'failed' */
+  deliveryStatus?: 'sending' | 'sent' | 'failed';
+}
+
+/**
+ * Payload for sending a lounge chat message
+ */
+export interface LoungeChatPayload {
+  message: string;
+  mediaType?: 'gif' | 'image' | 'link' | null;
+  mediaUrl?: string | null;
+  mediaThumbnailUrl?: string | null;
+  mediaAltText?: string | null;
+  replyToId?: number | null;
+}
+
+/**
+ * Payload for editing a lounge message
+ */
+export interface EditMessagePayload {
+  messageId: number;
+  newText: string;
+}
+
+/**
+ * Payload for deleting a lounge message
+ */
+export interface DeleteMessagePayload {
+  messageId: number;
+}
+
+/**
+ * Payload for toggling a reaction
+ */
+export interface ToggleReactionPayload {
+  messageId: number;
+  emoji: string;
+}
+
+/**
+ * Payload for typing indicator
+ */
+export interface TypingIndicatorPayload {
+  isTyping: boolean;
 }
 
 /**

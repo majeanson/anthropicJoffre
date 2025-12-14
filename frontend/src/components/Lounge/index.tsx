@@ -19,7 +19,8 @@ import {
   LoungePlayer,
   LoungeVoiceParticipant,
   LiveGame,
-  ChatMessage,
+  LoungeChatMessage,
+  LoungeChatPayload,
   GameState,
 } from '../../types/game';
 import { VoiceRoom } from './VoiceRoom';
@@ -31,11 +32,33 @@ import { LiveGamesView } from './LiveGamesView';
 import { LoungeHeader } from './LoungeHeader';
 import { TableRoom } from './TableRoom';
 import { CreateTableModal } from './CreateTableModal';
+import { ConnectionStatus } from './ConnectionStatus';
 import { useSocketEvent } from '../../hooks/useSocketEvent';
 import { useLoungeVoice } from '../../hooks/useLoungeVoice';
+import { useAutoAway } from '../../hooks/useAutoAway';
+import { useBrowserNotifications } from '../../hooks/useBrowserNotifications';
 import { sounds } from '../../utils/sounds';
 import { Button } from '../ui/Button';
 import { Toast, ToastContainer } from '../ui/Toast';
+import { ErrorBoundary } from '../ErrorBoundary';
+
+/**
+ * Lightweight fallback UI for when a lounge section crashes.
+ * Allows the rest of the lounge to continue functioning.
+ */
+function SectionErrorFallback({ section }: { section: string }) {
+  return (
+    <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-center">
+      <p className="text-red-400 text-sm">{section} temporarily unavailable</p>
+      <button
+        onClick={() => window.location.reload()}
+        className="mt-2 text-xs text-skin-secondary hover:text-skin-primary underline"
+      >
+        Reload page
+      </button>
+    </div>
+  );
+}
 
 interface LoungeProps {
   socket: Socket | null;
@@ -76,24 +99,80 @@ export function Lounge({
   const [voiceParticipants, setVoiceParticipants] = useState<LoungeVoiceParticipant[]>([]);
   const [onlinePlayers, setOnlinePlayers] = useState<LoungePlayer[]>([]);
   const [liveGames, setLiveGames] = useState<LiveGame[]>([]);
-  const [loungeMessages, setLoungeMessages] = useState<ChatMessage[]>([]);
+  const [loungeMessages, setLoungeMessages] = useState<LoungeChatMessage[]>([]);
+  const [typingPlayers, setTypingPlayers] = useState<string[]>([]);
+  const [blockedPlayers, setBlockedPlayers] = useState<string[]>([]);
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
 
   // Track seen message IDs to prevent duplicates on reconnection
-  const seenMessageIds = useRef<Set<string>>(new Set());
+  const seenMessageIds = useRef<Set<number>>(new Set());
 
   // Voice chat with microphone permission handling
   const {
     isInVoice,
     isConnecting: isVoiceConnecting,
     isMuted,
+    isDeafened,
     error: voiceError,
     joinVoice,
     leaveVoice,
     toggleMute,
+    toggleDeafen,
+    // Push-to-talk
+    isPushToTalk,
+    togglePushToTalk,
+    pttActive,
+    setPttActive,
+    // Volume control
+    participantVolumes,
+    setParticipantVolume,
   } = useLoungeVoice({ socket });
+
+  // Get current player's status from onlinePlayers list
+  const currentPlayer = onlinePlayers.find(p => p.playerName === playerName);
+  const currentStatus = currentPlayer?.status || 'in_lounge';
+
+  // Auto-away detection - automatically set status to 'away' after 5 minutes of inactivity
+  const {
+    isAutoAway,
+    setManualAway,
+    clearManualAway,
+  } = useAutoAway({
+    socket,
+    isInLounge: !!currentPlayer,
+    currentStatus,
+    timeout: 5 * 60 * 1000, // 5 minutes
+    enabled: true,
+  });
+
+  // Browser notifications for mentions, waves, invites
+  const { showNotification, requestPermission, permission } = useBrowserNotifications();
+
+  // Request notification permission on first user interaction
+  useEffect(() => {
+    if (permission === 'default') {
+      const handleInteraction = () => {
+        requestPermission();
+        window.removeEventListener('click', handleInteraction);
+      };
+      window.addEventListener('click', handleInteraction);
+      return () => window.removeEventListener('click', handleInteraction);
+    }
+  }, [permission, requestPermission]);
 
   // Local state
   const [mobileTab, setMobileTab] = useState<MobileTab>('tables');
+  const mobileTabRef = useRef<MobileTab>('tables'); // Ref for socket handlers
+
+  // Keep ref in sync with state for socket handlers
+  useEffect(() => {
+    mobileTabRef.current = mobileTab;
+    // Clear unread count when switching to chat tab
+    if (mobileTab === 'chat') {
+      setUnreadChatCount(0);
+    }
+  }, [mobileTab]);
+
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [joiningTableId, setJoiningTableId] = useState<string | null>(null); // Track pending join
@@ -180,7 +259,9 @@ export function Lounge({
     voiceParticipants: LoungeVoiceParticipant[];
     onlinePlayers: LoungePlayer[];
     liveGames: LiveGame[];
-    chatMessages?: ChatMessage[];
+    chatMessages?: LoungeChatMessage[];
+    typingPlayers?: string[];
+    blockedPlayers?: string[];
   }) => {
     setTables(data.tables);
     setActivities(data.activities);
@@ -189,7 +270,34 @@ export function Lounge({
     setLiveGames(data.liveGames);
     if (data.chatMessages) {
       setLoungeMessages(data.chatMessages);
+      // Populate seen IDs from loaded history
+      data.chatMessages.forEach(msg => seenMessageIds.current.add(msg.messageId));
     }
+    if (data.typingPlayers) {
+      setTypingPlayers(data.typingPlayers);
+    }
+    if (data.blockedPlayers) {
+      setBlockedPlayers(data.blockedPlayers);
+    }
+  });
+
+  // Block/unblock responses
+  useSocketEvent(socket, 'player_blocked', (data: { blockedName: string; friendshipRemoved: boolean }) => {
+    setBlockedPlayers(prev => [...prev, data.blockedName]);
+    setToastMessage({
+      message: `You have blocked ${data.blockedName}${data.friendshipRemoved ? ' and removed them from your friends' : ''}`,
+      variant: 'success',
+      title: 'Player Blocked',
+    });
+  });
+
+  useSocketEvent(socket, 'player_unblocked', (data: { unblockedName: string }) => {
+    setBlockedPlayers(prev => prev.filter(n => n !== data.unblockedName));
+    setToastMessage({
+      message: `You have unblocked ${data.unblockedName}`,
+      variant: 'success',
+      title: 'Player Unblocked',
+    });
   });
 
   // Activity feed updates
@@ -199,17 +307,51 @@ export function Lounge({
   });
 
   // Lounge chat updates - with deduplication to prevent duplicates on reconnection
-  useSocketEvent(socket, 'lounge_chat_message', (data: { message: ChatMessage }) => {
-    // Create unique ID from timestamp + playerName to detect duplicates
-    const msgId = `${data.message.timestamp}-${data.message.playerName}`;
-    if (seenMessageIds.current.has(msgId)) return;
-    seenMessageIds.current.add(msgId);
+  useSocketEvent(socket, 'lounge_chat_message', (data: { message: LoungeChatMessage }) => {
+    // Use messageId for deduplication (more reliable than timestamp)
+    if (seenMessageIds.current.has(data.message.messageId)) return;
+    seenMessageIds.current.add(data.message.messageId);
     // Limit seen IDs to prevent memory growth (keep last 200)
     if (seenMessageIds.current.size > 200) {
       const idsArray = Array.from(seenMessageIds.current);
       seenMessageIds.current = new Set(idsArray.slice(-150));
     }
     setLoungeMessages(prev => [...prev, data.message].slice(-100));
+
+    // Increment unread count if not on chat tab and message is from someone else
+    if (mobileTabRef.current !== 'chat' && data.message.playerName !== playerName) {
+      setUnreadChatCount(prev => prev + 1);
+    }
+  });
+
+  // Typing indicator updates
+  useSocketEvent(socket, 'lounge_typing_started', (data: { playerName: string }) => {
+    setTypingPlayers(prev => {
+      if (prev.includes(data.playerName)) return prev;
+      return [...prev, data.playerName];
+    });
+  });
+
+  useSocketEvent(socket, 'lounge_typing_stopped', (data: { playerName: string }) => {
+    setTypingPlayers(prev => prev.filter(p => p !== data.playerName));
+  });
+
+  // @mention received - show browser notification
+  useSocketEvent(socket, 'lounge_mention', (data: {
+    messageId: number;
+    mentionedBy: string;
+    messagePreview: string;
+  }) => {
+    // Browser notification when tab is not focused
+    showNotification({
+      title: `@${playerName} mentioned`,
+      body: `${data.mentionedBy}: ${data.messagePreview.slice(0, 100)}${data.messagePreview.length > 100 ? '...' : ''}`,
+      tag: `mention-${data.messageId}`,
+      onClick: () => {
+        // Switch to chat tab on mobile
+        setMobileTab('chat');
+      },
+    });
   });
 
   // Table updates
@@ -258,10 +400,11 @@ export function Lounge({
   useSocketEvent(socket, 'lounge_player_status_changed', (data: {
     playerName: string;
     status: string;
+    statusMessage?: string;
   }) => {
     setOnlinePlayers(prev => prev.map(p =>
       p.playerName === data.playerName
-        ? { ...p, status: data.status as LoungePlayer['status'] }
+        ? { ...p, status: data.status as LoungePlayer['status'], statusMessage: data.statusMessage }
         : p
     ));
   });
@@ -323,13 +466,19 @@ export function Lounge({
     setLiveGames(prev => prev.filter(g => g.gameId !== data.gameId));
   });
 
-  // Wave received - show toast notification
+  // Wave received - show toast notification and browser notification
   useSocketEvent(socket, 'player_waved_at_you', (data: { playerName: string }) => {
     sounds.chatNotification();
     setToastMessage({
       message: `${data.playerName} waved at you!`,
       variant: 'info',
       title: '👋 Wave',
+    });
+    // Browser notification when tab is not focused
+    showNotification({
+      title: '👋 Wave',
+      body: `${data.playerName} waved at you!`,
+      tag: `wave-${data.playerName}`,
     });
   });
 
@@ -395,6 +544,17 @@ export function Lounge({
             setPendingInvites(prev => prev.filter(inv => inv.tableId !== data.tableId));
           }
         },
+      },
+    });
+
+    // Browser notification when tab is not focused
+    showNotification({
+      title: '📨 Table Invite',
+      body: `${data.inviterName} invited you to "${data.tableName}"`,
+      tag: `invite-${data.tableId}`,
+      requireInteraction: true, // Keep visible until user interacts
+      onClick: () => {
+        // Focus will happen automatically, then user can see the toast
       },
     });
   });
@@ -530,9 +690,9 @@ export function Lounge({
   }, [socket]);
 
 
-  const handleSendMessage = useCallback((message: string) => {
-    if (socket && message.trim()) {
-      socket.emit('lounge_chat', { message: message.trim() });
+  const handleSendMessage = useCallback((payload: LoungeChatPayload) => {
+    if (socket && (payload.message?.trim() || payload.mediaUrl)) {
+      socket.emit('lounge_chat', payload);
     }
   }, [socket]);
 
@@ -560,6 +720,29 @@ export function Lounge({
       // Toast will be shown on invite_sent or error event from server
     }
   }, [socket, selectedTableId]);
+
+  const handleBlockPlayer = useCallback((targetName: string) => {
+    if (socket) {
+      socket.emit('block_player', { targetPlayerName: targetName });
+      sounds.buttonClick();
+    }
+  }, [socket]);
+
+  // Set status to "looking for game"
+  const handleSetLookingForGame = useCallback(() => {
+    if (socket) {
+      socket.emit('set_player_status', { status: 'looking_for_game' });
+      sounds.buttonClick();
+    }
+  }, [socket]);
+
+  // Set status with optional message
+  const handleSetStatusWithMessage = useCallback((status: LoungePlayer['status'], message?: string) => {
+    if (socket) {
+      socket.emit('set_player_status', { status, statusMessage: message });
+      sounds.buttonClick();
+    }
+  }, [socket]);
 
   const handleAcceptInvite = useCallback((tableId: string) => {
     if (socket && !joiningTableId) {
@@ -610,6 +793,7 @@ export function Lounge({
             onSendMessage={handleSendMessage}
             playerName={playerName}
             onlinePlayers={onlinePlayers}
+            typingPlayers={typingPlayers}
           />
         );
       case 'players':
@@ -622,8 +806,10 @@ export function Lounge({
             onMessage={onOpenMessages}
             onAddFriend={handleAddFriend}
             onInviteToTable={handleInviteToTable}
+            onBlockPlayer={handleBlockPlayer}
             isAuthenticated={!!user}
             isAtTable={!!selectedTableId}
+            blockedPlayers={blockedPlayers}
           />
         );
       case 'games':
@@ -638,6 +824,9 @@ export function Lounge({
 
   return (
     <div className="min-h-screen bg-skin-primary">
+      {/* Connection status banner (shows when disconnected) */}
+      <ConnectionStatus socket={socket} />
+
       {/* Toast notifications */}
       {toastMessage && (
         <ToastContainer position="top-right">
@@ -667,6 +856,13 @@ export function Lounge({
         pendingInvites={pendingInvites}
         onAcceptInvite={handleAcceptInvite}
         onDismissInvite={handleDismissInvite}
+        currentStatus={currentStatus}
+        isAutoAway={isAutoAway}
+        onSetAway={setManualAway}
+        onClearAway={clearManualAway}
+        onSetLookingForGame={handleSetLookingForGame}
+        currentStatusMessage={currentPlayer?.statusMessage}
+        onSetStatusWithMessage={handleSetStatusWithMessage}
       />
 
       {/* Create Table Modal */}
@@ -681,59 +877,82 @@ export function Lounge({
       <div className="hidden md:grid md:grid-cols-12 gap-4 p-4 max-w-[1600px] mx-auto">
         {/* Left Sidebar - Voice + Players */}
         <div className="col-span-3 space-y-4">
-          <VoiceRoom
-            playerName={playerName}
-            participants={voiceParticipants}
-            onJoinVoice={handleJoinVoice}
-            onLeaveVoice={handleLeaveVoice}
-            onToggleMute={toggleMute}
-            isInVoice={isInVoice}
-            isConnecting={isVoiceConnecting}
-            isMuted={isMuted}
-            error={voiceError}
-          />
-          <WhoIsHere
-            players={onlinePlayers}
-            playerName={playerName}
-            onWave={handleWave}
-            onViewProfile={onViewProfile}
-            onMessage={onOpenMessages}
-            onAddFriend={handleAddFriend}
-            onInviteToTable={handleInviteToTable}
-            isAuthenticated={!!user}
-            isAtTable={!!selectedTableId}
-          />
+          <ErrorBoundary fallback={<SectionErrorFallback section="Voice" />} componentName="VoiceRoom">
+            <VoiceRoom
+              playerName={playerName}
+              participants={voiceParticipants}
+              onJoinVoice={handleJoinVoice}
+              onLeaveVoice={handleLeaveVoice}
+              onToggleMute={toggleMute}
+              onToggleDeafen={toggleDeafen}
+              isInVoice={isInVoice}
+              isConnecting={isVoiceConnecting}
+              isMuted={isMuted}
+              isDeafened={isDeafened}
+              error={voiceError}
+              isPushToTalk={isPushToTalk}
+              onTogglePushToTalk={togglePushToTalk}
+              pttActive={pttActive}
+              onSetPttActive={setPttActive}
+              participantVolumes={participantVolumes}
+              onSetParticipantVolume={setParticipantVolume}
+            />
+          </ErrorBoundary>
+          <ErrorBoundary fallback={<SectionErrorFallback section="Players" />} componentName="WhoIsHere">
+            <WhoIsHere
+              players={onlinePlayers}
+              playerName={playerName}
+              onWave={handleWave}
+              onViewProfile={onViewProfile}
+              onMessage={onOpenMessages}
+              onAddFriend={handleAddFriend}
+              onInviteToTable={handleInviteToTable}
+              onBlockPlayer={handleBlockPlayer}
+              isAuthenticated={!!user}
+              isAtTable={!!selectedTableId}
+              blockedPlayers={blockedPlayers}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Center - Tables + Activity */}
         <div className="col-span-6 space-y-4">
-          <TablesView
-            tables={tables}
-            onCreateTable={handleCreateTable}
-            onJoinTable={handleJoinTable}
-            onViewTable={handleViewTable}
-            playerName={playerName}
-          />
-          <ActivityFeed
-            activities={activities}
-            onPlayerClick={handlePlayerClick}
-            onTableClick={handleTableClick}
-          />
+          <ErrorBoundary fallback={<SectionErrorFallback section="Tables" />} componentName="TablesView">
+            <TablesView
+              tables={tables}
+              onCreateTable={handleCreateTable}
+              onJoinTable={handleJoinTable}
+              onViewTable={handleViewTable}
+              playerName={playerName}
+            />
+          </ErrorBoundary>
+          <ErrorBoundary fallback={<SectionErrorFallback section="Activity" />} componentName="ActivityFeed">
+            <ActivityFeed
+              activities={activities}
+              onPlayerClick={handlePlayerClick}
+              onTableClick={handleTableClick}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Right Sidebar - Chat + Live Games */}
         <div className="col-span-3 space-y-4">
-          <LoungeChat
-            socket={socket}
-            messages={loungeMessages}
-            onSendMessage={handleSendMessage}
-            playerName={playerName}
-            onlinePlayers={onlinePlayers}
-          />
-          <LiveGamesView
-            games={liveGames}
-            onSpectate={onSpectateGame}
-          />
+          <ErrorBoundary fallback={<SectionErrorFallback section="Chat" />} componentName="LoungeChat">
+            <LoungeChat
+              socket={socket}
+              messages={loungeMessages}
+              onSendMessage={handleSendMessage}
+              playerName={playerName}
+              onlinePlayers={onlinePlayers}
+              typingPlayers={typingPlayers}
+            />
+          </ErrorBoundary>
+          <ErrorBoundary fallback={<SectionErrorFallback section="Live Games" />} componentName="LiveGamesView">
+            <LiveGamesView
+              games={liveGames}
+              onSpectate={onSpectateGame}
+            />
+          </ErrorBoundary>
         </div>
       </div>
 
@@ -741,17 +960,27 @@ export function Lounge({
       <div className="md:hidden">
         {/* Voice Room - Always visible at top on mobile */}
         <div className="p-2">
-          <VoiceRoom
-            playerName={playerName}
-            participants={voiceParticipants}
-            onJoinVoice={handleJoinVoice}
-            onLeaveVoice={handleLeaveVoice}
-            onToggleMute={toggleMute}
-            isInVoice={isInVoice}
-            isConnecting={isVoiceConnecting}
-            isMuted={isMuted}
-            error={voiceError}
-          />
+          <ErrorBoundary fallback={<SectionErrorFallback section="Voice" />} componentName="VoiceRoom-Mobile">
+            <VoiceRoom
+              playerName={playerName}
+              participants={voiceParticipants}
+              onJoinVoice={handleJoinVoice}
+              onLeaveVoice={handleLeaveVoice}
+              onToggleMute={toggleMute}
+              onToggleDeafen={toggleDeafen}
+              isInVoice={isInVoice}
+              isConnecting={isVoiceConnecting}
+              isMuted={isMuted}
+              isDeafened={isDeafened}
+              error={voiceError}
+              isPushToTalk={isPushToTalk}
+              onTogglePushToTalk={togglePushToTalk}
+              pttActive={pttActive}
+              onSetPttActive={setPttActive}
+              participantVolumes={participantVolumes}
+              onSetParticipantVolume={setParticipantVolume}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Tab Content */}
@@ -777,15 +1006,27 @@ export function Lounge({
                   }
                 `}
               >
-                <div className="text-xl mb-1">
+                <div className="text-xl mb-1 relative">
                   {tab === 'tables' && '🎴'}
-                  {tab === 'chat' && '💬'}
+                  {tab === 'chat' && (
+                    <>
+                      💬
+                      {unreadChatCount > 0 && (
+                        <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                          {unreadChatCount > 99 ? '99+' : unreadChatCount}
+                        </span>
+                      )}
+                    </>
+                  )}
                   {tab === 'players' && '👥'}
                   {tab === 'games' && '👁️'}
                 </div>
                 <div className="text-xs font-medium capitalize">{tab}</div>
                 {tab === 'tables' && tables.filter(t => t.status === 'gathering').length > 0 && (
                   <div className="text-[10px] text-green-400">{tables.filter(t => t.status === 'gathering').length} open</div>
+                )}
+                {tab === 'chat' && unreadChatCount > 0 && (
+                  <div className="text-[10px] text-red-400">{unreadChatCount} new</div>
                 )}
                 {tab === 'players' && (
                   <div className="text-[10px] text-skin-muted">{onlinePlayers.length}</div>
