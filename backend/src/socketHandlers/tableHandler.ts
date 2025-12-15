@@ -125,6 +125,12 @@ function releaseTableCreationLock(playerName: string): void {
 // Disconnect grace period (30 seconds)
 const TABLE_DISCONNECT_TIMEOUT = 30000;
 
+// Empty table timeout (20 minutes) - allows players to leave and come back
+const EMPTY_TABLE_TIMEOUT = 20 * 60 * 1000;
+
+// Track when tables became empty for cleanup
+const emptyTableTimeouts = new Map<string, NodeJS.Timeout>(); // tableId -> timeout
+
 // Orphan table check interval (5 minutes)
 const ORPHAN_CHECK_INTERVAL = 5 * 60 * 1000;
 // How long a table can be in_game without a valid game before cleanup (10 minutes)
@@ -386,6 +392,29 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
 
         socket.join(`table:${tableId}`);
 
+        // Cancel empty table timeout if one was running
+        const emptyTimeout = emptyTableTimeouts.get(tableId);
+        if (emptyTimeout) {
+          clearTimeout(emptyTimeout);
+          emptyTableTimeouts.delete(tableId);
+          logger.info(`Empty table timeout cancelled for ${tableId} - player joined`);
+
+          // Add system message
+          table.chatMessages.push({
+            playerId: 'system',
+            playerName: 'System',
+            teamId: null,
+            message: `Table is no longer empty - deletion cancelled.`,
+            timestamp: Date.now(),
+          });
+        }
+
+        // If this is the first human joining an empty table, make them the host
+        const humanPlayers = table.seats.filter(s => s.playerName !== null && !s.isBot);
+        if (humanPlayers.length === 1 && humanPlayers[0].playerName === playerName) {
+          table.hostName = playerName;
+        }
+
         // Remove from lounge voice if they were in it
         removePlayerFromLoungeVoice(io, playerName);
 
@@ -620,17 +649,56 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       // Check remaining human players (exclude bots)
       const remainingHumans = table.seats.filter(s => s.playerName !== null && !s.isBot);
 
-      // If no human players remain, delete the table (bots can't play alone)
+      // If no human players remain, start empty table timeout instead of immediate deletion
       if (remainingHumans.length === 0) {
-        io.to(`table:${tableId}`).emit('table_deleted', { tableId });
-        io.to('lounge').emit('lounge_table_deleted', { tableId });
-        // Clean up socket room before deleting table
-        cleanupTableRoom(io, tableId);
-        tables.delete(tableId);
-        tableGameStartTimes.delete(tableId);
-        logger.info(`Table ${tableId} deleted (only bots remaining)`);
-        // Still emit table_left to the leaving player so frontend can handle it
+        // Remove any bots when table becomes empty
+        table.seats.forEach(s => {
+          if (s.isBot) {
+            s.playerName = null;
+            s.isBot = false;
+            s.botDifficulty = undefined;
+            s.isReady = false;
+          }
+        });
+
+        // Set status to gathering (empty but not deleted)
+        table.status = 'gathering';
+
+        // Add system message
+        table.chatMessages.push({
+          playerId: 'system',
+          playerName: 'System',
+          teamId: null,
+          message: `Table is now empty. It will be deleted in 20 minutes if no one joins.`,
+          timestamp: Date.now(),
+        });
+
+        // Start empty table timeout if not already running
+        if (!emptyTableTimeouts.has(tableId)) {
+          const timeout = setTimeout(() => {
+            emptyTableTimeouts.delete(tableId);
+            const currentTable = tables.get(tableId);
+            if (currentTable) {
+              // Re-check if still empty
+              const currentHumans = currentTable.seats.filter(s => s.playerName !== null && !s.isBot);
+              if (currentHumans.length === 0) {
+                io.to(`table:${tableId}`).emit('table_deleted', { tableId, reason: 'timeout' });
+                io.to('lounge').emit('lounge_table_deleted', { tableId });
+                cleanupTableRoom(io, tableId);
+                tables.delete(tableId);
+                tableGameStartTimes.delete(tableId);
+                tableTypingPlayers.delete(tableId);
+                tableVoice.delete(tableId);
+                logger.info(`Table ${tableId} deleted after empty timeout`);
+              }
+            }
+          }, EMPTY_TABLE_TIMEOUT);
+          emptyTableTimeouts.set(tableId, timeout);
+          logger.info(`Table ${tableId} is now empty, will be deleted in 20 minutes if no one joins`);
+        }
+
         socket.emit('table_left', { tableId });
+        broadcastTableUpdate(io, table);
         return;
       }
 
@@ -1508,15 +1576,55 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       // Check remaining human players (exclude bots)
       const remainingHumans = currentTable.seats.filter(s => s.playerName !== null && !s.isBot);
 
-      // If no human players remain, delete the table (bots can't play alone)
+      // If no human players remain, start empty table timeout instead of immediate deletion
       if (remainingHumans.length === 0) {
-        io.to(`table:${tableId}`).emit('table_deleted', { tableId });
-        io.to('lounge').emit('lounge_table_deleted', { tableId });
-        // Clean up socket room before deleting table
-        cleanupTableRoom(io, tableId);
-        tables.delete(tableId);
-        tableGameStartTimes.delete(tableId);
-        logger.info(`Table ${tableId} deleted (all humans disconnected, only bots remaining)`);
+        // Remove any bots when table becomes empty
+        currentTable.seats.forEach(s => {
+          if (s.isBot) {
+            s.playerName = null;
+            s.isBot = false;
+            s.botDifficulty = undefined;
+            s.isReady = false;
+          }
+        });
+
+        // Set status to gathering (empty but not deleted)
+        currentTable.status = 'gathering';
+
+        // Add system message
+        currentTable.chatMessages.push({
+          playerId: 'system',
+          playerName: 'System',
+          teamId: null,
+          message: `Table is now empty. It will be deleted in 20 minutes if no one joins.`,
+          timestamp: Date.now(),
+        });
+
+        // Start empty table timeout if not already running
+        if (!emptyTableTimeouts.has(tableId)) {
+          const emptyTimeout = setTimeout(() => {
+            emptyTableTimeouts.delete(tableId);
+            const tableToDelete = tables.get(tableId);
+            if (tableToDelete) {
+              // Re-check if still empty
+              const humans = tableToDelete.seats.filter(s => s.playerName !== null && !s.isBot);
+              if (humans.length === 0) {
+                io.to(`table:${tableId}`).emit('table_deleted', { tableId, reason: 'timeout' });
+                io.to('lounge').emit('lounge_table_deleted', { tableId });
+                cleanupTableRoom(io, tableId);
+                tables.delete(tableId);
+                tableGameStartTimes.delete(tableId);
+                tableTypingPlayers.delete(tableId);
+                tableVoice.delete(tableId);
+                logger.info(`Table ${tableId} deleted after empty timeout (all disconnected)`);
+              }
+            }
+          }, EMPTY_TABLE_TIMEOUT);
+          emptyTableTimeouts.set(tableId, emptyTimeout);
+          logger.info(`Table ${tableId} is now empty after disconnect, will be deleted in 20 minutes if no one joins`);
+        }
+
+        broadcastTableUpdate(io, currentTable);
         return;
       }
 

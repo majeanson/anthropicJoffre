@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-06T01:25:49.683Z",
+  "buildDate": "2025-12-15T00:27:59.302Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "fix: Improve MatchStatsModal for incomplete games\n\n- Remove all dark: class prefixes (parchment theme is always light)\n- Add empty state for no rounds recorded yet\n- Add tricks summary display with winners per trick\n- Handle missing bets/results gracefully with informative messages\n- Handle missing player_teams data with fallback to team 1\n- Add empty state for no player data\n- Show \"Current Score\" vs \"Final Score\" based on game completion\n- Improve in-progress game display with amber styling\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "48809ac",
-    "commitDate": "2025-12-05 18:18:43 -0500",
+    "commitMessage": "feat: Add lounge-like features to TableRoom\n\n- Enhanced TableRoom chat with rich features:\n  - 44px touch-friendly send button\n  - Quick emoji row for fast reactions\n  - Message grouping for consecutive messages\n  - Scroll-to-bottom button with unread count\n  - Typing indicators\n- Added table-scoped voice chat:\n  - Full WebRTC voice chat for table participants\n  - Mute/unmute, deafen, push-to-talk\n  - Speaking indicators and volume control\n- Improved mobile layout with responsive grid\n- Backend support for table voice and typing events:\n  - table_typing indicator events\n  - join/leave_table_voice events\n  - WebRTC signaling (offer/answer/ice)\n  - Voice participant tracking per table\n  - Cleanup on disconnect and leave\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "commitHash": "a4e1a79",
+    "commitDate": "2025-12-14 19:24:42 -0500",
     "branch": "main"
   },
   "futureTodos": [
