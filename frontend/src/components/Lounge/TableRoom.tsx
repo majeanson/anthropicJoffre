@@ -5,18 +5,21 @@
  * Features:
  * - Visual seat selection (click to sit/stand)
  * - Ready up system
- * - Table chat
+ * - Enhanced table chat with emojis, grouping, scroll to bottom
+ * - Table-scoped voice chat
  * - Add bots to fill seats
  * - Start game when ready
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Socket } from 'socket.io-client';
-import { LoungeTable, ChatMessage, GameState } from '../../types/game';
+import { LoungeTable, ChatMessage, GameState, LoungeVoiceParticipant } from '../../types/game';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { sounds } from '../../utils/sounds';
 import { useSocketEvent } from '../../hooks/useSocketEvent';
+import { useTableVoice } from '../../hooks/useTableVoice';
+import { VoiceRoom } from './VoiceRoom';
 
 interface TableRoomProps {
   socket: Socket | null;
@@ -25,6 +28,8 @@ interface TableRoomProps {
   onLeave: () => void;
   onGameStart: (gameId: string, gameState?: GameState) => void;
 }
+
+const QUICK_EMOJIS = ['👍', '😂', '🎮', '🔥', '❤️', '🎉'];
 
 export function TableRoom({
   socket,
@@ -48,6 +53,17 @@ export function TableRoom({
   const [confirmRemove, setConfirmRemove] = useState<{ position: number; playerName: string } | null>(null);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
+  // Enhanced chat state
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [typingPlayers, setTypingPlayers] = useState<string[]>([]);
+
+  // Voice chat state
+  const [voiceParticipants, setVoiceParticipants] = useState<LoungeVoiceParticipant[]>([]);
+  const tableVoice = useTableVoice({ socket, tableId: table.id });
+
   const isHost = table.hostName === playerName;
   const mySeat = table.seats.find(s => s.playerName === playerName);
   const isSeated = !!mySeat;
@@ -68,6 +84,49 @@ export function TableRoom({
   // Listen for chat messages
   useSocketEvent(socket, 'table_chat_message', (data: { message: ChatMessage }) => {
     setChatMessages(prev => [...prev, data.message].slice(-50));
+    // Track unread messages when not at bottom
+    if (!isAtBottom && data.message.playerName !== playerName) {
+      setUnreadCount(prev => prev + 1);
+    }
+  });
+
+  // Listen for typing indicators
+  useSocketEvent(socket, 'table_typing_started', (data: { tableId: string; playerName: string }) => {
+    if (data.tableId !== table.id) return;
+    setTypingPlayers(prev => {
+      if (prev.includes(data.playerName)) return prev;
+      return [...prev, data.playerName];
+    });
+  });
+
+  useSocketEvent(socket, 'table_typing_stopped', (data: { tableId: string; playerName: string }) => {
+    if (data.tableId !== table.id) return;
+    setTypingPlayers(prev => prev.filter(p => p !== data.playerName));
+  });
+
+  // Listen for voice participant updates
+  useSocketEvent(socket, 'table_voice_participant_joined', (data: { tableId: string; participant: LoungeVoiceParticipant }) => {
+    if (data.tableId !== table.id) return;
+    setVoiceParticipants(prev => [...prev, data.participant]);
+  });
+
+  useSocketEvent(socket, 'table_voice_participant_left', (data: { tableId: string; playerName: string }) => {
+    if (data.tableId !== table.id) return;
+    setVoiceParticipants(prev => prev.filter(p => p.playerName !== data.playerName));
+  });
+
+  useSocketEvent(socket, 'table_voice_participant_updated', (data: { tableId: string; playerName: string; isMuted: boolean }) => {
+    if (data.tableId !== table.id) return;
+    setVoiceParticipants(prev => prev.map(p =>
+      p.playerName === data.playerName ? { ...p, isMuted: data.isMuted } : p
+    ));
+  });
+
+  useSocketEvent(socket, 'table_voice_participant_speaking', (data: { tableId: string; playerName: string; isSpeaking: boolean }) => {
+    if (data.tableId !== table.id) return;
+    setVoiceParticipants(prev => prev.map(p =>
+      p.playerName === data.playerName ? { ...p, isSpeaking: data.isSpeaking } : p
+    ));
   });
 
   // Listen for game start
@@ -110,6 +169,34 @@ export function TableRoom({
       setIsReady(mySeat.isReady);
     }
   }, [mySeat]);
+
+  // Track scroll position for chat
+  const handleScroll = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const threshold = 50;
+    const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+
+    if (atBottom && !isAtBottom) {
+      setUnreadCount(0);
+    }
+
+    setIsAtBottom(atBottom);
+  }, [isAtBottom]);
+
+  // Auto-scroll to bottom when new messages arrive (if already at bottom)
+  useEffect(() => {
+    if (isAtBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, isAtBottom]);
+
+  // Scroll to bottom handler
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setIsAtBottom(true);
+    setUnreadCount(0);
+  }, []);
 
   // Timeout for pending seat actions to prevent stuck UI
   useEffect(() => {
@@ -181,12 +268,49 @@ export function TableRoom({
     }
   }, [socket, table.id, canStart, isStartingGame]);
 
+  // Typing timeout ref
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Send typing indicator
+  const sendTypingIndicator = useCallback((isTyping: boolean) => {
+    socket?.emit('table_typing', { tableId: table.id, isTyping });
+  }, [socket, table.id]);
+
+  // Handle input change with typing indicator
+  const handleChatInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setChatInput(value);
+
+    if (value.length > 0) {
+      sendTypingIndicator(true);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      typingTimeoutRef.current = setTimeout(() => {
+        sendTypingIndicator(false);
+      }, 2000);
+    } else {
+      sendTypingIndicator(false);
+    }
+  }, [sendTypingIndicator]);
+
   const handleSendChat = useCallback(() => {
     if (socket && chatInput.trim()) {
       socket.emit('table_chat', { tableId: table.id, message: chatInput.trim() });
       setChatInput('');
+      sendTypingIndicator(false);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
     }
-  }, [socket, table.id, chatInput]);
+  }, [socket, table.id, chatInput, sendTypingIndicator]);
+
+  // Handle quick emoji send
+  const handleQuickEmoji = useCallback((emoji: string) => {
+    if (socket) {
+      socket.emit('table_chat', { tableId: table.id, message: emoji });
+    }
+  }, [socket, table.id]);
 
   const handleLeave = useCallback(() => {
     // Host leaving will delete the table - show confirmation
@@ -390,48 +514,182 @@ export function TableRoom({
           )}
         </div>
 
-        {/* Table Chat */}
-        <div className="bg-skin-secondary rounded-xl border-2 border-skin-default p-4">
-          <h3 className="font-display text-skin-primary text-sm uppercase tracking-wider mb-3">
-            Table Chat
-          </h3>
+        {/* Chat and Voice Section - Side by side on desktop, stacked on mobile */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Table Chat */}
+          <div className="bg-skin-secondary rounded-xl border-2 border-skin-default flex flex-col h-[300px] sm:h-[350px]">
+            {/* Header */}
+            <div className="flex items-center gap-2 p-3 border-b border-skin-default">
+              <span className="text-xl">💬</span>
+              <h3 className="font-display text-skin-primary text-sm uppercase tracking-wider">
+                Table Chat
+              </h3>
+            </div>
 
-          {/* Messages */}
-          <div className="h-40 overflow-y-auto space-y-2 mb-3 p-2 bg-skin-tertiary rounded-lg">
-            {chatMessages.length === 0 ? (
-              <p className="text-skin-muted text-sm text-center py-4">
-                No messages yet. Say hello!
-              </p>
-            ) : (
-              chatMessages.map((msg, i) => (
-                <div key={i} className="text-sm">
-                  <span className={`font-medium ${
-                    msg.teamId === 1 ? 'text-blue-400' :
-                    msg.teamId === 2 ? 'text-red-400' :
-                    'text-skin-primary'
-                  }`}>
-                    {msg.playerName}:
-                  </span>
-                  <span className="text-skin-secondary ml-2">{msg.message}</span>
+            {/* Messages */}
+            <div
+              ref={messagesContainerRef}
+              onScroll={handleScroll}
+              className="flex-1 overflow-y-auto p-3 space-y-1"
+              role="log"
+              aria-label="Table chat messages"
+            >
+              {chatMessages.length === 0 ? (
+                <div className="text-center py-8 text-skin-muted text-sm">
+                  <div className="text-2xl mb-2">💭</div>
+                  <p>No messages yet</p>
+                  <p className="text-xs mt-1">Say hi to your teammates!</p>
                 </div>
-              ))
+              ) : (
+                chatMessages.map((msg, index) => {
+                  const isSelf = msg.playerName === playerName;
+                  // Message grouping - same sender within 2 minutes
+                  const prevMsg = index > 0 ? chatMessages[index - 1] : null;
+                  const isGrouped = prevMsg &&
+                    prevMsg.playerName === msg.playerName &&
+                    msg.timestamp - prevMsg.timestamp < 2 * 60 * 1000;
+
+                  return (
+                    <div
+                      key={index}
+                      className={`flex ${isSelf ? 'justify-end' : 'justify-start'} ${isGrouped ? 'mt-0.5' : 'mt-2 first:mt-0'}`}
+                    >
+                      <div className="max-w-[80%]">
+                        {!isGrouped && (
+                          <div className={`text-xs mb-0.5 ${isSelf ? 'text-right' : ''}`}>
+                            <span className={`font-medium ${
+                              msg.teamId === 1 ? 'text-blue-400' :
+                              msg.teamId === 2 ? 'text-red-400' :
+                              isSelf ? 'text-skin-accent' : 'text-skin-primary'
+                            }`}>
+                              {msg.playerName}
+                            </span>
+                          </div>
+                        )}
+                        <div
+                          className={`
+                            px-3 py-2 rounded-lg text-sm break-words
+                            ${isGrouped
+                              ? isSelf ? 'rounded-tr-md' : 'rounded-tl-md'
+                              : ''
+                            }
+                            ${isSelf
+                              ? 'bg-skin-accent text-skin-inverse'
+                              : 'bg-skin-tertiary text-skin-primary'
+                            }
+                          `}
+                        >
+                          {msg.message}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+              <div ref={messagesEndRef} />
+
+              {/* Scroll to bottom button */}
+              {!isAtBottom && chatMessages.length > 0 && (
+                <div className="sticky bottom-2 flex justify-center pointer-events-none">
+                  <button
+                    onClick={scrollToBottom}
+                    className="
+                      px-3 py-2 rounded-full
+                      bg-skin-accent text-skin-inverse
+                      shadow-lg shadow-skin-accent/30
+                      flex items-center gap-2
+                      text-sm font-medium
+                      hover:bg-skin-accent/90 transition-all
+                      pointer-events-auto
+                    "
+                    aria-label={unreadCount > 0 ? `${unreadCount} new messages - scroll to bottom` : 'Scroll to bottom'}
+                  >
+                    <span className="text-lg">↓</span>
+                    {unreadCount > 0 && (
+                      <span className="bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
+                        {unreadCount} new
+                      </span>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Typing indicator */}
+            {typingPlayers.length > 0 && (
+              <div className="px-3 py-1 text-xs text-skin-muted border-t border-skin-default">
+                <span className="animate-pulse">
+                  {typingPlayers.length === 1
+                    ? `${typingPlayers[0]} is typing...`
+                    : `${typingPlayers.length} people typing...`
+                  }
+                </span>
+              </div>
             )}
+
+            {/* Quick Emojis */}
+            <div className="flex gap-1 px-3 py-2 border-t border-skin-default">
+              {QUICK_EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => handleQuickEmoji(emoji)}
+                  className="flex-1 py-1.5 rounded hover:bg-skin-tertiary transition-colors text-sm min-h-[36px]"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+
+            {/* Input */}
+            <div className="flex items-center gap-2 p-3 pt-0">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={handleChatInputChange}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
+                placeholder="Type a message..."
+                className="flex-1 px-4 py-3 bg-skin-tertiary border border-skin-default rounded-full text-skin-primary text-sm focus:outline-none focus:border-skin-accent"
+                aria-label="Chat message input"
+              />
+              <button
+                onClick={handleSendChat}
+                disabled={!chatInput.trim()}
+                className={`
+                  min-w-[44px] min-h-[44px] p-2 rounded-full transition-all flex-shrink-0
+                  flex items-center justify-center
+                  ${chatInput.trim()
+                    ? 'bg-skin-accent text-skin-inverse hover:bg-skin-accent/90 active:scale-95'
+                    : 'bg-skin-tertiary text-skin-muted cursor-not-allowed'
+                  }
+                `}
+                title="Send message"
+                aria-label="Send message"
+              >
+                <span className="text-lg">➤</span>
+              </button>
+            </div>
           </div>
 
-          {/* Input */}
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
-              placeholder="Type a message..."
-              className="flex-1 px-3 py-2 bg-skin-tertiary border border-skin-default rounded-lg text-skin-primary text-sm focus:outline-none focus:border-skin-accent"
-            />
-            <Button variant="primary" size="sm" onClick={handleSendChat}>
-              Send
-            </Button>
-          </div>
+          {/* Table Voice Chat */}
+          <VoiceRoom
+            playerName={playerName}
+            participants={voiceParticipants}
+            onJoinVoice={tableVoice.joinVoice}
+            onLeaveVoice={tableVoice.leaveVoice}
+            onToggleMute={tableVoice.toggleMute}
+            onToggleDeafen={tableVoice.toggleDeafen}
+            isInVoice={tableVoice.isInVoice}
+            isConnecting={tableVoice.isConnecting}
+            isMuted={tableVoice.isMuted}
+            isDeafened={tableVoice.isDeafened}
+            error={tableVoice.error}
+            isPushToTalk={tableVoice.isPushToTalk}
+            onTogglePushToTalk={tableVoice.togglePushToTalk}
+            pttActive={tableVoice.pttActive}
+            onSetPttActive={tableVoice.setPttActive}
+            participantVolumes={tableVoice.participantVolumes}
+            onSetParticipantVolume={tableVoice.setParticipantVolume}
+          />
         </div>
       </div>
     </div>

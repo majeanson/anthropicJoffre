@@ -50,6 +50,19 @@ const playerTables = new Map<string, string>(); // playerName -> tableId
 // Track disconnect timeouts for table players
 const tableDisconnectTimeouts = new Map<string, NodeJS.Timeout>(); // playerName -> timeout
 
+// Track typing indicators per table
+const tableTypingPlayers = new Map<string, Map<string, NodeJS.Timeout>>(); // tableId -> Map<playerName, timeout>
+
+// Track voice participants per table
+interface TableVoiceParticipant {
+  socketId: string;
+  playerName: string;
+  isMuted: boolean;
+  isSpeaking: boolean;
+  joinedAt: number;
+}
+const tableVoice = new Map<string, Map<string, TableVoiceParticipant>>(); // tableId -> Map<socketId, participant>
+
 // Lock for seat assignment to prevent race conditions
 // Format: "tableId:position" -> timestamp when locked
 const seatLocks = new Map<string, number>();
@@ -571,6 +584,26 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       playerTables.delete(playerName);
 
       socket.leave(`table:${tableId}`);
+
+      // Clean up typing indicator
+      const tableTyping = tableTypingPlayers.get(tableId);
+      if (tableTyping) {
+        const timeout = tableTyping.get(playerName);
+        if (timeout) {
+          clearTimeout(timeout);
+          tableTyping.delete(playerName);
+          io.to(`table:${tableId}`).emit('table_typing_stopped', { tableId, playerName });
+        }
+      }
+
+      // Clean up voice participant
+      const voiceRoom = tableVoice.get(tableId);
+      if (voiceRoom?.has(socket.id)) {
+        voiceRoom.delete(socket.id);
+        socket.leave(`table_voice:${tableId}`);
+        io.to(`table:${tableId}`).emit('table_voice_participant_left', { tableId, playerName });
+        io.to(`table_voice:${tableId}`).emit('table_voice_participant_left', { tableId, playerName });
+      }
 
       // Update player status in lounge back to 'in_lounge'
       updatePlayerStatus(io, playerName, 'in_lounge', undefined, undefined);
@@ -1096,9 +1129,254 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
       }
 
       io.to(`table:${tableId}`).emit('table_chat_message', { message: chatMessage });
+
+      // Clear typing indicator since user just sent a message
+      const tableTyping = tableTypingPlayers.get(tableId);
+      if (tableTyping) {
+        const existingTimeout = tableTyping.get(playerName);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+          tableTyping.delete(playerName);
+          io.to(`table:${tableId}`).emit('table_typing_stopped', { tableId, playerName });
+        }
+      }
     } catch (error) {
       logger.error('Error sending table chat:', error);
       socket.emit('error', { message: 'Failed to send message', context: 'table_chat' });
+    }
+  });
+
+  // ============================================================================
+  // table_typing - Typing indicator for table chat
+  // ============================================================================
+  socket.on('table_typing', (payload: { tableId: string; isTyping: boolean }) => {
+    try {
+      const playerName = getPlayerName();
+      const { tableId, isTyping } = payload;
+
+      const table = tables.get(tableId);
+      if (!table) return;
+
+      const seat = table.seats.find(s => s.playerName === playerName);
+      if (!seat) return;
+
+      // Get or create typing map for this table
+      let tableTyping = tableTypingPlayers.get(tableId);
+      if (!tableTyping) {
+        tableTyping = new Map();
+        tableTypingPlayers.set(tableId, tableTyping);
+      }
+
+      // Clear existing timeout
+      const existingTimeout = tableTyping.get(playerName);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+      }
+
+      if (isTyping) {
+        // Set typing indicator with auto-expire after 3 seconds
+        const timeout = setTimeout(() => {
+          tableTyping?.delete(playerName);
+          io.to(`table:${tableId}`).emit('table_typing_stopped', { tableId, playerName });
+        }, 3000);
+
+        tableTyping.set(playerName, timeout);
+        socket.to(`table:${tableId}`).emit('table_typing_started', { tableId, playerName });
+      } else {
+        tableTyping.delete(playerName);
+        socket.to(`table:${tableId}`).emit('table_typing_stopped', { tableId, playerName });
+      }
+    } catch (error) {
+      logger.error('Error handling table typing:', error);
+    }
+  });
+
+  // ============================================================================
+  // Table Voice Chat Events
+  // ============================================================================
+
+  // join_table_voice - Join voice chat for a table
+  socket.on('join_table_voice', (payload: { tableId: string }) => {
+    try {
+      const playerName = getPlayerName();
+      const { tableId } = payload;
+
+      const table = tables.get(tableId);
+      if (!table) {
+        socket.emit('error', { message: 'Table not found', context: 'join_table_voice' });
+        return;
+      }
+
+      const seat = table.seats.find(s => s.playerName === playerName);
+      if (!seat) {
+        socket.emit('error', { message: 'You are not at this table', context: 'join_table_voice' });
+        return;
+      }
+
+      // Get or create voice map for this table
+      let voiceRoom = tableVoice.get(tableId);
+      if (!voiceRoom) {
+        voiceRoom = new Map();
+        tableVoice.set(tableId, voiceRoom);
+      }
+
+      const participant: TableVoiceParticipant = {
+        socketId: socket.id,
+        playerName,
+        isMuted: false,
+        isSpeaking: false,
+        joinedAt: Date.now(),
+      };
+
+      voiceRoom.set(socket.id, participant);
+      socket.join(`table_voice:${tableId}`);
+
+      // Send participant list to the joining player
+      socket.emit('table_voice_joined', {
+        tableId,
+        participants: Array.from(voiceRoom.values()),
+      });
+
+      // Notify others in the voice room
+      socket.to(`table_voice:${tableId}`).emit('table_voice_participant_joined', {
+        tableId,
+        participant,
+      });
+
+      // Also notify the table room for UI updates
+      io.to(`table:${tableId}`).emit('table_voice_participant_joined', {
+        tableId,
+        participant,
+      });
+
+      logger.info(`${playerName} joined table ${tableId} voice`);
+    } catch (error) {
+      logger.error('Error joining table voice:', error);
+      socket.emit('error', { message: 'Failed to join voice', context: 'join_table_voice' });
+    }
+  });
+
+  // leave_table_voice - Leave voice chat
+  socket.on('leave_table_voice', (payload: { tableId: string }) => {
+    try {
+      const playerName = getPlayerName();
+      const { tableId } = payload;
+
+      const voiceRoom = tableVoice.get(tableId);
+      if (voiceRoom) {
+        voiceRoom.delete(socket.id);
+        socket.leave(`table_voice:${tableId}`);
+
+        io.to(`table:${tableId}`).emit('table_voice_participant_left', { tableId, playerName });
+        io.to(`table_voice:${tableId}`).emit('table_voice_participant_left', { tableId, playerName });
+
+        logger.info(`${playerName} left table ${tableId} voice`);
+      }
+    } catch (error) {
+      logger.error('Error leaving table voice:', error);
+    }
+  });
+
+  // table_voice_mute - Toggle mute
+  socket.on('table_voice_mute', (payload: { tableId: string; isMuted: boolean }) => {
+    try {
+      const playerName = getPlayerName();
+      const { tableId, isMuted } = payload;
+
+      const voiceRoom = tableVoice.get(tableId);
+      const participant = voiceRoom?.get(socket.id);
+      if (participant) {
+        participant.isMuted = isMuted;
+        io.to(`table:${tableId}`).emit('table_voice_participant_updated', {
+          tableId,
+          playerName,
+          isMuted,
+        });
+        io.to(`table_voice:${tableId}`).emit('table_voice_participant_updated', {
+          tableId,
+          playerName,
+          isMuted,
+        });
+      }
+    } catch (error) {
+      logger.error('Error toggling table voice mute:', error);
+    }
+  });
+
+  // table_voice_speaking - Speaking indicator
+  socket.on('table_voice_speaking', (payload: { tableId: string; isSpeaking: boolean }) => {
+    try {
+      const playerName = getPlayerName();
+      const { tableId, isSpeaking } = payload;
+
+      const voiceRoom = tableVoice.get(tableId);
+      const participant = voiceRoom?.get(socket.id);
+      if (participant) {
+        participant.isSpeaking = isSpeaking;
+        io.to(`table:${tableId}`).emit('table_voice_participant_speaking', {
+          tableId,
+          playerName,
+          isSpeaking,
+        });
+      }
+    } catch (error) {
+      logger.error('Error updating table voice speaking:', error);
+    }
+  });
+
+  // WebRTC signaling for table voice
+  socket.on('table_voice_offer', (data: { tableId: string; targetPeerId: string; sdp: { type: string; sdp: string } }) => {
+    try {
+      const playerName = getPlayerName();
+      const { tableId, targetPeerId, sdp } = data;
+
+      const voiceRoom = tableVoice.get(tableId);
+      if (!voiceRoom?.has(socket.id)) return;
+
+      io.to(targetPeerId).emit('table_voice_offer', {
+        tableId,
+        peerId: socket.id,
+        playerName,
+        sdp,
+      });
+    } catch (error) {
+      logger.error('Error forwarding table voice offer:', error);
+    }
+  });
+
+  socket.on('table_voice_answer', (data: { tableId: string; targetPeerId: string; sdp: { type: string; sdp: string } }) => {
+    try {
+      const playerName = getPlayerName();
+      const { tableId, targetPeerId, sdp } = data;
+
+      const voiceRoom = tableVoice.get(tableId);
+      if (!voiceRoom?.has(socket.id)) return;
+
+      io.to(targetPeerId).emit('table_voice_answer', {
+        tableId,
+        peerId: socket.id,
+        playerName,
+        sdp,
+      });
+    } catch (error) {
+      logger.error('Error forwarding table voice answer:', error);
+    }
+  });
+
+  socket.on('table_voice_ice', (data: { tableId: string; targetPeerId: string; candidate: { candidate: string; sdpMid: string | null; sdpMLineIndex: number | null } }) => {
+    try {
+      const { tableId, targetPeerId, candidate } = data;
+
+      const voiceRoom = tableVoice.get(tableId);
+      if (!voiceRoom?.has(socket.id)) return;
+
+      io.to(targetPeerId).emit('table_voice_ice', {
+        tableId,
+        peerId: socket.id,
+        candidate,
+      });
+    } catch (error) {
+      logger.error('Error forwarding table voice ICE candidate:', error);
     }
   });
 
@@ -1157,6 +1435,27 @@ export function setupTableHandler(io: Server, socket: Socket, dependencies?: Tab
   socket.on('disconnect', () => {
     const playerName = getPlayerName();
     const tableId = playerTables.get(playerName);
+
+    // Clean up typing indicator
+    if (tableId) {
+      const tableTyping = tableTypingPlayers.get(tableId);
+      if (tableTyping) {
+        const timeout = tableTyping.get(playerName);
+        if (timeout) {
+          clearTimeout(timeout);
+          tableTyping.delete(playerName);
+          io.to(`table:${tableId}`).emit('table_typing_stopped', { tableId, playerName });
+        }
+      }
+
+      // Clean up voice participant
+      const voiceRoom = tableVoice.get(tableId);
+      if (voiceRoom?.has(socket.id)) {
+        voiceRoom.delete(socket.id);
+        io.to(`table:${tableId}`).emit('table_voice_participant_left', { tableId, playerName });
+        io.to(`table_voice:${tableId}`).emit('table_voice_participant_left', { tableId, playerName });
+      }
+    }
 
     if (!tableId) return;
 
