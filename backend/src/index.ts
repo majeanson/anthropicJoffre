@@ -1068,6 +1068,30 @@ app.use('/api/profiles', csrfProtection, profileRoutes);
 app.use(csrfErrorHandler);
 
 // ============================================================================
+// 404 Handler - Catch-all for unmatched routes (with CORS headers)
+// ============================================================================
+// This must be AFTER all routes to catch any unmatched paths
+// Returns proper CORS headers so cross-origin clients can read the error
+app.use((req, res) => {
+  // Set CORS headers manually for 404 responses
+  const origin = req.headers.origin;
+  if (origin) {
+    if (corsOrigin === '*') {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    } else if (Array.isArray(corsOrigin) && corsOrigin.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+  }
+
+  res.status(404).json({
+    error: 'Not found',
+    path: req.path,
+    method: req.method,
+  });
+});
+
+// ============================================================================
 
 // Socket.IO authentication middleware - set playerName from JWT token if available
 io.use(async (socket, next) => {

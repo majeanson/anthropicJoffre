@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-15T00:27:59.302Z",
+  "buildDate": "2025-12-15T01:09:35.781Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "feat: Add lounge-like features to TableRoom\n\n- Enhanced TableRoom chat with rich features:\n  - 44px touch-friendly send button\n  - Quick emoji row for fast reactions\n  - Message grouping for consecutive messages\n  - Scroll-to-bottom button with unread count\n  - Typing indicators\n- Added table-scoped voice chat:\n  - Full WebRTC voice chat for table participants\n  - Mute/unmute, deafen, push-to-talk\n  - Speaking indicators and volume control\n- Improved mobile layout with responsive grid\n- Backend support for table voice and typing events:\n  - table_typing indicator events\n  - join/leave_table_voice events\n  - WebRTC signaling (offer/answer/ice)\n  - Voice participant tracking per table\n  - Cleanup on disconnect and leave\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
-    "commitHash": "a4e1a79",
-    "commitDate": "2025-12-14 19:24:42 -0500",
+    "commitMessage": "feat: Allow empty tables to persist for 20 minutes\n\n- Tables no longer deleted immediately when all players leave\n- Empty tables have a 20-minute grace period before deletion\n- Players can leave and come back to the same table\n- Timeout cancelled when someone joins the empty table\n- System messages inform when table becomes/stops being empty\n- First player to join empty table becomes the new host\n- Bots are removed when table becomes empty (cleaner state)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>",
+    "commitHash": "a92ba2d",
+    "commitDate": "2025-12-14 19:28:39 -0500",
     "branch": "main"
   },
   "futureTodos": [
