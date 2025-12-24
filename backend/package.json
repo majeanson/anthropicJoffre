@@ -3,6 +3,9 @@
   "version": "5.0.0",
   "description": "Backend server for trick card game",
   "main": "dist/index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "npm run build:backend",
