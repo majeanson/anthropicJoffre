@@ -1,3 +1,9 @@
+// Early startup log - before any imports that might fail
+console.log('🚀 Starting backend server...');
+console.log(`📍 Node version: ${process.version}`);
+console.log(`📍 Platform: ${process.platform}`);
+console.log(`📍 PORT env: ${process.env.PORT || 'not set (will use 3001)'}`);
+
 // Sentry must be imported and initialized first
 import * as Sentry from '@sentry/node';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
@@ -18,18 +24,23 @@ if (existsSync(localEnvPath)) {
 // Initialize Sentry for error tracking
 if (process.env.SENTRY_DSN) {
   console.log('🚨 Initializing Sentry for backend...');
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    environment: process.env.NODE_ENV || 'production',
-    integrations: [
-      nodeProfilingIntegration(),
-    ],
-    // Performance Monitoring
-    tracesSampleRate: 1.0, // Capture 100% of transactions in development
-    // Profiling
-    profilesSampleRate: 1.0, // Profile 100% of transactions
-  });
-  console.log('✅ Sentry initialized successfully for backend');
+  try {
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      environment: process.env.NODE_ENV || 'production',
+      integrations: [
+        // Profiling is optional - may fail on some platforms
+        ...(process.env.ENABLE_PROFILING === 'true' ? [nodeProfilingIntegration()] : []),
+      ],
+      // Performance Monitoring
+      tracesSampleRate: 0.1, // Sample 10% of transactions in production
+      // Profiling (only if enabled)
+      profilesSampleRate: process.env.ENABLE_PROFILING === 'true' ? 0.1 : 0,
+    });
+    console.log('✅ Sentry initialized successfully for backend');
+  } catch (error) {
+    console.error('⚠️ Sentry initialization failed:', error);
+  }
 } else {
   console.warn('⚠️ SENTRY_DSN not found. Backend error tracking disabled.');
 }
