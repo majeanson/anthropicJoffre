@@ -236,8 +236,13 @@ const refreshLimiter = rateLimit({
   // Use IP + cookie combination for keying (more specific than IP alone)
   keyGenerator: (req) => {
     const token = req.cookies.refresh_token || 'no-token';
-    return `${req.ip}-${token.substring(0, 16)}`;
-  }
+    // Use X-Forwarded-For header or socket address for IP (handles proxies)
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const ipStr = Array.isArray(ip) ? ip[0] : ip;
+    return `${ipStr}-${token.substring(0, 16)}`;
+  },
+  // Disable IPv6 key generator validation since we handle IP manually
+  validate: { xForwardedForHeader: false },
 });
 
 router.post('/refresh', refreshLimiter, async (req: Request, res: Response) => {
