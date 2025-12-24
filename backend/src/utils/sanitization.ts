@@ -5,8 +5,25 @@
  * XSS attacks, injection attacks, and ensure data integrity.
  */
 
-import DOMPurify from 'isomorphic-dompurify';
 import validator from 'validator';
+
+/**
+ * Strip HTML tags from text
+ * Simple server-side HTML sanitization without requiring DOM
+ */
+function stripHtmlTags(text: string): string {
+  // Remove HTML tags
+  let cleaned = text.replace(/<[^>]*>/g, '');
+  // Decode common HTML entities
+  cleaned = cleaned
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+  return cleaned;
+}
 
 /**
  * Sanitize player name
@@ -20,7 +37,7 @@ export function sanitizePlayerName(name: string): string {
   }
 
   // Remove HTML tags and escape special characters
-  const cleaned = DOMPurify.sanitize(name, { ALLOWED_TAGS: [] });
+  const cleaned = stripHtmlTags(name);
 
   // Escape any remaining HTML entities
   const escaped = validator.escape(cleaned);
@@ -51,11 +68,8 @@ export function sanitizeChatMessage(message: string): string {
     throw new Error('Chat message must be a non-empty string');
   }
 
-  // Remove dangerous HTML but allow safe tags (if needed)
-  const cleaned = DOMPurify.sanitize(message, {
-    ALLOWED_TAGS: [], // No HTML tags allowed in chat
-    ALLOWED_ATTR: [],
-  });
+  // Remove all HTML tags
+  const cleaned = stripHtmlTags(message);
 
   // Trim and limit length
   const trimmed = cleaned.trim().substring(0, 200);
@@ -155,7 +169,7 @@ export function sanitizeTextInput(text: string, maxLength: number = 500): string
     return '';
   }
 
-  const cleaned = DOMPurify.sanitize(text, { ALLOWED_TAGS: [] });
+  const cleaned = stripHtmlTags(text);
   return cleaned.trim().substring(0, maxLength);
 }
 
