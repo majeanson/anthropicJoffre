@@ -6,6 +6,9 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "overrides": {
+    "webidl-conversions": "7.0.0"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "npm run build:backend",
