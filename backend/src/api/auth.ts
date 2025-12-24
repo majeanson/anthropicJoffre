@@ -233,16 +233,8 @@ const refreshLimiter = rateLimit({
   message: 'Too many token refresh attempts, please try again later',
   standardHeaders: true,
   legacyHeaders: false,
-  // Use IP + cookie combination for keying (more specific than IP alone)
-  keyGenerator: (req) => {
-    const token = req.cookies.refresh_token || 'no-token';
-    // Use X-Forwarded-For header or socket address for IP (handles proxies)
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
-    const ipStr = Array.isArray(ip) ? ip[0] : ip;
-    return `${ipStr}-${token.substring(0, 16)}`;
-  },
-  // Disable IPv6 key generator validation since we handle IP manually
-  validate: { xForwardedForHeader: false },
+  // Simplified: just use default IP-based rate limiting
+  // The cookie-based keying caused IPv6 validation issues
 });
 
 router.post('/refresh', refreshLimiter, async (req: Request, res: Response) => {
