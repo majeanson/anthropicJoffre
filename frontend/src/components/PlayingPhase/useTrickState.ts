@@ -65,6 +65,9 @@ export function useTrickState({
   const lastSoundedTrickWinnerRef = useRef<string | null>(null);
 
   // Track trick collection state - when 4 cards are in trick, set collecting for 2 seconds
+  // Use a ref to track the timeout so we can let it complete even if dependencies change
+  const collectingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (currentTrick.length === 4) {
       // Find the winner (based on previousTrick when it gets updated, or infer from currentTrick)
@@ -75,13 +78,37 @@ export function useTrickState({
         setLastTrickWinnerName(winnerInfo.name);
       }
       setIsTrickCollecting(true);
-      const timeout = setTimeout(() => {
+
+      // Clear any existing timeout before starting a new one
+      if (collectingTimeoutRef.current) {
+        clearTimeout(collectingTimeoutRef.current);
+      }
+
+      collectingTimeoutRef.current = setTimeout(() => {
         setIsTrickCollecting(false);
         setLastTrickWinnerName(null);
+        collectingTimeoutRef.current = null;
       }, 2000);
-      return () => clearTimeout(timeout);
+
+      // Don't clear timeout on effect cleanup - let it complete
+      // This fixes the bug where backend clearing the trick would cancel the timeout
+      // before it had a chance to reset isTrickCollecting
+    } else if (currentTrick.length === 0 && !collectingTimeoutRef.current) {
+      // If trick is empty and no timeout is running, ensure collecting state is reset
+      // This handles edge cases like component remounting or missed state updates
+      setIsTrickCollecting(false);
+      setLastTrickWinnerName(null);
     }
   }, [currentTrick.length, currentTrickWinnerId, players]);
+
+  // Cleanup timeout on unmount only
+  useEffect(() => {
+    return () => {
+      if (collectingTimeoutRef.current) {
+        clearTimeout(collectingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Win/loss sound effects
   useEffect(() => {

@@ -74,12 +74,16 @@ function TurnIndicatorComponent({
     );
   }
 
+  // Safely get the current player's name with defensive checks
+  const currentTurnPlayer = players[currentPlayerIndex];
+  const currentTurnPlayerName = currentTurnPlayer?.name || 'Player';
+
   const turnMessage = isCurrentTurn
     ? 'Your Turn - Play a card!'
-    : `Waiting for ${players[currentPlayerIndex]?.name}...`;
+    : `Waiting for ${currentTurnPlayerName}...`;
   const compactMessage = isCurrentTurn
     ? 'Your Turn'
-    : `${players[currentPlayerIndex]?.name}'s turn`;
+    : `${currentTurnPlayerName}'s turn`;
 
   // Large centered indicator when no cards in trick
   if (currentTrickLength === 0) {

@@ -497,12 +497,14 @@ const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 // Voice chat participants (maps gameId -> (socketId -> VoiceParticipant))
 const voiceParticipants = new Map<string, Map<string, VoiceParticipant>>();
 
-// Swap request tracking (maps gameId-targetPlayerId to request data)
+// Swap request tracking (maps gameId-targetPlayerName to request data)
+// Uses player NAMES (stable) instead of socket IDs (volatile) for reliable lookups
 interface SwapRequest {
   gameId: string;
-  requesterId: string;
-  requesterName: string;
-  targetId: string;
+  requesterId: string; // Socket ID at request time (for backwards compat only)
+  requesterName: string; // STABLE identifier - use this for lookups
+  targetId: string; // Socket ID at request time (for backwards compat only)
+  targetName: string; // STABLE identifier - use this for lookups
   timeout: NodeJS.Timeout;
 }
 const pendingSwapRequests = new Map<string, SwapRequest>();
@@ -2209,9 +2211,22 @@ httpServer.listen(PORT, HOST, async () => {
     try {
       const staleGames = await cleanupStaleGames();
 
-      // Remove from memory if exists
+      // Remove from memory if exists, but ONLY if not actively being played
       for (const staleGame of staleGames) {
         if (games.has(staleGame.game_id)) {
+          const game = games.get(staleGame.game_id);
+
+          // SAFETY CHECK: Never delete games that are actively being played with connected players
+          if (game && (game.phase === 'betting' || game.phase === 'playing')) {
+            const hasConnectedHumans = game.players.some(
+              p => !p.isBot && !p.isEmpty && p.connectionStatus !== 'disconnected'
+            );
+            if (hasConnectedHumans) {
+              console.log(`[Cleanup] Skipping active game ${staleGame.game_id} - has connected players`);
+              continue; // Don't delete this game
+            }
+          }
+
           games.delete(staleGame.game_id);
           gameCreationTimes.delete(staleGame.game_id);
           previousGameStates.delete(staleGame.game_id);

@@ -142,22 +142,51 @@ export class MemoryManager {
       console.log(`[MemoryManager] Removed ${toDelete.length} old finished games`);
     }
 
-    // 3. Clean up inactive games (no activity for 15+ minutes)
+    // 3. Clean up TRULY inactive games - games with no connected players
+    // IMPORTANT: Never delete games that are actively being played!
     const now = Date.now();
     const inactiveGames: string[] = [];
 
     games.forEach((game, gameId) => {
-      const createdAt = gameCreationTimes.get(gameId) || now;
-      const finishedAt = gameFinishTimes.get(gameId);
-      const relevantTime = finishedAt || createdAt;
-      const age = now - relevantTime;
-
-      if (age > this.config.inactiveGameTimeout) {
-        inactiveGames.push(gameId);
+      // NEVER delete games that are actively being played (betting or playing phases)
+      if (game.phase === 'betting' || game.phase === 'playing') {
+        // Check if there are any connected human players
+        const hasConnectedHumans = game.players.some(
+          p => !p.isBot && !p.isEmpty && p.connectionStatus !== 'disconnected'
+        );
+        // Don't delete if any human is still connected
+        if (hasConnectedHumans) {
+          return;
+        }
       }
+
+      // For finished games (game_over) or games in team_selection with all empty seats,
+      // use time-based cleanup
+      const finishedAt = gameFinishTimes.get(gameId);
+      const createdAt = gameCreationTimes.get(gameId) || now;
+
+      // Only use time-based cleanup for:
+      // 1. Finished games (use finish time)
+      // 2. Games where ALL seats are empty (use creation time)
+      const allEmpty = game.players.every(p => p.isEmpty);
+
+      if (game.phase === 'game_over' && finishedAt) {
+        const age = now - finishedAt;
+        if (age > this.config.inactiveGameTimeout) {
+          inactiveGames.push(gameId);
+        }
+      } else if (allEmpty) {
+        const age = now - createdAt;
+        if (age > this.config.inactiveGameTimeout) {
+          inactiveGames.push(gameId);
+        }
+      }
+      // Active games with connected players are NEVER cleaned up by the memory manager
     });
 
     inactiveGames.forEach(gameId => {
+      const game = games.get(gameId);
+      console.log(`[MemoryManager] Removing inactive game ${gameId} (phase: ${game?.phase}, allEmpty: ${game?.players.every(p => p.isEmpty)})`);
       games.delete(gameId);
       gameFinishTimes.delete(gameId);
       gameCreationTimes.delete(gameId);

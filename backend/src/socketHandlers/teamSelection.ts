@@ -15,12 +15,14 @@ import { Logger } from 'winston';
 
 /**
  * Swap request tracking interface
+ * Uses player NAMES (stable) instead of socket IDs (volatile) for reliable lookups
  */
 export interface SwapRequest {
   gameId: string;
-  requesterId: string;
-  requesterName: string;
-  targetId: string;
+  requesterId: string; // Socket ID at request time (for backwards compat only)
+  requesterName: string; // STABLE identifier - use this for lookups
+  targetId: string; // Socket ID at request time (for backwards compat only)
+  targetName: string; // STABLE identifier - use this for lookups
   timeout: NodeJS.Timeout;
 }
 
@@ -182,22 +184,30 @@ export function registerTeamSelectionHandlers(socket: Socket, deps: TeamSelectio
 
     // Create timeout for auto-rejection (30 seconds)
     const timeout = setTimeout(() => {
-      const requestKey = `${gameId}-${targetPlayerId}`;
+      const requestKey = `${gameId}-${target.name}`;
       pendingSwapRequests.delete(requestKey);
 
-      // Notify requester that request expired
-      io.to(socket.id).emit('swap_rejected', {
-        message: `${target.name} didn't respond to your swap request`
-      });
+      // Find requester's CURRENT socket ID (may have changed due to reconnection)
+      const currentGame = games.get(gameId);
+      const currentRequester = currentGame?.players.find(p => p.name === requester.name);
+
+      if (currentRequester) {
+        // Notify requester that request expired using their current socket ID
+        io.to(currentRequester.id).emit('swap_rejected', {
+          message: `${target.name} didn't respond to your swap request`
+        });
+      }
     }, 30000);
 
-    // Store pending request
-    const requestKey = `${gameId}-${targetPlayerId}`;
+    // Store pending request using target NAME for stable lookups
+    // Key by target name instead of ID for stability across reconnections
+    const requestKey = `${gameId}-${target.name}`;
     pendingSwapRequests.set(requestKey, {
       gameId,
       requesterId: socket.id,
       requesterName: requester.name,
       targetId: targetPlayerId,
+      targetName: target.name,
       timeout
     });
 
@@ -230,11 +240,11 @@ export function registerTeamSelectionHandlers(socket: Socket, deps: TeamSelectio
       return;
     }
 
-    // Find and validate pending request - use target's player ID
-    const requestKey = `${gameId}-${target.id}`;
+    // Find pending request by TARGET NAME (stable) instead of ID (volatile)
+    const requestKey = `${gameId}-${target.name}`;
     const swapRequest = pendingSwapRequests.get(requestKey);
 
-    if (!swapRequest || swapRequest.requesterId !== requesterId) {
+    if (!swapRequest) {
       socket.emit('error', { message: 'No pending swap request found' });
       return;
     }
@@ -243,19 +253,21 @@ export function registerTeamSelectionHandlers(socket: Socket, deps: TeamSelectio
     clearTimeout(swapRequest.timeout);
     pendingSwapRequests.delete(requestKey);
 
-    const requester = game.players.find(p => p.id === requesterId);
+    // Find requester by NAME (stable) instead of socket ID (volatile)
+    // This fixes the bug where requester's socket reconnecting would break the swap
+    const requester = game.players.find(p => p.name === swapRequest.requesterName);
 
     if (!requester) {
-      socket.emit('error', { message: 'Requester not found' });
+      socket.emit('error', { message: 'Requester not found - they may have left the game' });
       return;
     }
 
     if (accepted) {
-      // Execute the swap
-      applyPositionSwap(game, requesterId, target.id);
+      // Execute the swap using current player IDs (not the stale IDs from request time)
+      applyPositionSwap(game, requester.id, target.id);
 
-      // Notify both players
-      io.to(requesterId).emit('swap_accepted', {
+      // Notify both players using CURRENT socket IDs (not stale ones from request time)
+      io.to(requester.id).emit('swap_accepted', {
         message: `${target.name} accepted your swap request`
       });
       socket.emit('swap_accepted', {
@@ -265,8 +277,8 @@ export function registerTeamSelectionHandlers(socket: Socket, deps: TeamSelectio
       // Update all players with new game state (force full update to ensure hands are synced)
       emitGameUpdate(gameId, game, true);
     } else {
-      // Notify requester of rejection
-      io.to(requesterId).emit('swap_rejected', {
+      // Notify requester of rejection using CURRENT socket ID
+      io.to(requester.id).emit('swap_rejected', {
         message: `${target.name} rejected your swap request`
       });
     }
